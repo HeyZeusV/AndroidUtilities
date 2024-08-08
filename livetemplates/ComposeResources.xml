@@ -1,0 +1,66 @@
+<templateSet group="ComposeResources">
+  <template name="pRes" value="com.heyzeusv.androidutilities.compose.util.pRes(R.drawable.$NAME$)" description="Create a Painter from drawable resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="sRes" value="com.heyzeusv.androidutilities.compose.util.sRes(R.string.$NAME$)" description="Load a string resource with formatting" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="dRes" value="com.heyzeusv.androidutilities.compose.util.dRes(R.dimen.$NAME$)" description="Load a dimension resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="iRes" value="com.heyzeusv.androidutilities.compose.util.iRes(R.integer.$NAME$)" description="Load an integer resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="saRes" value="com.heyzeusv.androidutilities.compose.util.saRes(R.array.$NAME$)" description="Load a string array resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="psRes" value="com.heyzeusv.androidutilities.compose.util.psRes(R.plurals.$NAME$, $COUNT$)" description="Load a purls resource with provided format arguments" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="COUNT" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="cRes" value="com.heyzeusv.androidutilities.compose.util.cRes(R.color.$NAME$)" description="Load a color resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="avRes" value="com.heyzeusv.androidutilities.compose.util.avRes(R.drawble.$NAME$)" description="Load an AnimatedImageVector from drawable resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+  <template name="iaRes" value="com.heyzeusv.androidutilities.compose.util.iaRes(R.array.$NAME$)" description="Load an array of interger resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
+</templateSet>
