@@ -31,7 +31,11 @@ import androidx.compose.ui.unit.Dp
  *  I highly recommend pairing these with Live Templates and having "Add unambiguous imports on the
  *  fly" turned on. Setting is found File -> Settings -> Editor -> General -> Auto Import.
  *
- *  TODO: Add link to xml containing LiveTemplates
+ *  ComposeResources xml and zip files can be found under /livetemplates folder. If you know
+ *  location of your Android Studio configuration directory, you can copy ComposeResources.xml
+ *  directly into your templates folder. Else you can import ComposeResources.zip by File ->
+ *  Manage IDE Settings -> Import Settings... (ComposeResources.zip does not touch any settings,
+ *  only adds live templates)
  */
 /**
  *  Load a string resource with formatting.
