@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="dRes_example">50.dp</dimen>
+    <dimen name="dRes_example">100.dp</dimen>
     <integer name="iRes_example">10</integer>
     <integer-array name="iaRes_example">
         <item>10</item>
