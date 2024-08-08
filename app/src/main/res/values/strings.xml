@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Android Utilities Library</string>
+    <string name="sRes_example">This string is loaded using sRes()</string>
+    <string name="sRes_args_example">This string is loaded using sRes() %1$s %2$s</string>
+    <string-array name="saRes_example">
+        <item>These</item>
+        <item>strings</item>
+        <item>are</item>
+        <item>loaded</item>
+        <item>using</item>
+        <item>saRes()</item>
+    </string-array>
+    <plurals name="psRes_example">
+        <item quantity="one">This string is loaded using psRes() %1$s %2$s</item>
+        <item quantity="other">This string is loaded using psRes() %1$s %2$s</item>
+    </plurals>
 </resources>
