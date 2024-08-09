@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dRes_example">100.dp</dimen>
+    <integer name="iRes_example">10</integer>
+    <integer-array name="iaRes_example">
+        <item>10</item>
+        <item>50</item>
+        <item>100</item>
+    </integer-array>
+</resources>
