@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/HeyZeusV/AndroidUtilities.svg)](https://jitpack.io/#HeyZeusV/AndroidUtilities)
+
 # Android Utilities
 
 A collection of Android utilities I find myself reusing across my apps. 
@@ -18,3 +20,32 @@ Or you can import [ComposeResources.zip][3] using File -> Manage IDE Settings ->
 [1]: /androidutilities/src/main/java/com/heyzeusv/androidutilities/compose/util/ComposeResources.kt
 [2]: /livetemplates/ComposeResources.xml
 [3]: /livetemplates/ComposeResources.zip
+
+## Installation
+
+**Step 1.** Add JitPack repository to root build.gradle
+```kotlin
+allprojects {
+    repositories {
+        // ...
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
+or to settings.gradle (depending on your configuration)
+```kotlin
+dependencyResolutionManagement {
+    // ...
+    repositories {
+        // ...
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
+
+**Step 2.** Add dependency to your module's build.gradle
+```kotlin
+dependencies {
+         implementation ("com.github.HeyZeusV:AndroidUtilities:$androidUtilitiesVersion")
+ }
+```
