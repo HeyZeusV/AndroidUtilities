@@ -63,4 +63,11 @@
       <option name="ANDROID_KOTLIN_COMMENT" value="false" />
     </context>
   </template>
+  <template name="bRes" value="com.heyzeusv.androidutilities.compose.util.bRes(R.bool.$NAME$)" description="Load a boolean resource" toReformat="false" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ANDROID" value="true" />
+      <option name="ANDROID_KOTLIN_COMMENT" value="false" />
+    </context>
+  </template>
 </templateSet>
