@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Android Utilities Library"
+rootProject.name = "Android Utilities"
 include(":app")
 include(":androidutilities")
