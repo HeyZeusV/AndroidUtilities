@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.aboutlibraries.plugin)
 }
 
 android {
@@ -52,7 +53,7 @@ android {
 dependencies {
     implementation(project(":androidutilities"))
 
-
+    implementation(libs.aboutlibraries.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -69,4 +70,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+aboutLibraries {
+    // Enable fetching of "remote" licenses.  Uses the API of supported source hosts
+    // See https://github.com/mikepenz/AboutLibraries#special-repository-support
+    fetchRemoteLicense = true
+    // Enable pretty printing for the generated JSON file
+    prettyPrint = false
 }
