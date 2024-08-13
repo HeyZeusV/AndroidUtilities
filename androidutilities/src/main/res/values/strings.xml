@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wtf_is_this">Wtf is this</string>
+    <string name="library_description_empty">No description was provided…</string>
+    <string name="library_version_empty">No version was provided…</string>
+    <string name="library_license_empty">No license was provided…</string>
+</resources>

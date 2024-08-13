@@ -63,6 +63,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.animation.graphics)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.material3)
 
     // AboutLibraries
     implementation(libs.aboutlibraries.core)
