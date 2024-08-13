@@ -77,5 +77,5 @@ aboutLibraries {
     // See https://github.com/mikepenz/AboutLibraries#special-repository-support
     fetchRemoteLicense = true
     // Enable pretty printing for the generated JSON file
-    prettyPrint = false
+    prettyPrint = true
 }
