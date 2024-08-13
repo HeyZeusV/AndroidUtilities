@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
@@ -76,6 +77,11 @@ fun LibraryItem(
                     else -> LibraryInfo(body = licenseContent, footer = licenseName)
                 }
             }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                pageCount = 2,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
     }
 }
