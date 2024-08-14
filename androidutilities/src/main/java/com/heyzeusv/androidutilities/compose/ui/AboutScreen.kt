@@ -13,9 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -54,16 +52,12 @@ fun AboutScreen(
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(libraries.first) {
-                LibraryItem(library = it)
-            }
-        }
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(libraries.second) {
-                LibraryItem(library = it)
-            }
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item { Text(text = "Third-Party Libraries") }
+        items(libraries.second) { LibraryItem(library = it) }
+        if (separateByParty) {
+            item { Text(text = "First-Party Libraries") }
+            items(libraries.first) { LibraryItem(library = it) }
         }
     }
 }
@@ -156,8 +150,7 @@ internal fun LibraryInfo(
             text = body,
             modifier = Modifier
                 .padding(padding.bodyPadding)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                .fillMaxWidth(),
             color = colors.contentColor,
             maxLines = 5,
             minLines = 5,
