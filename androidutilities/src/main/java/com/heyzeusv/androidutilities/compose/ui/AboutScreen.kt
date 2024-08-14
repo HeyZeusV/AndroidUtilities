@@ -116,24 +116,16 @@ fun LibraryItem(
                 style = textStyles.developerStyle
             )
             HorizontalPager(state = pagerState) { page ->
-                when (page) {
-                    0 -> LibraryInfo(
-                        body = description,
-                        footer = version,
-                        colors = colors,
-                        padding = padding,
-                        dimensions = dimensions,
-                        textStyles = textStyles,
-                    )
-                    else -> LibraryInfo(
-                        body = licenseContent,
-                        footer = licenseName,
-                        colors = colors,
-                        padding = padding,
-                        dimensions = dimensions,
-                        textStyles = textStyles,
-                    )
-                }
+                val body: String = if (page == 0) description else licenseContent
+                val footer: String = if (page == 0) version else licenseName
+                LibraryInfo(
+                    body = body,
+                    footer = footer,
+                    colors = colors,
+                    padding = padding,
+                    dimensions = dimensions,
+                    textStyles = textStyles,
+                )
             }
             HorizontalPagerIndicator(
                 pagerState = pagerState,
