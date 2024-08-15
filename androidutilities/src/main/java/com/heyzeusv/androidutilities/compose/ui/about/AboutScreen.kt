@@ -1,11 +1,9 @@
-package com.heyzeusv.androidutilities.compose.ui
+package com.heyzeusv.androidutilities.compose.ui.about
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,26 +11,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.R
+import com.heyzeusv.androidutilities.compose.ui.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.Libs
@@ -49,26 +39,55 @@ private val firstPartyIds = listOf(ANDROID, JETBRAINS, GOOGLE)
 @Composable
 fun AboutScreen(
     separateByParty: Boolean = true,
+    colors: AboutColors = AboutDefaults.aboutColors(),
+    padding: AboutPadding = AboutDefaults.aboutPadding(),
+    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item { Text(text = "Third-Party Libraries") }
-        items(libraries.second) { LibraryItem(library = it) }
+        item {
+            Text(
+                text = sRes(if (separateByParty) R.string.about_third_party_header else R.string.about_all_header),
+                color = colors.libraryHeaderColor,
+                style = textStyles.libraryHeaderStyle,
+            )
+        }
+        items(libraries.second) {
+            LibraryItem(
+                library = it,
+                colors = colors.libraryColors,
+                padding = padding.libraryPadding,
+                dimensions = dimensions.libraryDimensions,
+                textStyles = textStyles.libraryStyles,
+            )
+        }
         if (separateByParty) {
-            item { Text(text = "First-Party Libraries") }
-            items(libraries.first) { LibraryItem(library = it) }
+            item {
+                Text(
+                    text = sRes(R.string.about_first_party_header),
+                    color = colors.libraryHeaderColor,
+                    style = textStyles.libraryHeaderStyle,
+                )
+            }
+            items(libraries.first) {
+                LibraryItem(
+                    library = it,
+                    colors = colors.libraryColors,
+                    padding = padding.libraryPadding,
+                    dimensions = dimensions.libraryDimensions,
+                    textStyles = textStyles.libraryStyles,
+                )
+            }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryItem(
     library: Library,
-    shape: Shape = LibraryDefaults.Shape,
     colors: LibraryColors = LibraryDefaults.libraryColors(),
-    contentPadding: PaddingValues = LibraryDefaults.ContentPadding,
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
     dimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
     textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
@@ -83,12 +102,12 @@ fun LibraryItem(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = shape,
+        shape = dimensions.shape,
         color = colors.backgroundColor,
         border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
     ) {
         Column(
-            modifier = Modifier.padding(contentPadding),
+            modifier = Modifier.padding(padding.contentPadding),
             verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
         ) {
             Text(
@@ -183,136 +202,9 @@ private fun produceLibraryState(separateByParty: Boolean): State<Pair<List<Libra
                     firstPartyIds.any { library.uniqueId.contains(it) }
                 }
             } else {
-                Pair(libs.libraries, listOf())
+                Pair(listOf(), libs.libraries)
             }
         }
         
     }
 }
-
-object LibraryDefaults {
-    private val BorderWidth = 2.dp
-    private val DividerWidth = 2.dp
-    private val CornerRadius = 12.dp
-    private val ItemPadding = 12.dp
-    private val ItemSpacing = 8.dp
-
-    val Shape = RoundedCornerShape(CornerRadius)
-    val ContentPadding = PaddingValues(ItemPadding)
-
-    @Composable
-    fun libraryColors(
-        borderColor: Color = MaterialTheme.colorScheme.onSurface,
-        backgroundColor: Color = MaterialTheme.colorScheme.surface,
-        contentColor: Color = MaterialTheme.colorScheme.onSurface,
-        dividerColor: Color = MaterialTheme.colorScheme.onSurface,
-    ): LibraryColors = DefaultLibraryColors(
-        borderColor = borderColor,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-        dividerColor = dividerColor
-    )
-
-    @Composable
-    fun libraryPadding(
-        namePadding: PaddingValues = PaddingValues(),
-        developerPadding: PaddingValues = PaddingValues(),
-        bodyPadding: PaddingValues = PaddingValues(),
-        footerPadding: PaddingValues = PaddingValues(),
-        pageIndicatorPadding: PaddingValues = PaddingValues(),
-    ): LibraryPadding = DefaultLibraryPadding(
-        namePadding = namePadding,
-        developerPadding = developerPadding,
-        bodyPadding = bodyPadding,
-        footerPadding = footerPadding,
-        pageIndicatorPadding = pageIndicatorPadding,
-    )
-
-    @Composable
-    fun libraryDimensions(
-        borderWidth: Dp = BorderWidth,
-        itemSpacing: Dp = ItemSpacing,
-        dividerWidth: Dp = DividerWidth,
-    ): LibraryDimensions = DefaultLibraryDimensions(
-        borderWidth = borderWidth,
-        itemSpacing = itemSpacing,
-        dividerWidth = dividerWidth,
-    )
-
-    @Composable
-    fun libraryTextStyles(
-        nameStyle: TextStyle = MaterialTheme.typography.headlineSmall,
-        developerStyle: TextStyle = MaterialTheme.typography.titleMedium,
-        bodyStyle: TextStyle = MaterialTheme.typography.bodyMedium,
-        footerStyle: TextStyle = MaterialTheme.typography.titleMedium,
-    ): LibraryTextStyles = DefaultLibraryTextStyles(
-        nameStyle = nameStyle,
-        developerStyle = developerStyle,
-        bodyStyle = bodyStyle,
-        footerStyle = footerStyle,
-    )
-}
-
-@Stable
-interface LibraryColors {
-    val borderColor: Color
-    val backgroundColor: Color
-    val contentColor: Color
-    val dividerColor: Color
-}
-
-@Immutable
-private data class DefaultLibraryColors(
-    override val borderColor: Color,
-    override val backgroundColor: Color,
-    override val contentColor: Color,
-    override val dividerColor: Color
-) : LibraryColors
-
-@Stable
-interface LibraryPadding {
-    val namePadding: PaddingValues
-    val developerPadding: PaddingValues
-    val bodyPadding: PaddingValues
-    val footerPadding: PaddingValues
-    val pageIndicatorPadding: PaddingValues
-}
-
-@Immutable
-private data class DefaultLibraryPadding(
-    override val namePadding: PaddingValues,
-    override val developerPadding: PaddingValues,
-    override val bodyPadding: PaddingValues,
-    override val footerPadding: PaddingValues,
-    override val pageIndicatorPadding: PaddingValues,
-) : LibraryPadding
-
-@Stable
-interface LibraryDimensions {
-    val borderWidth: Dp
-    val itemSpacing: Dp
-    val dividerWidth: Dp
-}
-
-@Immutable
-private data class DefaultLibraryDimensions(
-    override val borderWidth: Dp,
-    override val itemSpacing: Dp,
-    override val dividerWidth: Dp,
-) : LibraryDimensions
-
-@Stable
-interface LibraryTextStyles {
-    val nameStyle: TextStyle
-    val developerStyle: TextStyle
-    val bodyStyle: TextStyle
-    val footerStyle: TextStyle
-}
-
-@Immutable
-private data class DefaultLibraryTextStyles(
-    override val nameStyle: TextStyle,
-    override val developerStyle: TextStyle,
-    override val bodyStyle: TextStyle,
-    override val footerStyle: TextStyle,
-) : LibraryTextStyles

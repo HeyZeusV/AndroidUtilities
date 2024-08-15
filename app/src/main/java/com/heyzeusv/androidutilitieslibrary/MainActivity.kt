@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.heyzeusv.androidutilities.compose.ui.AboutScreen
+import com.heyzeusv.androidutilities.compose.ui.about.AboutScreen
 import com.heyzeusv.androidutilities.compose.util.avRes
 import com.heyzeusv.androidutilities.compose.util.bRes
 import com.heyzeusv.androidutilities.compose.util.cRes
