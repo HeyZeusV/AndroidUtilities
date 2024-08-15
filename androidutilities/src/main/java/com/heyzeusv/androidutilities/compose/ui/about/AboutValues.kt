@@ -6,8 +6,13 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 object AboutDefaults {
+    private val LibraryItemSpacing = 8.dp
 
     @Composable
     fun aboutColors(
@@ -27,14 +32,19 @@ object AboutDefaults {
 
     @Composable
     fun aboutDimensions(
+        libraryItemSpacing: Dp = LibraryItemSpacing,
         libraryDimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
     ): AboutDimensions = DefaultAboutDimensions(
         libraryDimensions = libraryDimensions,
+        libraryItemSpacing = libraryItemSpacing,
     )
 
     @Composable
     fun aboutTextStyles(
-        libraryHeaderStyle: TextStyle = MaterialTheme.typography.headlineLarge,
+        libraryHeaderStyle: TextStyle = MaterialTheme.typography.headlineLarge.copy(
+            textDecoration = TextDecoration.Underline,
+            textAlign = TextAlign.Center
+        ),
         libraryStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
     ): AboutTextStyles = DefaultAboutTextStyles(
         libraryHeaderStyle = libraryHeaderStyle,
@@ -66,12 +76,14 @@ private data class DefaultAboutPadding(
 
 @Stable
 interface AboutDimensions {
+    val libraryItemSpacing: Dp
     val libraryDimensions: LibraryDimensions
 }
 
 @Immutable
 private data class DefaultAboutDimensions(
-    override val libraryDimensions: LibraryDimensions
+    override val libraryItemSpacing: Dp,
+    override val libraryDimensions: LibraryDimensions,
 ) : AboutDimensions
 
 @Stable

@@ -46,10 +46,14 @@ fun AboutScreen(
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(dimensions.libraryItemSpacing)
+    ) {
         item {
             Text(
                 text = sRes(if (separateByParty) R.string.about_third_party_header else R.string.about_all_header),
+                modifier = Modifier.fillMaxWidth(),
                 color = colors.libraryHeaderColor,
                 style = textStyles.libraryHeaderStyle,
             )
@@ -67,6 +71,7 @@ fun AboutScreen(
             item {
                 Text(
                     text = sRes(R.string.about_first_party_header),
+                    modifier = Modifier.fillMaxWidth(),
                     color = colors.libraryHeaderColor,
                     style = textStyles.libraryHeaderStyle,
                 )
