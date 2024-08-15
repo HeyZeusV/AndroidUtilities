@@ -44,7 +44,20 @@ val fakeLicense = License(
     hash = "fake hash"
 )
 
-val fakeLibrary = Library(
+val fakeShortLibrary = Library(
+    uniqueId = "com.google.fakeLibrary",
+    artifactVersion = "1.0.0",
+    name = "Fake Google Library",
+    description = "This is a fake first party library used in previews.",
+    website = "www.fake.com",
+    developers = persistentListOf(fakeDeveloper),
+    organization = fakeOrganization,
+    scm = null,
+    licenses = persistentSetOf(fakeLicense),
+    funding = persistentSetOf(),
+)
+
+val fakeLongLibrary = Library(
     uniqueId = "com.google.fakeLibrary",
     artifactVersion = "1.0.0",
     name = "Fake Google Library Fake Google Library Fake Google Library",

@@ -46,19 +46,59 @@ fun AboutScreen(
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
+    AboutScreen(
+        libraries = libraries,
+        colors = colors,
+        padding = padding,
+        dimensions = dimensions,
+        textStyles = textStyles,
+    )
+}
+
+@Composable
+fun AboutScreen(
+    libraries: Pair<List<Library>, List<Library>>,
+    colors: AboutColors = AboutDefaults.aboutColors(),
+    padding: AboutPadding = AboutDefaults.aboutPadding(),
+    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        LibraryList(
+            libraries = libraries,
+            colors = colors,
+            padding = padding,
+            dimensions = dimensions,
+            textStyles = textStyles,
+        )
+    }
+}
+
+@Composable
+internal fun LibraryList(
+    libraries: Pair<List<Library>, List<Library>>,
+    colors: AboutColors = AboutDefaults.aboutColors(),
+    padding: AboutPadding = AboutDefaults.aboutPadding(),
+    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(dimensions.libraryItemSpacing)
     ) {
         item {
             Text(
-                text = sRes(if (separateByParty) R.string.about_third_party_header else R.string.about_all_header),
+                text = if (libraries.second.isNotEmpty()) {
+                    sRes(R.string.about_third_party_header)
+                } else {
+                    sRes(R.string.about_all_header)
+                },
                 modifier = Modifier.fillMaxWidth(),
                 color = colors.libraryHeaderColor,
                 style = textStyles.libraryHeaderStyle,
             )
         }
-        items(libraries.second) {
+        items(libraries.first) {
             LibraryItem(
                 library = it,
                 colors = colors.libraryColors,
@@ -67,7 +107,7 @@ fun AboutScreen(
                 textStyles = textStyles.libraryStyles,
             )
         }
-        if (separateByParty) {
+        if (libraries.second.isNotEmpty()) {
             item {
                 Text(
                     text = sRes(R.string.about_first_party_header),
@@ -76,7 +116,7 @@ fun AboutScreen(
                     style = textStyles.libraryHeaderStyle,
                 )
             }
-            items(libraries.first) {
+            items(libraries.second) {
                 LibraryItem(
                     library = it,
                     colors = colors.libraryColors,
@@ -90,7 +130,7 @@ fun AboutScreen(
 }
 
 @Composable
-fun LibraryItem(
+internal fun LibraryItem(
     library: Library,
     colors: LibraryColors = LibraryDefaults.libraryColors(),
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
@@ -177,7 +217,6 @@ internal fun LibraryInfo(
                 .fillMaxWidth(),
             color = colors.contentColor,
             maxLines = 5,
-            minLines = 5,
             style = textStyles.bodyStyle,
         )
         HorizontalDivider(
@@ -204,7 +243,7 @@ private fun produceLibraryState(separateByParty: Boolean): State<Pair<List<Libra
             val libs = Libs.Builder().withContext(context).build()
             if (separateByParty) {
                 libs.libraries.partition { library ->
-                    firstPartyIds.any { library.uniqueId.contains(it) }
+                    !firstPartyIds.any { library.uniqueId.contains(it) }
                 }
             } else {
                 Pair(listOf(), libs.libraries)
