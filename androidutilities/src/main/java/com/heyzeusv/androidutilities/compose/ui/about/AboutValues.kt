@@ -83,7 +83,7 @@ object AboutDefaults {
     fun aboutTextStyles(
         titleStyle: TextStyle = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
         versionStyle: TextStyle = MaterialTheme.typography.titleMedium,
-        infoStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+        infoStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
         libraryHeaderStyle: TextStyle = MaterialTheme.typography.headlineLarge.copy(
             textDecoration = TextDecoration.Underline,
             textAlign = TextAlign.Center

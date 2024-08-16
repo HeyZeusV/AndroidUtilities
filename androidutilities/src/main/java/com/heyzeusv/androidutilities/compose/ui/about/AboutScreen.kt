@@ -25,7 +25,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
@@ -149,7 +148,7 @@ internal fun AppInfo(
                 text = info[pagerState.currentPage],
                 modifier = Modifier
                     .padding(padding.infoPadding)
-                    .height(100.dp)
+                    .height(dimensions.infoHeight)
                     .verticalScroll(rememberScrollState()),
                 color = colors.infoColor,
                 style = textStyles.infoStyle,
