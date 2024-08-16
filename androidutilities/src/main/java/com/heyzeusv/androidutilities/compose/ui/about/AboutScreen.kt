@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,9 +25,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
+import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
@@ -38,6 +44,12 @@ private val firstPartyIds = listOf(ANDROID, JETBRAINS, GOOGLE)
 
 @Composable
 fun AboutScreen(
+    icon: @Composable () -> Unit = {
+        Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
+    },
+    title: String = "App name",
+    version: String = "1.0.0",
+    info: List<String> = listOf(),
     separateByParty: Boolean = true,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
@@ -47,6 +59,10 @@ fun AboutScreen(
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
     AboutScreen(
+        icon = icon,
+        title = title,
+        version = version,
+        info = info,
         libraries = libraries,
         colors = colors,
         padding = padding,
@@ -57,19 +73,104 @@ fun AboutScreen(
 
 @Composable
 fun AboutScreen(
+    icon: @Composable () -> Unit = {
+        Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
+    },
+    title: String = "App name",
+    version: String = "1.0.0",
+    info: List<String> = listOf(),
     libraries: Pair<List<Library>, List<Library>>,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
     textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .padding(padding.contentPadding)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+    ) {
+        AppInfo(
+            icon = icon,
+            title = title,
+            version = version,
+            info = info,
+            colors = colors,
+            padding = padding,
+            dimensions = dimensions,
+            textStyles = textStyles,
+        )
         LibraryList(
             libraries = libraries,
             colors = colors,
             padding = padding,
             dimensions = dimensions,
             textStyles = textStyles,
+        )
+    }
+}
+
+@Composable
+internal fun AppInfo(
+    icon: @Composable () -> Unit = {
+        Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
+    },
+    title: String = "App name",
+    version: String = "1.0.0",
+    info: List<String> = listOf(),
+    colors: AboutColors = AboutDefaults.aboutColors(),
+    padding: AboutPadding = AboutDefaults.aboutPadding(),
+    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+) {
+    val pagerState = rememberPagerState(pageCount = { info.size })
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensions.appInfoItemSpacing),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        icon()
+        Text(
+            text = title,
+            modifier = Modifier.padding(padding.titlePadding),
+            color = colors.titleColor,
+            style = textStyles.titleStyle,
+        )
+        Text(
+            text = version,
+            modifier = Modifier.padding(padding.versionPadding),
+            color = colors.versionColor,
+            style = textStyles.versionStyle,
+        )
+        HorizontalPager(state = pagerState) {
+            Text(
+                text = info[pagerState.currentPage],
+                modifier = Modifier
+                    .padding(padding.infoPadding)
+                    .height(100.dp)
+                    .verticalScroll(rememberScrollState()),
+                color = colors.infoColor,
+                style = textStyles.infoStyle,
+            )
+        }
+        if (info.size > 1) {
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                pageCount = info.size,
+                modifier = Modifier.padding(padding.pageIndicatorPadding),
+                activeColor = colors.pagerIndicatorColors.activeColor,
+                inactiveColor = colors.pagerIndicatorColors.inactiveColor,
+                indicatorWidth = dimensions.pagerIndicatorDimensions.indicatorWidth,
+                indicatorHeight = dimensions.pagerIndicatorDimensions.indicatorHeight,
+                indicatorSpacing = dimensions.pagerIndicatorDimensions.indicatorSpacing,
+                indicatorShape = dimensions.pagerIndicatorDimensions.indicatorShape,
+            )
+        }
+        HorizontalDivider(
+            thickness = dimensions.dividerWidth,
+            color = colors.dividerColor,
         )
     }
 }
@@ -190,7 +291,7 @@ internal fun LibraryItem(
                 pageCount = 2,
                 modifier = Modifier
                     .padding(padding.pageIndicatorPadding)
-                    .align(Alignment.CenterHorizontally)
+                    .align(Alignment.CenterHorizontally),
             )
         }
     }

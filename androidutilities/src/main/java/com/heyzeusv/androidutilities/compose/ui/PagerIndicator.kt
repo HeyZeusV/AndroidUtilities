@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -34,18 +34,18 @@ fun HorizontalPagerIndicator(
     inactiveColor: Color = activeColor.copy(alpha = 0.38f),
     indicatorWidth: Dp = 8.dp,
     indicatorHeight: Dp = indicatorWidth,
-    spacing: Dp = indicatorWidth,
-    indicatorShape: RoundedCornerShape = CircleShape,
+    indicatorSpacing: Dp = indicatorWidth,
+    indicatorShape: Shape = CircleShape,
 ) {
     val indicatorWidthPx = LocalDensity.current.run { indicatorWidth.roundToPx() }
-    val spacingPx = LocalDensity.current.run { spacing.roundToPx() }
+    val spacingPx = LocalDensity.current.run { indicatorSpacing.roundToPx() }
 
     Box(
         modifier = modifier,
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing),
+            horizontalArrangement = Arrangement.spacedBy(indicatorSpacing),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val indicatorModifier = Modifier
