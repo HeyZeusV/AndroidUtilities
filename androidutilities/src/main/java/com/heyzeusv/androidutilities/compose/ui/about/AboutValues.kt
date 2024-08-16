@@ -20,7 +20,7 @@ object AboutDefaults {
     private val ItemSpacing = 12.dp
     private val AppInfoItemSpacing = 8.dp
     private val InfoHeight = 100.dp
-    private val DividerWidth = 2.dp
+    private val DividerThickness = 2.dp
     private val ItemPadding = 16.dp
     private val LibraryItemSpacing = 8.dp
 
@@ -66,7 +66,7 @@ object AboutDefaults {
         appInfoItemSpacing: Dp = AppInfoItemSpacing,
         infoHeight: Dp = InfoHeight,
         pagerIndicatorDimensions: PagerIndicatorDimensions = PagerIndicatorDefaults.pagerIndicatorDimensions(),
-        dividerWidth: Dp = DividerWidth,
+        dividerThickness: Dp = DividerThickness,
         libraryItemSpacing: Dp = LibraryItemSpacing,
         libraryDimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
     ): AboutDimensions = DefaultAboutDimensions(
@@ -74,7 +74,7 @@ object AboutDefaults {
         appInfoItemSpacing = appInfoItemSpacing,
         infoHeight = infoHeight,
         pagerIndicatorDimensions = pagerIndicatorDimensions,
-        dividerWidth = dividerWidth,
+        dividerThickness = dividerThickness,
         libraryDimensions = libraryDimensions,
         libraryItemSpacing = libraryItemSpacing,
     )
@@ -146,7 +146,7 @@ interface AboutDimensions {
     val appInfoItemSpacing: Dp
     val infoHeight: Dp
     val pagerIndicatorDimensions: PagerIndicatorDimensions
-    val dividerWidth: Dp
+    val dividerThickness: Dp
     val libraryItemSpacing: Dp
     val libraryDimensions: LibraryDimensions
 }
@@ -157,7 +157,7 @@ private data class DefaultAboutDimensions(
     override val appInfoItemSpacing: Dp,
     override val infoHeight: Dp,
     override val pagerIndicatorDimensions: PagerIndicatorDimensions,
-    override val dividerWidth: Dp,
+    override val dividerThickness: Dp,
     override val libraryItemSpacing: Dp,
     override val libraryDimensions: LibraryDimensions,
 ) : AboutDimensions

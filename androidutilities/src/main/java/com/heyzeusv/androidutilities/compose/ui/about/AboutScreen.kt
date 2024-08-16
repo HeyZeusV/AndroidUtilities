@@ -169,7 +169,7 @@ internal fun AppInfo(
             )
         }
         HorizontalDivider(
-            thickness = dimensions.dividerWidth,
+            thickness = dimensions.dividerThickness,
             color = colors.dividerColor,
         )
     }
@@ -308,7 +308,7 @@ internal fun LibraryInfo(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)) {
         HorizontalDivider(
-            thickness = dimensions.dividerWidth,
+            thickness = dimensions.dividerThickness,
             color = colors.dividerColor,
         )
         Text(
@@ -321,7 +321,7 @@ internal fun LibraryInfo(
             style = textStyles.bodyStyle,
         )
         HorizontalDivider(
-            thickness = dimensions.dividerWidth,
+            thickness = dimensions.dividerThickness,
             color = colors.dividerColor,
         )
         Text(

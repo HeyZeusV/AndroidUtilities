@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 object LibraryDefaults {
     private val BorderWidth = 2.dp
-    private val DividerWidth = 2.dp
+    private val DividerThickness = 2.dp
     private val CornerRadius = 12.dp
     private val ItemPadding = 12.dp
     private val ItemSpacing = 8.dp
@@ -54,12 +54,12 @@ object LibraryDefaults {
         shape: Shape = RoundedCornerShape(CornerRadius),
         borderWidth: Dp = BorderWidth,
         itemSpacing: Dp = ItemSpacing,
-        dividerWidth: Dp = DividerWidth,
+        dividerThickness: Dp = DividerThickness,
     ): LibraryDimensions = DefaultLibraryDimensions(
         shape = shape,
         borderWidth = borderWidth,
         itemSpacing = itemSpacing,
-        dividerWidth = dividerWidth,
+        dividerThickness = dividerThickness,
     )
 
     @Composable
@@ -117,7 +117,7 @@ interface LibraryDimensions {
     val shape: Shape
     val borderWidth: Dp
     val itemSpacing: Dp
-    val dividerWidth: Dp
+    val dividerThickness: Dp
 }
 
 @Immutable
@@ -125,7 +125,7 @@ private data class DefaultLibraryDimensions(
     override val shape: Shape,
     override val borderWidth: Dp,
     override val itemSpacing: Dp,
-    override val dividerWidth: Dp,
+    override val dividerThickness: Dp,
 ) : LibraryDimensions
 
 @Stable
