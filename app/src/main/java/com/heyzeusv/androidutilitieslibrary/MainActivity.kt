@@ -26,11 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.heyzeusv.androidutilities.compose.ui.about.AboutScreen
+import com.heyzeusv.androidutilities.compose.ui.about.AboutNavigation
 import com.heyzeusv.androidutilities.compose.util.avRes
 import com.heyzeusv.androidutilities.compose.util.bRes
 import com.heyzeusv.androidutilities.compose.util.cRes
@@ -42,7 +41,6 @@ import com.heyzeusv.androidutilities.compose.util.psRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilities.compose.util.saRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
-import com.heyzeusv.androidutilitieslibrary.util.lorem
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -51,18 +49,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidUtilitiesLibraryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AboutScreen(
-                        icon = {
-                            Icon(
-                                painter = pRes(R.drawable.ic_launcher_foreground),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .scale(1.5f),
-                            )
-                        },
-                        info = listOf(lorem, lorem, lorem),
-                    )
+                    AboutNavigation()
 //                    ComposableResources(Modifier.padding(innerPadding))
                 }
             }

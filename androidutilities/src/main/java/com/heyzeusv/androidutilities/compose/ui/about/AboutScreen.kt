@@ -1,7 +1,13 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.heyzeusv.androidutilities.compose.ui.about
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -42,7 +48,8 @@ private const val GOOGLE = "com.google"
 private val firstPartyIds = listOf(ANDROID, JETBRAINS, GOOGLE)
 
 @Composable
-fun AboutScreen(
+fun SharedTransitionScope.AboutScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
     icon: @Composable () -> Unit = {
         Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
     },
@@ -50,6 +57,7 @@ fun AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     separateByParty: Boolean = true,
+    libraryOnClick: (Int) -> Unit = { }, 
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -58,11 +66,13 @@ fun AboutScreen(
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
     AboutScreen(
+        animatedVisibilityScope = animatedVisibilityScope,
         icon = icon,
         title = title,
         version = version,
         info = info,
         libraries = libraries,
+        libraryOnClick = libraryOnClick,
         colors = colors,
         padding = padding,
         dimensions = dimensions,
@@ -71,7 +81,8 @@ fun AboutScreen(
 }
 
 @Composable
-fun AboutScreen(
+fun SharedTransitionScope.AboutScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
     icon: @Composable () -> Unit = {
         Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
     },
@@ -79,6 +90,7 @@ fun AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     libraries: Pair<List<Library>, List<Library>>,
+    libraryOnClick: (Int) -> Unit = { },
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -101,7 +113,9 @@ fun AboutScreen(
             textStyles = textStyles,
         )
         LibraryList(
+            animatedVisibilityScope = animatedVisibilityScope,
             libraries = libraries,
+            libraryOnClick = libraryOnClick,
             colors = colors,
             padding = padding,
             dimensions = dimensions,
@@ -175,8 +189,10 @@ internal fun AppInfo(
 }
 
 @Composable
-internal fun LibraryList(
+internal fun SharedTransitionScope.LibraryList(
+    animatedVisibilityScope: AnimatedVisibilityScope,
     libraries: Pair<List<Library>, List<Library>>,
+    libraryOnClick: (Int) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -198,9 +214,18 @@ internal fun LibraryList(
                 style = textStyles.libraryHeaderStyle,
             )
         }
-        items(libraries.first) {
+        itemsIndexed(
+            items = libraries.first,
+            key = { _, library -> library.uniqueId }
+        ) { index, library ->
             LibraryItem(
-                library = it,
+                modifier = Modifier
+                    .clickable { libraryOnClick(index) }
+                    .sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "library-$index"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    ),
+                library = library,
                 colors = colors.libraryColors,
                 padding = padding.libraryPadding,
                 dimensions = dimensions.libraryDimensions,
@@ -216,9 +241,18 @@ internal fun LibraryList(
                     style = textStyles.libraryHeaderStyle,
                 )
             }
-            items(libraries.second) {
+            itemsIndexed(
+                items = libraries.second,
+                key = { _, library -> library.uniqueId }
+            ) { index, library ->
                 LibraryItem(
-                    library = it,
+                    modifier = Modifier
+                        .clickable { libraryOnClick(index) }
+                        .sharedBounds(
+                            sharedContentState = rememberSharedContentState(key = "library-$index"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        ),
+                    library = library,
                     colors = colors.libraryColors,
                     padding = padding.libraryPadding,
                     dimensions = dimensions.libraryDimensions,
@@ -231,6 +265,7 @@ internal fun LibraryList(
 
 @Composable
 internal fun LibraryItem(
+    modifier: Modifier,
     library: Library,
     colors: LibraryColors = LibraryDefaults.libraryColors(),
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
@@ -246,7 +281,7 @@ internal fun LibraryItem(
     val licenseName = license?.name.ifNullOrBlank(sRes(R.string.library_license_empty))
 
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = dimensions.shape,
         color = colors.backgroundColor,
         border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
