@@ -28,22 +28,23 @@ fun AboutNavigation() {
                 AboutScreen(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this,
-                    libraryOnClick = { partyId, index ->
-                        navController.navigate("details/$partyId/$index")
+                    libraryOnClick = { partyId, libraryId ->
+                        navController.navigate("details/$partyId/$libraryId")
                     }
                 )
             }
             composable(
-                route = "details/{libraryParty}/{libraryIndex}",
+                route = "details/{partyId}/{libraryId}",
                 arguments = listOf(
-                    navArgument("libraryParty") { type = NavType.StringType },
-                    navArgument("libraryIndex") { type = NavType.IntType}
+                    navArgument("partyId") { type = NavType.StringType },
+                    navArgument("libraryId") { type = NavType.StringType}
                 )
             ) { backStackEntry ->
-                val libraryParty = backStackEntry.arguments?.getString("libraryParty")!!
-                val libraryIndex = backStackEntry.arguments?.getInt("libraryIndex")!!
-                val library = libraries[LibraryPartyInfo from libraryParty]!![libraryIndex]
-                val sharedKey = "library-$libraryParty-$libraryIndex"
+                val partyId = backStackEntry.arguments?.getString("partyId")!!
+                val libraryId = backStackEntry.arguments?.getString("libraryId")!!
+                val libs = libraries[LibraryPartyInfo from partyId]!!
+                val library = libs.find { it.uniqueId == libraryId }!!
+                val sharedKey = "library-$libraryId"
 
                 LibraryScreen(
                     modifier = Modifier

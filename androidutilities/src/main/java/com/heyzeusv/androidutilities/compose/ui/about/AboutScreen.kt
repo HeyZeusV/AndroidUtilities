@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -59,7 +59,7 @@ fun AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     separateByParty: Boolean = true,
-    libraryOnClick: (String, Int) -> Unit = { _, _ -> },
+    libraryOnClick: (String, String) -> Unit = { _, _ -> },
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -94,7 +94,7 @@ fun AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (String, Int) -> Unit = { _, _ -> },
+    libraryOnClick: (String, String) -> Unit = { _, _ -> },
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -198,7 +198,7 @@ internal fun LibraryList(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (String, Int) -> Unit,
+    libraryOnClick: (String, String) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -217,15 +217,15 @@ internal fun LibraryList(
                     style = textStyles.libraryHeaderStyle,
                 )
             }
-            itemsIndexed(
+            items(
                 items = libs,
-                key = { _, library -> library.uniqueId }
-            ) { index, library ->
+                key = { it.uniqueId }
+            ) { library ->
                 with(sharedTransitionScope) {
-                    val sharedKey = "library-${info.id}-$index"
+                    val sharedKey = "library-${library.uniqueId}"
                     LibraryItem(
                         modifier = Modifier
-                            .clickable { libraryOnClick(info.id, index) }
+                            .clickable { libraryOnClick(info.id, library.uniqueId) }
                             .sharedBounds(
                                 sharedContentState = rememberSharedContentState(sharedKey),
                                 animatedVisibilityScope = animatedContentScope
