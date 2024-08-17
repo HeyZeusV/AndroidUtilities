@@ -2,7 +2,7 @@
 
 package com.heyzeusv.androidutilities.compose.ui.about
 
-import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.BorderStroke
@@ -48,8 +48,9 @@ private const val GOOGLE = "com.google"
 private val firstPartyIds = listOf(ANDROID, JETBRAINS, GOOGLE)
 
 @Composable
-fun SharedTransitionScope.AboutScreen(
-    animatedVisibilityScope: AnimatedVisibilityScope,
+fun AboutScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     icon: @Composable () -> Unit = {
         Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
     },
@@ -57,7 +58,7 @@ fun SharedTransitionScope.AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     separateByParty: Boolean = true,
-    libraryOnClick: (Int) -> Unit = { }, 
+    libraryOnClick: (Int) -> Unit = { },
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -66,7 +67,8 @@ fun SharedTransitionScope.AboutScreen(
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
     AboutScreen(
-        animatedVisibilityScope = animatedVisibilityScope,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedContentScope = animatedContentScope,
         icon = icon,
         title = title,
         version = version,
@@ -81,8 +83,9 @@ fun SharedTransitionScope.AboutScreen(
 }
 
 @Composable
-fun SharedTransitionScope.AboutScreen(
-    animatedVisibilityScope: AnimatedVisibilityScope,
+fun AboutScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     icon: @Composable () -> Unit = {
         Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
     },
@@ -113,7 +116,8 @@ fun SharedTransitionScope.AboutScreen(
             textStyles = textStyles,
         )
         LibraryList(
-            animatedVisibilityScope = animatedVisibilityScope,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
             libraries = libraries,
             libraryOnClick = libraryOnClick,
             colors = colors,
@@ -189,8 +193,9 @@ internal fun AppInfo(
 }
 
 @Composable
-internal fun SharedTransitionScope.LibraryList(
-    animatedVisibilityScope: AnimatedVisibilityScope,
+internal fun LibraryList(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     libraries: Pair<List<Library>, List<Library>>,
     libraryOnClick: (Int) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
@@ -219,12 +224,10 @@ internal fun SharedTransitionScope.LibraryList(
             key = { _, library -> library.uniqueId }
         ) { index, library ->
             LibraryItem(
-                modifier = Modifier
-                    .clickable { libraryOnClick(index) }
-                    .sharedBounds(
-                        sharedContentState = rememberSharedContentState(key = "library-$index"),
-                        animatedVisibilityScope = animatedVisibilityScope
-                    ),
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
+                libraryIndex = index,
+                modifier = Modifier.clickable { libraryOnClick(index) },
                 library = library,
                 colors = colors.libraryColors,
                 padding = padding.libraryPadding,
@@ -246,12 +249,10 @@ internal fun SharedTransitionScope.LibraryList(
                 key = { _, library -> library.uniqueId }
             ) { index, library ->
                 LibraryItem(
-                    modifier = Modifier
-                        .clickable { libraryOnClick(index) }
-                        .sharedBounds(
-                            sharedContentState = rememberSharedContentState(key = "library-$index"),
-                            animatedVisibilityScope = animatedVisibilityScope
-                        ),
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    libraryIndex = index,
+                    modifier = Modifier.clickable { libraryOnClick(index) },
                     library = library,
                     colors = colors.libraryColors,
                     padding = padding.libraryPadding,
@@ -265,6 +266,9 @@ internal fun SharedTransitionScope.LibraryList(
 
 @Composable
 internal fun LibraryItem(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    libraryIndex: Int,
     modifier: Modifier,
     library: Library,
     colors: LibraryColors = LibraryDefaults.libraryColors(),
@@ -272,61 +276,53 @@ internal fun LibraryItem(
     dimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
     textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
     val developers = library.developers.map { it.name }.joinToString(separator = ", ")
     val description = library.description.ifNullOrBlank(sRes(R.string.library_description_empty))
     val version = library.artifactVersion.ifNullOrBlank(sRes(R.string.library_version_empty))
-    val license = library.licenses.firstOrNull()
-    val licenseContent = license?.licenseContent.ifNullOrBlank(sRes(R.string.library_license_empty))
-    val licenseName = license?.name.ifNullOrBlank(sRes(R.string.library_license_empty))
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = dimensions.shape,
-        color = colors.backgroundColor,
-        border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
-    ) {
-        Column(
-            modifier = Modifier.padding(padding.contentPadding),
-            verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+    with(sharedTransitionScope) {
+        Surface(
+            modifier = modifier
+                .fillMaxWidth()
+                .sharedBounds(
+                    sharedContentState = rememberSharedContentState(key = "library-$libraryIndex"),
+                    animatedVisibilityScope = animatedContentScope
+                ),
+            shape = dimensions.shape,
+            color = colors.backgroundColor,
+            border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
         ) {
-            Text(
-                text = library.name,
-                modifier = Modifier
-                    .padding(padding.namePadding)
-                    .fillMaxWidth()
-                    .basicMarquee(),
-                maxLines = 1,
-                style = textStyles.nameStyle,
-            )
-            Text(
-                text = developers,
-                modifier = Modifier
-                    .padding(padding.developerPadding)
-                    .fillMaxWidth()
-                    .basicMarquee(),
-                maxLines = 1,
-                style = textStyles.developerStyle
-            )
-            HorizontalPager(state = pagerState) { page ->
-                val body: String = if (page == 0) description else licenseContent
-                val footer: String = if (page == 0) version else licenseName
+            Column(
+                modifier = Modifier.padding(padding.contentPadding),
+                verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+            ) {
+                Text(
+                    text = library.name,
+                    modifier = Modifier
+                        .padding(padding.namePadding)
+                        .fillMaxWidth()
+                        .basicMarquee(),
+                    maxLines = 1,
+                    style = textStyles.nameStyle,
+                )
+                Text(
+                    text = developers,
+                    modifier = Modifier
+                        .padding(padding.developerPadding)
+                        .fillMaxWidth()
+                        .basicMarquee(),
+                    maxLines = 1,
+                    style = textStyles.developerStyle
+                )
                 LibraryInfo(
-                    body = body,
-                    footer = footer,
+                    body = description,
+                    footer = version,
                     colors = colors,
                     padding = padding,
                     dimensions = dimensions,
                     textStyles = textStyles,
                 )
             }
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                pageCount = 2,
-                modifier = Modifier
-                    .padding(padding.pageIndicatorPadding)
-                    .align(Alignment.CenterHorizontally),
-            )
         }
     }
 }
@@ -370,7 +366,7 @@ internal fun LibraryInfo(
 }
 
 @Composable
-private fun produceLibraryState(separateByParty: Boolean): State<Pair<List<Library>, List<Library>>> {
+fun produceLibraryState(separateByParty: Boolean): State<Pair<List<Library>, List<Library>>> {
     val context = LocalContext.current
 
     return produceState(Pair(listOf(), listOf())) {
@@ -384,6 +380,6 @@ private fun produceLibraryState(separateByParty: Boolean): State<Pair<List<Libra
                 Pair(listOf(), libs.libraries)
             }
         }
-        
+
     }
 }
