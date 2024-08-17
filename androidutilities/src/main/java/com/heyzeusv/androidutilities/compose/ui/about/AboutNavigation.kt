@@ -20,7 +20,6 @@ fun AboutNavigation() {
         val libraries by produceLibraryState(true)
 
         // TODO: Try out both sharedElement and sharedBounds
-        // TODO: Change libraries to only return one list
         NavHost(
             navController = navController,
             startDestination = "about"
@@ -29,21 +28,28 @@ fun AboutNavigation() {
                 AboutScreen(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this,
-                    libraryOnClick = { index -> navController.navigate("details/$index") }
+                    libraryOnClick = { partyId, index ->
+                        navController.navigate("details/$partyId/$index")
+                    }
                 )
             }
             composable(
-                route = "details/{library}",
-                arguments = listOf(navArgument("library") { type = NavType.IntType})
+                route = "details/{libraryParty}/{libraryIndex}",
+                arguments = listOf(
+                    navArgument("libraryParty") { type = NavType.StringType },
+                    navArgument("libraryIndex") { type = NavType.IntType}
+                )
             ) { backStackEntry ->
-                val libraryId = backStackEntry.arguments?.getInt("library") ?: 0
-                val library = libraries.second[libraryId]
+                val libraryParty = backStackEntry.arguments?.getString("libraryParty")!!
+                val libraryIndex = backStackEntry.arguments?.getInt("libraryIndex")!!
+                val library = libraries[LibraryPartyInfo from libraryParty]!![libraryIndex]
+                val sharedKey = "library-$libraryParty-$libraryIndex"
 
                 LibraryScreen(
                     modifier = Modifier
                         .clickable { navController.navigate("about") }
                         .sharedBounds(
-                            sharedContentState = rememberSharedContentState(key = "library-$libraryId"),
+                            sharedContentState = rememberSharedContentState(sharedKey),
                             animatedVisibilityScope = this
                         ),
                     library = library,

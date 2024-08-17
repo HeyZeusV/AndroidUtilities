@@ -2,6 +2,7 @@
 
 package com.heyzeusv.androidutilities.compose.ui.about
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -58,7 +59,7 @@ fun AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     separateByParty: Boolean = true,
-    libraryOnClick: (Int) -> Unit = { },
+    libraryOnClick: (String, Int) -> Unit = { _, _ -> },
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -92,8 +93,8 @@ fun AboutScreen(
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),
-    libraries: Pair<List<Library>, List<Library>>,
-    libraryOnClick: (Int) -> Unit = { },
+    libraries: Map<LibraryPartyInfo, List<Library>>,
+    libraryOnClick: (String, Int) -> Unit = { _, _ -> },
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -196,8 +197,8 @@ internal fun AppInfo(
 internal fun LibraryList(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    libraries: Pair<List<Library>, List<Library>>,
-    libraryOnClick: (Int) -> Unit,
+    libraries: Map<LibraryPartyInfo, List<Library>>,
+    libraryOnClick: (String, Int) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
@@ -207,58 +208,35 @@ internal fun LibraryList(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(dimensions.libraryItemSpacing)
     ) {
-        item {
-            Text(
-                text = if (libraries.second.isNotEmpty()) {
-                    sRes(R.string.about_third_party_header)
-                } else {
-                    sRes(R.string.about_all_header)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                color = colors.libraryHeaderColor,
-                style = textStyles.libraryHeaderStyle,
-            )
-        }
-        itemsIndexed(
-            items = libraries.first,
-            key = { _, library -> library.uniqueId }
-        ) { index, library ->
-            LibraryItem(
-                sharedTransitionScope = sharedTransitionScope,
-                animatedContentScope = animatedContentScope,
-                libraryIndex = index,
-                modifier = Modifier.clickable { libraryOnClick(index) },
-                library = library,
-                colors = colors.libraryColors,
-                padding = padding.libraryPadding,
-                dimensions = dimensions.libraryDimensions,
-                textStyles = textStyles.libraryStyles,
-            )
-        }
-        if (libraries.second.isNotEmpty()) {
+        libraries.forEach { (info, libs) ->
             item {
                 Text(
-                    text = sRes(R.string.about_first_party_header),
+                    text = sRes(info.headerId),
                     modifier = Modifier.fillMaxWidth(),
                     color = colors.libraryHeaderColor,
                     style = textStyles.libraryHeaderStyle,
                 )
             }
             itemsIndexed(
-                items = libraries.second,
+                items = libs,
                 key = { _, library -> library.uniqueId }
             ) { index, library ->
-                LibraryItem(
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope,
-                    libraryIndex = index,
-                    modifier = Modifier.clickable { libraryOnClick(index) },
-                    library = library,
-                    colors = colors.libraryColors,
-                    padding = padding.libraryPadding,
-                    dimensions = dimensions.libraryDimensions,
-                    textStyles = textStyles.libraryStyles,
-                )
+                with(sharedTransitionScope) {
+                    val sharedKey = "library-${info.id}-$index"
+                    LibraryItem(
+                        modifier = Modifier
+                            .clickable { libraryOnClick(info.id, index) }
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState(sharedKey),
+                                animatedVisibilityScope = animatedContentScope
+                            ),
+                        library = library,
+                        colors = colors.libraryColors,
+                        padding = padding.libraryPadding,
+                        dimensions = dimensions.libraryDimensions,
+                        textStyles = textStyles.libraryStyles,
+                    )
+                }
             }
         }
     }
@@ -266,9 +244,6 @@ internal fun LibraryList(
 
 @Composable
 internal fun LibraryItem(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    libraryIndex: Int,
     modifier: Modifier,
     library: Library,
     colors: LibraryColors = LibraryDefaults.libraryColors(),
@@ -280,49 +255,42 @@ internal fun LibraryItem(
     val description = library.description.ifNullOrBlank(sRes(R.string.library_description_empty))
     val version = library.artifactVersion.ifNullOrBlank(sRes(R.string.library_version_empty))
 
-    with(sharedTransitionScope) {
-        Surface(
-            modifier = modifier
-                .fillMaxWidth()
-                .sharedBounds(
-                    sharedContentState = rememberSharedContentState(key = "library-$libraryIndex"),
-                    animatedVisibilityScope = animatedContentScope
-                ),
-            shape = dimensions.shape,
-            color = colors.backgroundColor,
-            border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = dimensions.shape,
+        color = colors.backgroundColor,
+        border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
+    ) {
+        Column(
+            modifier = Modifier.padding(padding.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
         ) {
-            Column(
-                modifier = Modifier.padding(padding.contentPadding),
-                verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
-            ) {
-                Text(
-                    text = library.name,
-                    modifier = Modifier
-                        .padding(padding.namePadding)
-                        .fillMaxWidth()
-                        .basicMarquee(),
-                    maxLines = 1,
-                    style = textStyles.nameStyle,
-                )
-                Text(
-                    text = developers,
-                    modifier = Modifier
-                        .padding(padding.developerPadding)
-                        .fillMaxWidth()
-                        .basicMarquee(),
-                    maxLines = 1,
-                    style = textStyles.developerStyle
-                )
-                LibraryInfo(
-                    body = description,
-                    footer = version,
-                    colors = colors,
-                    padding = padding,
-                    dimensions = dimensions,
-                    textStyles = textStyles,
-                )
-            }
+            Text(
+                text = library.name,
+                modifier = Modifier
+                    .padding(padding.namePadding)
+                    .fillMaxWidth()
+                    .basicMarquee(),
+                maxLines = 1,
+                style = textStyles.nameStyle,
+            )
+            Text(
+                text = developers,
+                modifier = Modifier
+                    .padding(padding.developerPadding)
+                    .fillMaxWidth()
+                    .basicMarquee(),
+                maxLines = 1,
+                style = textStyles.developerStyle
+            )
+            LibraryInfo(
+                body = description,
+                footer = version,
+                colors = colors,
+                padding = padding,
+                dimensions = dimensions,
+                textStyles = textStyles,
+            )
         }
     }
 }
@@ -366,20 +334,38 @@ internal fun LibraryInfo(
 }
 
 @Composable
-fun produceLibraryState(separateByParty: Boolean): State<Pair<List<Library>, List<Library>>> {
+fun produceLibraryState(separateByParty: Boolean): State<Map<LibraryPartyInfo, List<Library>>> {
     val context = LocalContext.current
 
-    return produceState(Pair(listOf(), listOf())) {
+    return produceState(mapOf(LibraryPartyInfo.INIT to listOf())) {
         value = withContext(Dispatchers.IO) {
             val libs = Libs.Builder().withContext(context).build()
             if (separateByParty) {
-                libs.libraries.partition { library ->
+                val (thirdLibs, firstLibs) = libs.libraries.partition { library ->
                     !firstPartyIds.any { library.uniqueId.contains(it) }
                 }
+                mapOf(LibraryPartyInfo.THIRD to thirdLibs, LibraryPartyInfo.FIRST to firstLibs)
             } else {
-                Pair(listOf(), libs.libraries)
+                mapOf(LibraryPartyInfo.ALL to libs.libraries)
             }
         }
 
+    }
+}
+
+enum class LibraryPartyInfo(
+    val id: String,
+    @StringRes val headerId: Int,
+) {
+    INIT(id = "", headerId = R.string.about_empty_header),
+    FIRST(id = "first", headerId = R.string.about_first_party_header),
+    THIRD(id = "third", headerId = R.string.about_third_party_header),
+    ALL(id = "all", headerId = R.string.about_all_header),
+
+    ;
+
+    companion object {
+        private val map = LibraryPartyInfo.entries.associateBy { it.id }
+        infix fun from(id: String): LibraryPartyInfo = map[id] ?: INIT
     }
 }
