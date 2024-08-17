@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.compose.ui
+package com.heyzeusv.androidutilities.compose.ui.pageindicator
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

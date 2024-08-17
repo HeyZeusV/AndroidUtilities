@@ -41,6 +41,7 @@ import com.heyzeusv.androidutilities.compose.util.psRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilities.compose.util.saRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
+import com.heyzeusv.androidutilitieslibrary.util.lorem
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -49,7 +50,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidUtilitiesLibraryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AboutNavigation()
+                    AboutNavigation(
+                        icon = {
+                            Icon(
+                                painter = pRes(R.drawable.ic_launcher_foreground),
+                                contentDescription = null
+                            )
+                        },
+                        title = sRes(R.string.app_name),
+                        version = "v1.0.0",
+                        info = listOf(lorem, lorem, lorem),
+                    )
 //                    ComposableResources(Modifier.padding(innerPadding))
                 }
             }

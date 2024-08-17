@@ -1,0 +1,21 @@
+package com.heyzeusv.androidutilities.compose.ui.library
+
+import androidx.annotation.StringRes
+import com.heyzeusv.androidutilities.R
+
+enum class LibraryPartyInfo(
+    val id: String,
+    @StringRes val headerId: Int,
+) {
+    INIT(id = "", headerId = R.string.about_empty_header),
+    FIRST(id = "first", headerId = R.string.about_first_party_header),
+    THIRD(id = "third", headerId = R.string.about_third_party_header),
+    ALL(id = "all", headerId = R.string.about_all_header),
+
+    ;
+
+    companion object {
+        private val map = LibraryPartyInfo.entries.associateBy { it.id }
+        infix fun from(id: String): LibraryPartyInfo = map[id] ?: INIT
+    }
+}

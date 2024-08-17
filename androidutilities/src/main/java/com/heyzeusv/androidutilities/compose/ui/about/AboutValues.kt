@@ -12,9 +12,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.heyzeusv.androidutilities.compose.ui.PagerIndicatorColors
-import com.heyzeusv.androidutilities.compose.ui.PagerIndicatorDefaults
-import com.heyzeusv.androidutilities.compose.ui.PagerIndicatorDimensions
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorColors
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDefaults
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDimensions
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryDimensions
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
 
 object AboutDefaults {
     private val ItemSpacing = 12.dp
