@@ -33,9 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.about.AboutColors
-import com.heyzeusv.androidutilities.compose.ui.about.AboutDefaults
-import com.heyzeusv.androidutilities.compose.ui.about.AboutDimensions
-import com.heyzeusv.androidutilities.compose.ui.about.AboutPadding
 import com.heyzeusv.androidutilities.compose.ui.about.AboutTextStyles
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
@@ -47,10 +44,10 @@ internal fun LibraryScreen(
     modifier: Modifier,
     onBackPressed: () -> Unit,
     library: Library,
-    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
-    padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
-    textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
+    colors: LibraryColors,
+    padding: LibraryPadding,
+    dimensions: LibraryDimensions,
+    textStyles: LibraryTextStyles,
 ) {
     Column {
         LibraryScreen(
@@ -70,10 +67,10 @@ internal fun ColumnScope.LibraryScreen(
     modifier: Modifier,
     onBackPressed: () -> Unit,
     library: Library,
-    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
-    padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
-    textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
+    colors: LibraryColors,
+    padding: LibraryPadding,
+    dimensions: LibraryDimensions,
+    textStyles: LibraryTextStyles,
 ) {
     LibraryDetails(
         modifier = modifier.fillMaxSize(),
@@ -99,14 +96,14 @@ internal fun LibraryList(
     libraries: Map<LibraryPartyInfo, List<Library>>,
     libraryOnClick: (String, String) -> Unit,
     bodyMaxLines: Int,
-    colors: AboutColors = AboutDefaults.aboutColors(),
-    padding: AboutPadding = AboutDefaults.aboutPadding(),
-    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
-    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    colors: AboutColors,
+    padding: LibraryPadding,
+    dimensions: LibraryDimensions,
+    textStyles: AboutTextStyles,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.libraryItemDimensions.itemSpacing)
+        verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)
     ) {
         libraries.forEach { (info, libs) ->
             item {
@@ -134,8 +131,8 @@ internal fun LibraryList(
                         library = library,
                         bodyMaxLines = bodyMaxLines,
                         colors = colors.libraryItemColors,
-                        padding = padding.libraryItemPadding,
-                        dimensions = dimensions.libraryItemDimensions,
+                        padding = padding,
+                        dimensions = dimensions,
                         textStyles = textStyles.libraryItemStyles,
                     )
                 }
@@ -153,10 +150,10 @@ internal fun LibraryDetails(
     onBackPressed: () -> Unit = { },
     library: Library,
     bodyMaxLines: Int,
-    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
-    padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryScreenDimensions(),
-    textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
+    colors: LibraryColors,
+    padding: LibraryPadding,
+    dimensions: LibraryDimensions,
+    textStyles: LibraryTextStyles,
 ) {
     val pagerState = rememberPagerState(pageCount = { if (isFullscreen) 2 else 1 })
     val developers = library.developers.map { it.name }.joinToString(separator = ", ")
@@ -174,7 +171,7 @@ internal fun LibraryDetails(
     ) {
         Column(
             modifier = Modifier.padding(padding.contentPadding),
-            verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+            verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isFullscreen) {
@@ -238,12 +235,12 @@ internal fun LibraryInfo(
     body: String,
     bodyMaxLines: Int,
     footer: String,
-    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
-    padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
-    textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
+    colors: LibraryColors,
+    padding: LibraryPadding,
+    dimensions: LibraryDimensions,
+    textStyles: LibraryTextStyles,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)) {
+    Column(verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)) {
         HorizontalDivider(
             thickness = dimensions.dividerThickness,
             color = colors.dividerColor,

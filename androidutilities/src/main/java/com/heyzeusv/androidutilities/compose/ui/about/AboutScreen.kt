@@ -68,8 +68,8 @@ internal fun AboutScreen(
             libraryOnClick = libraryOnClick,
             bodyMaxLines = 5,
             colors = colors,
-            padding = padding,
-            dimensions = dimensions,
+            padding = padding.libraryItemPadding,
+            dimensions = dimensions.libraryItemDimensions,
             textStyles = textStyles,
         )
     }

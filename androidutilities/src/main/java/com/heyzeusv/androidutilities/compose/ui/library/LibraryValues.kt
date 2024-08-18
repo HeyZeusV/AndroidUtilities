@@ -68,12 +68,12 @@ object LibraryDefaults {
     fun libraryItemDimensions(
         shape: Shape = RoundedCornerShape(ItemCornerRadius),
         borderWidth: Dp = ItemBorderWidth,
-        itemSpacing: Dp = ContentSpacing,
+        contentSpacing: Dp = ContentSpacing,
         dividerThickness: Dp = DividerThickness,
     ): LibraryDimensions = DefaultLibraryDimensions(
         shape = shape,
         borderWidth = borderWidth,
-        itemSpacing = itemSpacing,
+        contentSpacing = contentSpacing,
         dividerThickness = dividerThickness,
     )
 
@@ -81,12 +81,12 @@ object LibraryDefaults {
     fun libraryScreenDimensions(
         shape: Shape = RoundedCornerShape(ScreenCornerRadius),
         borderWidth: Dp = ScreenBorderWidth,
-        itemSpacing: Dp = ContentSpacing,
+        contentSpacing: Dp = ContentSpacing,
         dividerThickness: Dp = DividerThickness,
     ): LibraryDimensions = DefaultLibraryDimensions(
         shape = shape,
         borderWidth = borderWidth,
-        itemSpacing = itemSpacing,
+        contentSpacing = contentSpacing,
         dividerThickness = dividerThickness,
     )
 
@@ -144,7 +144,7 @@ private data class DefaultLibraryPadding(
 interface LibraryDimensions {
     val shape: Shape
     val borderWidth: Dp
-    val itemSpacing: Dp
+    val contentSpacing: Dp
     val dividerThickness: Dp
 }
 
@@ -152,7 +152,7 @@ interface LibraryDimensions {
 private data class DefaultLibraryDimensions(
     override val shape: Shape,
     override val borderWidth: Dp,
-    override val itemSpacing: Dp,
+    override val contentSpacing: Dp,
     override val dividerThickness: Dp,
 ) : LibraryDimensions
 
