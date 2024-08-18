@@ -13,14 +13,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 object LibraryDefaults {
-    private val BorderWidth = 2.dp
+    private val ItemBorderWidth = 2.dp
     private val DividerThickness = 2.dp
-    private val CornerRadius = 12.dp
-    private val ItemPadding = 12.dp
-    private val ItemSpacing = 8.dp
+    private val ItemCornerRadius = 12.dp
+    private val ContentPadding = 12.dp
+    private val ContentSpacing = 8.dp
+    private val ScreenBorderWidth = 0.dp
+    private val ScreenCornerRadius = 0.dp
 
     @Composable
-    fun libraryColors(
+    fun libraryItemColors(
         borderColor: Color = MaterialTheme.colorScheme.onSurface,
         backgroundColor: Color = MaterialTheme.colorScheme.surface,
         contentColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -33,8 +35,21 @@ object LibraryDefaults {
     )
 
     @Composable
+    fun libraryScreenColors(
+        borderColor: Color = Color.Transparent,
+        backgroundColor: Color = MaterialTheme.colorScheme.surface,
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
+        dividerColor: Color = MaterialTheme.colorScheme.onSurface,
+    ): LibraryColors = DefaultLibraryColors(
+        borderColor = borderColor,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor,
+        dividerColor = dividerColor
+    )
+
+    @Composable
     fun libraryPadding(
-        contentPadding: PaddingValues = PaddingValues(ItemPadding),
+        contentPadding: PaddingValues = PaddingValues(ContentPadding),
         namePadding: PaddingValues = PaddingValues(),
         developerPadding: PaddingValues = PaddingValues(),
         bodyPadding: PaddingValues = PaddingValues(),
@@ -50,10 +65,23 @@ object LibraryDefaults {
     )
 
     @Composable
-    fun libraryDimensions(
-        shape: Shape = RoundedCornerShape(CornerRadius),
-        borderWidth: Dp = BorderWidth,
-        itemSpacing: Dp = ItemSpacing,
+    fun libraryItemDimensions(
+        shape: Shape = RoundedCornerShape(ItemCornerRadius),
+        borderWidth: Dp = ItemBorderWidth,
+        itemSpacing: Dp = ContentSpacing,
+        dividerThickness: Dp = DividerThickness,
+    ): LibraryDimensions = DefaultLibraryDimensions(
+        shape = shape,
+        borderWidth = borderWidth,
+        itemSpacing = itemSpacing,
+        dividerThickness = dividerThickness,
+    )
+
+    @Composable
+    fun libraryScreenDimensions(
+        shape: Shape = RoundedCornerShape(ScreenCornerRadius),
+        borderWidth: Dp = ScreenBorderWidth,
+        itemSpacing: Dp = ContentSpacing,
         dividerThickness: Dp = DividerThickness,
     ): LibraryDimensions = DefaultLibraryDimensions(
         shape = shape,

@@ -2,7 +2,6 @@ package com.heyzeusv.androidutilities.compose.ui.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -11,8 +10,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryDimensions
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryScreen
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
 import com.heyzeusv.androidutilities.compose.ui.library.produceLibraryState
 import com.mikepenz.aboutlibraries.entity.Library
 
@@ -27,6 +31,10 @@ fun AboutNavigation(
     aboutPadding: AboutPadding = AboutDefaults.aboutPadding(),
     aboutDimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
     aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    libraryColors: LibraryColors = LibraryDefaults.libraryScreenColors(),
+    libraryPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
+    libraryDimensions: LibraryDimensions = LibraryDefaults.libraryScreenDimensions(),
+    libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
@@ -40,6 +48,10 @@ fun AboutNavigation(
         aboutPadding = aboutPadding,
         aboutDimensions = aboutDimensions,
         aboutTextStyles = aboutTextStyles,
+        libraryColors = libraryColors,
+        libraryPadding = libraryPadding,
+        libraryDimensions = libraryDimensions,
+        libraryTextStyles = libraryTextStyles,
     )
 }
 
@@ -55,6 +67,10 @@ fun AboutNavigation(
     aboutPadding: AboutPadding = AboutDefaults.aboutPadding(),
     aboutDimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
     aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    libraryColors: LibraryColors = LibraryDefaults.libraryScreenColors(),
+    libraryPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
+    libraryDimensions: LibraryDimensions = LibraryDefaults.libraryScreenDimensions(),
+    libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     SharedTransitionLayout {
         val navController = rememberNavController()
@@ -97,16 +113,16 @@ fun AboutNavigation(
 
                 LibraryScreen(
                     modifier = Modifier
-                        .clickable { navController.navigate("about") }
                         .sharedBounds(
                             sharedContentState = rememberSharedContentState(sharedKey),
                             animatedVisibilityScope = this
                         ),
                     library = library,
-                    colors = aboutColors.libraryColors,
-                    padding = aboutPadding.libraryPadding,
-                    dimensions = aboutDimensions.libraryDimensions,
-                    textStyles = aboutTextStyles.libraryStyles,
+                    onBackPressed = { navController.navigate("about") },
+                    colors = libraryColors,
+                    padding = libraryPadding,
+                    dimensions = libraryDimensions,
+                    textStyles = libraryTextStyles,
                 )
             }
         }

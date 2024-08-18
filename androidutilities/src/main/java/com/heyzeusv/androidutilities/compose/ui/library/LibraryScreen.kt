@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,15 +45,17 @@ import com.mikepenz.aboutlibraries.entity.Library
 @Composable
 internal fun LibraryScreen(
     modifier: Modifier,
+    onBackPressed: () -> Unit,
     library: Library,
-    colors: LibraryColors = LibraryDefaults.libraryColors(),
+    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
+    dimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
     textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     Column {
         LibraryScreen(
             modifier = modifier,
+            onBackPressed = onBackPressed,
             library = library,
             colors = colors,
             padding = padding,
@@ -61,10 +68,11 @@ internal fun LibraryScreen(
 @Composable
 internal fun ColumnScope.LibraryScreen(
     modifier: Modifier,
+    onBackPressed: () -> Unit,
     library: Library,
-    colors: LibraryColors = LibraryDefaults.libraryColors(),
+    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
+    dimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
     textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     LibraryDetails(
@@ -74,6 +82,7 @@ internal fun ColumnScope.LibraryScreen(
             .weight(1f)
             .verticalScroll(rememberScrollState()),
         isFullscreen = true,
+        onBackPressed = onBackPressed,
         library = library,
         bodyMaxLines = Int.MAX_VALUE,
         colors = colors,
@@ -97,7 +106,7 @@ internal fun LibraryList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.libraryItemSpacing)
+        verticalArrangement = Arrangement.spacedBy(dimensions.libraryItemDimensions.itemSpacing)
     ) {
         libraries.forEach { (info, libs) ->
             item {
@@ -124,10 +133,10 @@ internal fun LibraryList(
                         isFullscreen = false,
                         library = library,
                         bodyMaxLines = bodyMaxLines,
-                        colors = colors.libraryColors,
-                        padding = padding.libraryPadding,
-                        dimensions = dimensions.libraryDimensions,
-                        textStyles = textStyles.libraryStyles,
+                        colors = colors.libraryItemColors,
+                        padding = padding.libraryItemPadding,
+                        dimensions = dimensions.libraryItemDimensions,
+                        textStyles = textStyles.libraryItemStyles,
                     )
                 }
             }
@@ -141,11 +150,12 @@ internal fun LibraryDetails(
     pagerModifier: Modifier = Modifier,
     bodyModifier: Modifier = Modifier,
     isFullscreen: Boolean,
+    onBackPressed: () -> Unit = { },
     library: Library,
     bodyMaxLines: Int,
-    colors: LibraryColors = LibraryDefaults.libraryColors(),
+    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
+    dimensions: LibraryDimensions = LibraryDefaults.libraryScreenDimensions(),
     textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     val pagerState = rememberPagerState(pageCount = { if (isFullscreen) 2 else 1 })
@@ -166,15 +176,26 @@ internal fun LibraryDetails(
             modifier = Modifier.padding(padding.contentPadding),
             verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
         ) {
-            Text(
-                text = library.name,
-                modifier = Modifier
-                    .padding(padding.namePadding)
-                    .fillMaxWidth()
-                    .basicMarquee(),
-                maxLines = 1,
-                style = textStyles.nameStyle,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isFullscreen) {
+                    IconButton(onClick = { onBackPressed() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = null,
+                            tint = colors.contentColor
+                        )
+                    }
+                }
+                Text(
+                    text = library.name,
+                    modifier = Modifier
+                        .padding(padding.namePadding)
+                        .fillMaxWidth()
+                        .basicMarquee(),
+                    maxLines = 1,
+                    style = textStyles.nameStyle,
+                )
+            }
             Text(
                 text = developers,
                 modifier = Modifier
@@ -217,9 +238,9 @@ internal fun LibraryInfo(
     body: String,
     bodyMaxLines: Int,
     footer: String,
-    colors: LibraryColors = LibraryDefaults.libraryColors(),
+    colors: LibraryColors = LibraryDefaults.libraryItemColors(),
     padding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    dimensions: LibraryDimensions = LibraryDefaults.libraryDimensions(),
+    dimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
     textStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)) {
