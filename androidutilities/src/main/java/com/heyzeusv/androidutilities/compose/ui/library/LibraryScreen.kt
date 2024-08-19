@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalSharedTransitionApi::class)
+@file:OptIn(ExperimentalSharedTransitionApi::class)
 
 package com.heyzeusv.androidutilities.compose.ui.library
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -35,6 +34,7 @@ import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.about.AboutColors
 import com.heyzeusv.androidutilities.compose.ui.about.AboutTextStyles
+import com.heyzeusv.androidutilities.compose.ui.library.LibrarySharedContent.*
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
@@ -167,7 +167,12 @@ internal fun LibraryDetails(
 
     with(sharedTransitionScope) {
         Surface(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .fillMaxWidth()
+                .sharedElement(
+                    state = librarySCS(sharedContent = SURFACE, libraryId = library.uniqueId),
+                    animatedVisibilityScope = animatedContentScope,
+                ),
             shape = dimensions.shape,
             color = colors.backgroundColor,
             border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
@@ -193,7 +198,7 @@ internal fun LibraryDetails(
                             .fillMaxWidth()
                             .basicMarquee()
                             .sharedElement(
-                                state = libraryNameSharedContentState(library.uniqueId),
+                                state = librarySCS(NAME, library.uniqueId),
                                 animatedVisibilityScope = animatedContentScope
                             ),
                         maxLines = 1,
@@ -207,24 +212,23 @@ internal fun LibraryDetails(
                         .fillMaxWidth()
                         .basicMarquee()
                         .sharedElement(
-                            state = libraryDeveloperSharedContentState(library.uniqueId),
-                            animatedVisibilityScope = animatedContentScope
+                            state = librarySCS(DEVELOPER, library.uniqueId),
+                            animatedVisibilityScope = animatedContentScope,
                         ),
                     maxLines = 1,
-                    style = textStyles.developerStyle
+                    style = textStyles.developerStyle,
                 )
-                HorizontalPager(state = pagerState, modifier = pagerModifier) { page ->
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = pagerModifier.sharedElement(
+                        state = librarySCS(sharedContent = PAGER, libraryId = library.uniqueId),
+                        animatedVisibilityScope = animatedContentScope,
+                    ),
+                ) { page ->
                     val body: String = if (page == 0) description else licenseContent
                     val footer: String = if (page == 0) version else licenseName
                     LibraryInfo(
-                        bodyModifier = bodyModifier.sharedElement(
-                            state = libraryBodySharedContentState(library.uniqueId),
-                            animatedVisibilityScope = animatedContentScope
-                        ),
-                        footerModifier = Modifier.sharedElement(
-                            state = libraryFooterSharedContentState(library.uniqueId),
-                            animatedVisibilityScope = animatedContentScope
-                        ),
+                        modifier = bodyModifier,
                         body = body,
                         bodyMaxLines = bodyMaxLines,
                         footer = footer,
@@ -240,7 +244,14 @@ internal fun LibraryDetails(
                         pageCount = 2,
                         modifier = Modifier
                             .padding(padding.pageIndicatorPadding)
-                            .align(Alignment.CenterHorizontally),
+                            .align(Alignment.CenterHorizontally)
+                            .sharedElement(
+                                state = librarySCS(
+                                    sharedContent = PAGER_INDICATOR,
+                                    libraryId = library.uniqueId
+                                ),
+                                animatedVisibilityScope = animatedContentScope
+                            ),
                     )
                 }
             }
@@ -250,8 +261,7 @@ internal fun LibraryDetails(
 
 @Composable
 internal fun LibraryInfo(
-    @SuppressLint("ModifierParameter") bodyModifier: Modifier,
-    footerModifier: Modifier,
+    modifier: Modifier,
     body: String,
     bodyMaxLines: Int,
     footer: String,
@@ -267,7 +277,7 @@ internal fun LibraryInfo(
         )
         Text(
             text = body,
-            modifier = bodyModifier
+            modifier = modifier
                 .padding(padding.bodyPadding)
                 .fillMaxWidth(),
             color = colors.contentColor,
@@ -280,7 +290,7 @@ internal fun LibraryInfo(
         )
         Text(
             text = footer,
-            modifier = footerModifier
+            modifier = Modifier
                 .padding(padding.footerPadding)
                 .align(Alignment.End),
             color = colors.contentColor,

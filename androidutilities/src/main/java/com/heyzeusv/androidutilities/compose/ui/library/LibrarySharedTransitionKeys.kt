@@ -7,23 +7,22 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.runtime.Composable
 
+private const val SURFACE_KEY = "library-surface-"
 private const val NAME_KEY = "library-name-"
 private const val DEVELOPER_KEY = "library-developer-"
-private const val BODY_KEY = "library-body-"
-private const val FOOTER_KEY = "library-footer-"
+private const val PAGER_KEY = "library-pager-"
+private const val PAGER_INDICATOR_KEY = "library-pager-indicator-"
 
 @Composable
-fun SharedTransitionScope.libraryNameSharedContentState(libraryId: String): SharedContentState =
-    rememberSharedContentState("$NAME_KEY$libraryId")
+fun SharedTransitionScope.librarySCS(
+    sharedContent: LibrarySharedContent,
+    libraryId: String,
+): SharedContentState = rememberSharedContentState("${sharedContent.key}$libraryId")
 
-@Composable
-fun SharedTransitionScope.libraryDeveloperSharedContentState(libraryId: String): SharedContentState =
-    rememberSharedContentState("$DEVELOPER_KEY$libraryId")
-
-@Composable
-fun SharedTransitionScope.libraryBodySharedContentState(libraryId: String): SharedContentState =
-    rememberSharedContentState("$BODY_KEY$libraryId")
-
-@Composable
-fun SharedTransitionScope.libraryFooterSharedContentState(libraryId: String): SharedContentState =
-    rememberSharedContentState("$FOOTER_KEY$libraryId")
+enum class LibrarySharedContent(val key: String) {
+    SURFACE(SURFACE_KEY),
+    NAME(NAME_KEY),
+    DEVELOPER(DEVELOPER_KEY),
+    PAGER(PAGER_KEY),
+    PAGER_INDICATOR(PAGER_INDICATOR_KEY),
+}

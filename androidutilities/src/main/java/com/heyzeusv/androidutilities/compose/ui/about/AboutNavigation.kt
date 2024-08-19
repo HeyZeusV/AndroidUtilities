@@ -74,7 +74,6 @@ fun AboutNavigation(
     SharedTransitionLayout {
         val navController = rememberNavController()
 
-        // TODO: Try out both sharedElement and sharedBounds
         NavHost(
             navController = navController,
             startDestination = "about"
