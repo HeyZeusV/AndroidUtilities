@@ -2,6 +2,7 @@
 
 package com.heyzeusv.androidutilities.compose.ui.library
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -41,7 +42,8 @@ import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
 internal fun LibraryScreen(
-    modifier: Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onBackPressed: () -> Unit,
     library: Library,
     colors: LibraryColors,
@@ -51,7 +53,8 @@ internal fun LibraryScreen(
 ) {
     Column {
         LibraryScreen(
-            modifier = modifier,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
             onBackPressed = onBackPressed,
             library = library,
             colors = colors,
@@ -64,7 +67,8 @@ internal fun LibraryScreen(
 
 @Composable
 internal fun ColumnScope.LibraryScreen(
-    modifier: Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onBackPressed: () -> Unit,
     library: Library,
     colors: LibraryColors,
@@ -73,7 +77,9 @@ internal fun ColumnScope.LibraryScreen(
     textStyles: LibraryTextStyles,
 ) {
     LibraryDetails(
-        modifier = modifier.fillMaxSize(),
+        sharedTransitionScope = sharedTransitionScope,
+        animatedContentScope = animatedContentScope,
+        modifier = Modifier.fillMaxSize(),
         pagerModifier = Modifier.weight(1f),
         bodyModifier = Modifier
             .weight(1f)
@@ -118,24 +124,18 @@ internal fun LibraryList(
                 items = libs,
                 key = { it.uniqueId }
             ) { library ->
-                with(sharedTransitionScope) {
-                    val sharedKey = "library-${library.uniqueId}"
-                    LibraryDetails(
-                        modifier = Modifier
-                            .clickable { libraryOnClick(info.id, library.uniqueId) }
-                            .sharedBounds(
-                                sharedContentState = rememberSharedContentState(sharedKey),
-                                animatedVisibilityScope = animatedContentScope
-                            ),
-                        isFullscreen = false,
-                        library = library,
-                        bodyMaxLines = bodyMaxLines,
-                        colors = colors.libraryItemColors,
-                        padding = padding,
-                        dimensions = dimensions,
-                        textStyles = textStyles.libraryItemStyles,
-                    )
-                }
+                LibraryDetails(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    modifier = Modifier.clickable { libraryOnClick(info.id, library.uniqueId) },
+                    isFullscreen = false,
+                    library = library,
+                    bodyMaxLines = bodyMaxLines,
+                    colors = colors.libraryItemColors,
+                    padding = padding,
+                    dimensions = dimensions,
+                    textStyles = textStyles.libraryItemStyles,
+                )
             }
         }
     }
@@ -143,6 +143,8 @@ internal fun LibraryList(
 
 @Composable
 internal fun LibraryDetails(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier,
     pagerModifier: Modifier = Modifier,
     bodyModifier: Modifier = Modifier,
@@ -163,67 +165,84 @@ internal fun LibraryDetails(
     val licenseContent = license?.licenseContent.ifNullOrBlank(sRes(R.string.library_license_empty))
     val licenseName = license?.name.ifNullOrBlank(sRes(R.string.library_license_empty))
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = dimensions.shape,
-        color = colors.backgroundColor,
-        border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
-    ) {
-        Column(
-            modifier = Modifier.padding(padding.contentPadding),
-            verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)
+    with(sharedTransitionScope) {
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            shape = dimensions.shape,
+            color = colors.backgroundColor,
+            border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (isFullscreen) {
-                    IconButton(onClick = { onBackPressed() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null,
-                            tint = colors.contentColor
-                        )
+            Column(
+                modifier = Modifier.padding(padding.contentPadding),
+                verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isFullscreen) {
+                        IconButton(onClick = { onBackPressed() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = null,
+                                tint = colors.contentColor
+                            )
+                        }
                     }
+                    Text(
+                        text = library.name,
+                        modifier = Modifier
+                            .padding(padding.namePadding)
+                            .fillMaxWidth()
+                            .basicMarquee()
+                            .sharedElement(
+                                state = libraryNameSharedContentState(library.uniqueId),
+                                animatedVisibilityScope = animatedContentScope
+                            ),
+                        maxLines = 1,
+                        style = textStyles.nameStyle,
+                    )
                 }
                 Text(
-                    text = library.name,
+                    text = developers,
                     modifier = Modifier
-                        .padding(padding.namePadding)
+                        .padding(padding.developerPadding)
                         .fillMaxWidth()
-                        .basicMarquee(),
+                        .basicMarquee()
+                        .sharedElement(
+                            state = libraryDeveloperSharedContentState(library.uniqueId),
+                            animatedVisibilityScope = animatedContentScope
+                        ),
                     maxLines = 1,
-                    style = textStyles.nameStyle,
+                    style = textStyles.developerStyle
                 )
-            }
-            Text(
-                text = developers,
-                modifier = Modifier
-                    .padding(padding.developerPadding)
-                    .fillMaxWidth()
-                    .basicMarquee(),
-                maxLines = 1,
-                style = textStyles.developerStyle
-            )
-            HorizontalPager(state = pagerState, modifier = pagerModifier) { page ->
-                val body: String = if (page == 0) description else licenseContent
-                val footer: String = if (page == 0) version else licenseName
-                LibraryInfo(
-                    modifier = bodyModifier,
-                    body = body,
-                    bodyMaxLines = bodyMaxLines,
-                    footer = footer,
-                    colors = colors,
-                    padding = padding,
-                    dimensions = dimensions,
-                    textStyles = textStyles,
-                )
-            }
-            if (isFullscreen) {
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    pageCount = 2,
-                    modifier = Modifier
-                        .padding(padding.pageIndicatorPadding)
-                        .align(Alignment.CenterHorizontally),
-                )
+                HorizontalPager(state = pagerState, modifier = pagerModifier) { page ->
+                    val body: String = if (page == 0) description else licenseContent
+                    val footer: String = if (page == 0) version else licenseName
+                    LibraryInfo(
+                        bodyModifier = bodyModifier.sharedElement(
+                            state = libraryBodySharedContentState(library.uniqueId),
+                            animatedVisibilityScope = animatedContentScope
+                        ),
+                        footerModifier = Modifier.sharedElement(
+                            state = libraryFooterSharedContentState(library.uniqueId),
+                            animatedVisibilityScope = animatedContentScope
+                        ),
+                        body = body,
+                        bodyMaxLines = bodyMaxLines,
+                        footer = footer,
+                        colors = colors,
+                        padding = padding,
+                        dimensions = dimensions,
+                        textStyles = textStyles,
+                    )
+                }
+                if (isFullscreen) {
+                    HorizontalPagerIndicator(
+                        pagerState = pagerState,
+                        pageCount = 2,
+                        modifier = Modifier
+                            .padding(padding.pageIndicatorPadding)
+                            .align(Alignment.CenterHorizontally),
+                    )
+                }
             }
         }
     }
@@ -231,7 +250,8 @@ internal fun LibraryDetails(
 
 @Composable
 internal fun LibraryInfo(
-    modifier: Modifier,
+    @SuppressLint("ModifierParameter") bodyModifier: Modifier,
+    footerModifier: Modifier,
     body: String,
     bodyMaxLines: Int,
     footer: String,
@@ -247,7 +267,7 @@ internal fun LibraryInfo(
         )
         Text(
             text = body,
-            modifier = modifier
+            modifier = bodyModifier
                 .padding(padding.bodyPadding)
                 .fillMaxWidth(),
             color = colors.contentColor,
@@ -260,7 +280,7 @@ internal fun LibraryInfo(
         )
         Text(
             text = footer,
-            modifier = Modifier
+            modifier = footerModifier
                 .padding(padding.footerPadding)
                 .align(Alignment.End),
             color = colors.contentColor,

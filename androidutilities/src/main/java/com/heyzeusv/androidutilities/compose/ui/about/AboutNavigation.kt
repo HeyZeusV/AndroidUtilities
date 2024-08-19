@@ -4,7 +4,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -109,14 +108,10 @@ fun AboutNavigation(
                 val libraryId = backStackEntry.arguments?.getString("libraryId")!!
                 val libs = libraries[LibraryPartyInfo from partyId]!!
                 val library = libs.find { it.uniqueId == libraryId }!!
-                val sharedKey = "library-$libraryId"
 
                 LibraryScreen(
-                    modifier = Modifier
-                        .sharedBounds(
-                            sharedContentState = rememberSharedContentState(sharedKey),
-                            animatedVisibilityScope = this
-                        ),
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedContentScope = this,
                     library = library,
                     onBackPressed = { navController.navigate("about") },
                     colors = libraryColors,
