@@ -34,7 +34,7 @@ internal fun AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (String, String) -> Unit = { _, _ -> },
+    libraryOnClick: (String, String, Int) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),

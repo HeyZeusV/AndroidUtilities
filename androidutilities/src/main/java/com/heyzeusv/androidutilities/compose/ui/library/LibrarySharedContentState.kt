@@ -10,19 +10,25 @@ import androidx.compose.runtime.Composable
 private const val SURFACE_KEY = "library-surface-"
 private const val NAME_KEY = "library-name-"
 private const val DEVELOPER_KEY = "library-developer-"
-private const val PAGER_KEY = "library-pager-"
+private const val TOP_DIVIDER_KEY = "library-top-divider-"
+private const val BODY_KEY = "library-body-"
+private const val BOTTOM_DIVIDER_KEY = "library-bottom-divider-"
+private const val FOOTER_KEY = "library-footer-"
 private const val PAGER_INDICATOR_KEY = "library-pager-indicator-"
 
 @Composable
 fun SharedTransitionScope.librarySCS(
-    sharedContent: LibrarySharedContent,
-    libraryId: String,
-): SharedContentState = rememberSharedContentState("${sharedContent.key}$libraryId")
+    prefix: LibrarySharedContentPrefix,
+    key: String,
+): SharedContentState = rememberSharedContentState("${prefix.prefix}$key")
 
-enum class LibrarySharedContent(val key: String) {
+enum class LibrarySharedContentPrefix(val prefix: String) {
     SURFACE(SURFACE_KEY),
     NAME(NAME_KEY),
     DEVELOPER(DEVELOPER_KEY),
-    PAGER(PAGER_KEY),
+    TOP_DIVIDER(TOP_DIVIDER_KEY),
+    BODY(BODY_KEY),
+    BOTTOM_DIVIDER(BOTTOM_DIVIDER_KEY),
+    FOOTER(FOOTER_KEY),
     PAGER_INDICATOR(PAGER_INDICATOR_KEY),
 }

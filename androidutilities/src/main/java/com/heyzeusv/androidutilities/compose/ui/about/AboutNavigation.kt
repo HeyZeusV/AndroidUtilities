@@ -87,8 +87,8 @@ fun AboutNavigation(
                     version = version,
                     info = info,
                     libraries = libraries,
-                    libraryOnClick = { partyId, libraryId ->
-                        navController.navigate("details/$partyId/$libraryId")
+                    libraryOnClick = { partyId, libraryId, pagerPage ->
+                        navController.navigate("details/$partyId/$libraryId/$pagerPage")
                     },
                     colors = aboutColors,
                     padding = aboutPadding,
@@ -97,22 +97,25 @@ fun AboutNavigation(
                 )
             }
             composable(
-                route = "details/{partyId}/{libraryId}",
+                route = "details/{partyId}/{libraryId}/{pagerPage}",
                 arguments = listOf(
                     navArgument("partyId") { type = NavType.StringType },
-                    navArgument("libraryId") { type = NavType.StringType}
+                    navArgument("libraryId") { type = NavType.StringType},
+                    navArgument("pagerPage") { type = NavType.IntType},
                 )
             ) { backStackEntry ->
                 val partyId = backStackEntry.arguments?.getString("partyId")!!
                 val libraryId = backStackEntry.arguments?.getString("libraryId")!!
+                val initialPagerPage = backStackEntry.arguments?.getInt("pagerPage")!!
                 val libs = libraries[LibraryPartyInfo from partyId]!!
                 val library = libs.find { it.uniqueId == libraryId }!!
 
                 LibraryScreen(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this,
-                    library = library,
                     backOnClick = { navController.navigate("about") },
+                    library = library,
+                    initialPagerPage = initialPagerPage,
                     colors = libraryColors,
                     padding = libraryPadding,
                     dimensions = libraryDimensions,

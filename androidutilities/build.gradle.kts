@@ -30,6 +30,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += listOf(
+            "-Xcontext-receivers",
+        )
     }
     buildFeatures {
         compose = true
