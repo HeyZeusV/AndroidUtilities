@@ -16,25 +16,20 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryList
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
-import com.heyzeusv.androidutilities.compose.util.pRes
 import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
 internal fun AboutScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    icon: @Composable () -> Unit = {
-        Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
-    },
+    icon: @Composable () -> Unit = { },
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),
@@ -77,9 +72,7 @@ internal fun AboutScreen(
 
 @Composable
 internal fun AppInfo(
-    icon: @Composable () -> Unit = {
-        Icon(painter = pRes(R.drawable.ic_launcher_foreground), contentDescription = null)
-    },
+    icon: @Composable () -> Unit = { },
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),

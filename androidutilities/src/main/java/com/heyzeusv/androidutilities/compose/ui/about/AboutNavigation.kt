@@ -112,7 +112,7 @@ fun AboutNavigation(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this,
                     library = library,
-                    onBackPressed = { navController.navigate("about") },
+                    backOnClick = { navController.navigate("about") },
                     colors = libraryColors,
                     padding = libraryPadding,
                     dimensions = libraryDimensions,

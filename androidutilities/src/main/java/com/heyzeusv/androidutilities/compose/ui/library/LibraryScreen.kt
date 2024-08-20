@@ -36,6 +36,7 @@ import com.heyzeusv.androidutilities.compose.ui.about.AboutColors
 import com.heyzeusv.androidutilities.compose.ui.about.AboutTextStyles
 import com.heyzeusv.androidutilities.compose.ui.library.LibrarySharedContent.*
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
+import com.heyzeusv.androidutilities.compose.util.formatContent
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
@@ -44,7 +45,7 @@ import com.mikepenz.aboutlibraries.entity.Library
 internal fun LibraryScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    onBackPressed: () -> Unit,
+    backOnClick: () -> Unit,
     library: Library,
     colors: LibraryColors,
     padding: LibraryPadding,
@@ -55,7 +56,7 @@ internal fun LibraryScreen(
         LibraryScreen(
             sharedTransitionScope = sharedTransitionScope,
             animatedContentScope = animatedContentScope,
-            onBackPressed = onBackPressed,
+            backOnClick = backOnClick,
             library = library,
             colors = colors,
             padding = padding,
@@ -69,7 +70,7 @@ internal fun LibraryScreen(
 internal fun ColumnScope.LibraryScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    onBackPressed: () -> Unit,
+    backOnClick: () -> Unit,
     library: Library,
     colors: LibraryColors,
     padding: LibraryPadding,
@@ -85,7 +86,7 @@ internal fun ColumnScope.LibraryScreen(
             .weight(1f)
             .verticalScroll(rememberScrollState()),
         isFullscreen = true,
-        onBackPressed = onBackPressed,
+        backOnClick = backOnClick,
         library = library,
         bodyMaxLines = Int.MAX_VALUE,
         colors = colors,
@@ -149,7 +150,7 @@ internal fun LibraryDetails(
     pagerModifier: Modifier = Modifier,
     bodyModifier: Modifier = Modifier,
     isFullscreen: Boolean,
-    onBackPressed: () -> Unit = { },
+    backOnClick: () -> Unit = { },
     library: Library,
     bodyMaxLines: Int,
     colors: LibraryColors,
@@ -158,6 +159,7 @@ internal fun LibraryDetails(
     textStyles: LibraryTextStyles,
 ) {
     val pagerState = rememberPagerState(pageCount = { if (isFullscreen) 2 else 1 })
+    // TODO: Maybe add string if blank developers
     val developers = library.developers.map { it.name }.joinToString(separator = ", ")
     val description = library.description.ifNullOrBlank(sRes(R.string.library_description_empty))
     val version = library.artifactVersion.ifNullOrBlank(sRes(R.string.library_version_empty))
@@ -183,7 +185,7 @@ internal fun LibraryDetails(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (isFullscreen) {
-                        IconButton(onClick = { onBackPressed() }) {
+                        IconButton(onClick = { backOnClick() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
                                 contentDescription = null,
@@ -229,7 +231,7 @@ internal fun LibraryDetails(
                     val footer: String = if (page == 0) version else licenseName
                     LibraryInfo(
                         modifier = bodyModifier,
-                        body = body,
+                        body = body.formatContent(),
                         bodyMaxLines = bodyMaxLines,
                         footer = footer,
                         colors = colors,
