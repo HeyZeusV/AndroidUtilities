@@ -24,12 +24,13 @@ import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
 object AboutDefaults {
     private val ItemSpacing = 12.dp
     private val AppInfoItemSpacing = 8.dp
-    private val InfoHeight = 100.dp
+    private val InfoHeight = 75.dp
     private val DividerThickness = 2.dp
     private val ItemPadding = 16.dp
 
     @Composable
     fun aboutColors(
+        backgroundColor: Color = MaterialTheme.colorScheme.surface,
         titleColor: Color = MaterialTheme.colorScheme.onSurface,
         versionColor: Color = MaterialTheme.colorScheme.onSurface,
         infoColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -38,6 +39,7 @@ object AboutDefaults {
         libraryHeaderColor: Color = MaterialTheme.colorScheme.onSurface,
         libraryItemColors: LibraryColors = LibraryDefaults.libraryItemColors()
     ): AboutColors = DefaultAboutColors(
+        backgroundColor = backgroundColor,
         titleColor = titleColor,
         versionColor = versionColor,
         infoColor = infoColor,
@@ -102,6 +104,7 @@ object AboutDefaults {
 
 @Stable
 interface AboutColors {
+    val backgroundColor: Color
     val titleColor: Color
     val versionColor: Color
     val infoColor: Color
@@ -113,6 +116,7 @@ interface AboutColors {
 
 @Immutable
 private data class DefaultAboutColors(
+    override val backgroundColor: Color,
     override val titleColor: Color,
     override val versionColor: Color,
     override val infoColor: Color,

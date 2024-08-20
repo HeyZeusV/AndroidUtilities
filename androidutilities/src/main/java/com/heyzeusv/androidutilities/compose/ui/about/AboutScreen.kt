@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,8 +27,7 @@ import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerInd
 import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
-internal fun AboutScreen(
-    sharedTransitionScope: SharedTransitionScope,
+internal fun SharedTransitionScope.AboutScreen(
     animatedContentScope: AnimatedContentScope,
     icon: @Composable () -> Unit = { },
     title: String = "App name",
@@ -57,11 +57,9 @@ internal fun AboutScreen(
             textStyles = textStyles,
         )
         LibraryList(
-            sharedTransitionScope = sharedTransitionScope,
             animatedContentScope = animatedContentScope,
             libraries = libraries,
             libraryOnClick = libraryOnClick,
-            bodyMaxLines = 5,
             colors = colors,
             padding = padding.libraryItemPadding,
             dimensions = dimensions.libraryItemDimensions,
@@ -71,7 +69,7 @@ internal fun AboutScreen(
 }
 
 @Composable
-internal fun AppInfo(
+internal fun SharedTransitionScope.AppInfo(
     icon: @Composable () -> Unit = { },
     title: String = "App name",
     version: String = "1.0.0",
@@ -83,51 +81,56 @@ internal fun AppInfo(
 ) {
     val pagerState = rememberPagerState(pageCount = { info.size })
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.appInfoItemSpacing),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(
+        modifier = Modifier.renderInSharedTransitionScopeOverlay(zIndexInOverlay = 10f),
+        color = colors.backgroundColor
     ) {
-        icon()
-        Text(
-            text = title,
-            modifier = Modifier.padding(padding.titlePadding),
-            color = colors.titleColor,
-            style = textStyles.titleStyle,
-        )
-        Text(
-            text = version,
-            modifier = Modifier.padding(padding.versionPadding),
-            color = colors.versionColor,
-            style = textStyles.versionStyle,
-        )
-        HorizontalPager(state = pagerState) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(dimensions.appInfoItemSpacing),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            icon()
             Text(
-                text = info[pagerState.currentPage],
-                modifier = Modifier
-                    .padding(padding.infoPadding)
-                    .height(dimensions.infoHeight)
-                    .verticalScroll(rememberScrollState()),
-                color = colors.infoColor,
-                style = textStyles.infoStyle,
+                text = title,
+                modifier = Modifier.padding(padding.titlePadding),
+                color = colors.titleColor,
+                style = textStyles.titleStyle,
+            )
+            Text(
+                text = version,
+                modifier = Modifier.padding(padding.versionPadding),
+                color = colors.versionColor,
+                style = textStyles.versionStyle,
+            )
+            HorizontalPager(state = pagerState) {
+                Text(
+                    text = info[pagerState.currentPage],
+                    modifier = Modifier
+                        .padding(padding.infoPadding)
+                        .height(dimensions.infoHeight)
+                        .verticalScroll(rememberScrollState()),
+                    color = colors.infoColor,
+                    style = textStyles.infoStyle,
+                )
+            }
+            if (info.size > 1) {
+                HorizontalPagerIndicator(
+                    pagerState = pagerState,
+                    pageCount = info.size,
+                    modifier = Modifier.padding(padding.pageIndicatorPadding),
+                    activeColor = colors.pagerIndicatorColors.activeColor,
+                    inactiveColor = colors.pagerIndicatorColors.inactiveColor,
+                    indicatorWidth = dimensions.pagerIndicatorDimensions.indicatorWidth,
+                    indicatorHeight = dimensions.pagerIndicatorDimensions.indicatorHeight,
+                    indicatorSpacing = dimensions.pagerIndicatorDimensions.indicatorSpacing,
+                    indicatorShape = dimensions.pagerIndicatorDimensions.indicatorShape,
+                )
+            }
+            HorizontalDivider(
+                thickness = dimensions.dividerThickness,
+                color = colors.dividerColor,
             )
         }
-        if (info.size > 1) {
-            HorizontalPagerIndicator(
-                pagerState = pagerState,
-                pageCount = info.size,
-                modifier = Modifier.padding(padding.pageIndicatorPadding),
-                activeColor = colors.pagerIndicatorColors.activeColor,
-                inactiveColor = colors.pagerIndicatorColors.inactiveColor,
-                indicatorWidth = dimensions.pagerIndicatorDimensions.indicatorWidth,
-                indicatorHeight = dimensions.pagerIndicatorDimensions.indicatorHeight,
-                indicatorSpacing = dimensions.pagerIndicatorDimensions.indicatorSpacing,
-                indicatorShape = dimensions.pagerIndicatorDimensions.indicatorShape,
-            )
-        }
-        HorizontalDivider(
-            thickness = dimensions.dividerThickness,
-            color = colors.dividerColor,
-        )
     }
 }

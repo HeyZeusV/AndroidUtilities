@@ -2,6 +2,8 @@ package com.heyzeusv.androidutilities.compose.ui.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
@@ -78,9 +80,12 @@ fun AboutNavigation(
             navController = navController,
             startDestination = "about"
         ) {
-            composable("about") {
+            composable(
+                route = "about",
+                enterTransition = { slideInVertically(initialOffsetY = { -it }) },
+                exitTransition = { slideOutVertically(targetOffsetY = { -it }) },
+            ) {
                 AboutScreen(
-                    sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this,
                     icon = icon,
                     title = title,
@@ -111,7 +116,6 @@ fun AboutNavigation(
                 val library = libs.find { it.uniqueId == libraryId }!!
 
                 LibraryScreen(
-                    sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this,
                     backOnClick = { navController.navigate("about") },
                     library = library,

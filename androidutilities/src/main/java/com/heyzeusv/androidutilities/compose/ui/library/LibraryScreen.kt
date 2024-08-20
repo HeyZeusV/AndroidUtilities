@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -42,9 +43,9 @@ import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
+
 @Composable
-internal fun LibraryScreen(
-    sharedTransitionScope: SharedTransitionScope,
+internal fun SharedTransitionScope.LibraryScreen(
     animatedContentScope: AnimatedContentScope,
     backOnClick: () -> Unit,
     library: Library,
@@ -56,7 +57,6 @@ internal fun LibraryScreen(
 ) {
     Column {
         LibraryScreen(
-            sharedTransitionScope = sharedTransitionScope,
             animatedContentScope = animatedContentScope,
             backOnClick = backOnClick,
             library = library,
@@ -69,9 +69,9 @@ internal fun LibraryScreen(
     }
 }
 
+context(SharedTransitionScope)
 @Composable
 internal fun ColumnScope.LibraryScreen(
-    sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     backOnClick: () -> Unit,
     library: Library,
@@ -84,18 +84,17 @@ internal fun ColumnScope.LibraryScreen(
     val pagerState = rememberPagerState(initialPage = initialPagerPage) { 2 }
 
     LibraryDetails(
-        sharedTransitionScope = sharedTransitionScope,
         animatedContentScope = animatedContentScope,
         modifier = Modifier.fillMaxSize(),
         pagerModifier = Modifier.weight(1f),
         bodyModifier = Modifier
             .weight(1f)
+            .padding(padding.bodyPadding)
             .verticalScroll(rememberScrollState()),
         isFullscreen = true,
         backOnClick = backOnClick,
         library = library,
         pagerState = pagerState,
-        bodyMaxLines = Int.MAX_VALUE,
         colors = colors,
         padding = padding,
         dimensions = dimensions,
@@ -104,12 +103,10 @@ internal fun ColumnScope.LibraryScreen(
 }
 
 @Composable
-internal fun LibraryList(
-    sharedTransitionScope: SharedTransitionScope,
+internal fun SharedTransitionScope.LibraryList(
     animatedContentScope: AnimatedContentScope,
     libraries: Map<LibraryPartyInfo, List<Library>>,
     libraryOnClick: (String, String, Int) -> Unit,
-    bodyMaxLines: Int,
     colors: AboutColors,
     padding: LibraryPadding,
     dimensions: LibraryDimensions,
@@ -117,7 +114,7 @@ internal fun LibraryList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)
+        verticalArrangement = Arrangement.spacedBy(LibraryDefaults.ContentSpacing)
     ) {
         libraries.forEach { (info, libs) ->
             item {
@@ -135,15 +132,16 @@ internal fun LibraryList(
                 val pagerState = rememberPagerState(pageCount = { 2 })
 
                 LibraryDetails(
-                    sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,
                     modifier = Modifier.clickable {
                         libraryOnClick(info.id, library.uniqueId, pagerState.currentPage)
                     },
+                    bodyModifier = Modifier
+                        .padding(padding.bodyPadding)
+                        .height(LibraryDefaults.ItemBodyHeight),
                     isFullscreen = false,
                     library = library,
                     pagerState = pagerState,
-                    bodyMaxLines = bodyMaxLines,
                     colors = colors.libraryItemColors,
                     padding = padding,
                     dimensions = dimensions,
@@ -155,17 +153,15 @@ internal fun LibraryList(
 }
 
 @Composable
-internal fun LibraryDetails(
-    sharedTransitionScope: SharedTransitionScope,
+internal fun SharedTransitionScope.LibraryDetails(
     animatedContentScope: AnimatedContentScope,
     modifier: Modifier,
     pagerModifier: Modifier = Modifier,
-    bodyModifier: Modifier = Modifier,
+    bodyModifier: Modifier,
     isFullscreen: Boolean,
     backOnClick: () -> Unit = { },
     library: Library,
     pagerState: PagerState,
-    bodyMaxLines: Int,
     colors: LibraryColors,
     padding: LibraryPadding,
     dimensions: LibraryDimensions,
@@ -179,90 +175,106 @@ internal fun LibraryDetails(
     val licenseContent = license?.licenseContent.ifNullOrBlank(sRes(R.string.library_license_empty))
     val licenseName = license?.name.ifNullOrBlank(sRes(R.string.library_license_empty))
 
-    with(sharedTransitionScope) {
-        Surface(
-            modifier = modifier
-                .fillMaxWidth()
-                .sharedElement(
-                    state = librarySCS(SURFACE, library.uniqueId),
-                    animatedVisibilityScope = animatedContentScope,
-                ),
-            shape = dimensions.shape,
-            color = colors.backgroundColor,
-            border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .sharedElement(
+                state = librarySCS(SURFACE, library.uniqueId),
+                animatedVisibilityScope = animatedContentScope,
+            ),
+        shape = dimensions.shape,
+        color = colors.backgroundColor,
+        border = BorderStroke(width = dimensions.borderWidth, color = colors.borderColor),
+    ) {
+        Column(
+            modifier = Modifier.padding(padding.contentPadding),
         ) {
-            Column(
-                modifier = Modifier.padding(padding.contentPadding),
-                verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (isFullscreen) {
-                        IconButton(onClick = { backOnClick() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = null,
-                                tint = colors.contentColor
-                            )
-                        }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isFullscreen) {
+                    IconButton(onClick = { backOnClick() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = null,
+                            tint = colors.contentColor
+                        )
                     }
-                    Text(
-                        text = library.name,
-                        modifier = Modifier
-                            .padding(padding.namePadding)
-                            .fillMaxWidth()
-                            .basicMarquee()
-                            .sharedElement(
-                                state = librarySCS(NAME, library.uniqueId),
-                                animatedVisibilityScope = animatedContentScope
-                            ),
-                        maxLines = 1,
-                        style = textStyles.nameStyle,
-                    )
                 }
                 Text(
-                    text = developers,
+                    text = library.name,
                     modifier = Modifier
-                        .padding(padding.developerPadding)
+                        .padding(padding.namePadding)
                         .fillMaxWidth()
                         .basicMarquee()
                         .sharedElement(
-                            state = librarySCS(DEVELOPER, library.uniqueId),
+                            state = librarySCS(NAME, library.uniqueId),
                             animatedVisibilityScope = animatedContentScope,
                         ),
                     maxLines = 1,
-                    style = textStyles.developerStyle,
-                )
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = pagerModifier,
-                ) { page ->
-                    val body: String = if (page == 0) description else licenseContent
-                    val footer: String = if (page == 0) version else licenseName
-                    LibraryInfo(
-                        animatedContentScope = animatedContentScope,
-                        sharedContentKey = "${library.uniqueId}-$page",
-                        modifier = bodyModifier,
-                        body = body.formatContent(),
-                        bodyMaxLines = bodyMaxLines,
-                        footer = footer,
-                        colors = colors,
-                        padding = padding,
-                        dimensions = dimensions,
-                        textStyles = textStyles,
-                    )
-                }
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    pageCount = 2,
-                    modifier = Modifier
-                        .padding(padding.pageIndicatorPadding)
-                        .align(Alignment.CenterHorizontally)
-                        .sharedElement(
-                            state = librarySCS(PAGER_INDICATOR, library.uniqueId),
-                            animatedVisibilityScope = animatedContentScope
-                        ),
+                    style = textStyles.nameStyle,
                 )
             }
+            Text(
+                text = developers,
+                modifier = Modifier
+                    .padding(padding.developerPadding)
+                    .fillMaxWidth()
+                    .basicMarquee()
+                    .sharedElement(
+                        state = librarySCS(DEVELOPER, library.uniqueId),
+                        animatedVisibilityScope = animatedContentScope,
+                    ),
+                maxLines = 1,
+                style = textStyles.developerStyle,
+            )
+            HorizontalPager(
+                state = pagerState,
+                modifier = pagerModifier,
+            ) { page ->
+                val body: String = if (page == 0) description else licenseContent
+                val footer: String = if (page == 0) version else licenseName
+                LibraryInfo(
+                    animatedContentScope = animatedContentScope,
+                    sharedContentKey = "${library.uniqueId}-$page",
+                    modifier = bodyModifier,
+                    body = body.formatContent(),
+                    footer = footer,
+                    colors = colors,
+                    padding = padding,
+                    dimensions = dimensions,
+                    textStyles = textStyles,
+                )
+            }
+            Surface(
+                modifier = Modifier
+                    .padding(bottom = dimensions.borderWidth)
+                    .fillMaxWidth()
+                    .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 1f),
+                color = colors.backgroundColor,
+            ) {
+                Column {
+                    HorizontalPagerIndicator(
+                        pagerState = pagerState,
+                        pageCount = 2,
+                        modifier = Modifier
+                            .padding(padding.pageIndicatorPadding)
+                            .align(Alignment.CenterHorizontally)
+                            .sharedElement(
+                                state = librarySCS(PAGER_INDICATOR, library.uniqueId),
+                                animatedVisibilityScope = animatedContentScope,
+                                zIndexInOverlay = 2f,
+                            ),
+                    )
+                }
+            }
+            HorizontalDivider(
+                modifier = Modifier.sharedElement(
+                    state = librarySCS(prefix = BOTTOM_DIVIDER, key = library.uniqueId),
+                    animatedVisibilityScope = animatedContentScope,
+                    zIndexInOverlay = 3f,
+                ),
+                thickness = dimensions.borderWidth,
+                color = colors.borderColor,
+            )
         }
     }
 }
@@ -273,14 +285,13 @@ internal fun SharedTransitionScope.LibraryInfo(
     sharedContentKey: String,
     modifier: Modifier,
     body: String,
-    bodyMaxLines: Int,
     footer: String,
     colors: LibraryColors,
     padding: LibraryPadding,
     dimensions: LibraryDimensions,
     textStyles: LibraryTextStyles,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(dimensions.contentSpacing)) {
+    Column {
         HorizontalDivider(
             modifier = Modifier.sharedElement(
                 state = librarySCS(TOP_DIVIDER, sharedContentKey),
@@ -292,35 +303,45 @@ internal fun SharedTransitionScope.LibraryInfo(
         Text(
             text = body,
             modifier = modifier
-                .padding(padding.bodyPadding)
                 .fillMaxWidth()
                 .sharedBounds(
                     sharedContentState = librarySCS(BODY, sharedContentKey),
                     animatedVisibilityScope = animatedContentScope,
                 ),
             color = colors.contentColor,
-            maxLines = bodyMaxLines,
+
             style = textStyles.bodyStyle,
         )
-        HorizontalDivider(
-            modifier = Modifier.sharedElement(
-                state = librarySCS(BOTTOM_DIVIDER, sharedContentKey),
-                animatedVisibilityScope = animatedContentScope,
-            ),
-            thickness = dimensions.dividerThickness,
-            color = colors.dividerColor,
-        )
-        Text(
-            text = footer,
+        Surface(
             modifier = Modifier
-                .padding(padding.footerPadding)
-                .align(Alignment.End)
-                .sharedElement(
-                    state = librarySCS(FOOTER, sharedContentKey),
-                    animatedVisibilityScope = animatedContentScope,
-                ),
-            color = colors.contentColor,
-            style = textStyles.footerStyle,
-        )
+                .fillMaxWidth()
+                .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 1f),
+            color = colors.backgroundColor
+        ) {
+            Column {
+                HorizontalDivider(
+                    modifier = Modifier.sharedElement(
+                        state = librarySCS(MIDDLE_DIVIDER, sharedContentKey),
+                        animatedVisibilityScope = animatedContentScope,
+                        zIndexInOverlay = 2f,
+                    ),
+                    thickness = dimensions.dividerThickness,
+                    color = colors.dividerColor,
+                )
+                Text(
+                    text = footer,
+                    modifier = Modifier
+                        .padding(padding.footerPadding)
+                        .align(Alignment.End)
+                        .sharedElement(
+                            state = librarySCS(FOOTER, sharedContentKey),
+                            animatedVisibilityScope = animatedContentScope,
+                            zIndexInOverlay = 2f,
+                        ),
+                    color = colors.contentColor,
+                    style = textStyles.footerStyle,
+                )
+            }
+        }
     }
 }
