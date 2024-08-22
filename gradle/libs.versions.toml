@@ -1,10 +1,9 @@
 [versions]
 kotlinxSerializationJson = "1.7.1"
-kotlinSerializationPlugin = "2.0.0"
 sharedElementTransition = "1.7.0-rc01"
 aboutlibraries = "11.2.2"
 agp = "8.5.0"
-kotlin = "1.9.0"
+kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -44,5 +43,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 aboutlibraries-plugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries"}
-jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerializationPlugin"}
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 

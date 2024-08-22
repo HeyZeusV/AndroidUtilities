@@ -2,15 +2,13 @@ package com.heyzeusv.androidutilities.compose.ui.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
@@ -25,6 +23,7 @@ import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
 fun AboutNavigation(
+    navController: NavHostController = rememberNavController(),
     icon: @Composable () -> Unit = { },
     title: String,
     version: String,
@@ -44,6 +43,7 @@ fun AboutNavigation(
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
     AboutNavigation(
+        navController = navController,
         icon = icon,
         title = title,
         version = version,
@@ -63,6 +63,7 @@ fun AboutNavigation(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AboutNavigation(
+    navController: NavHostController = rememberNavController(),
     icon: @Composable () -> Unit = { },
     title: String,
     version: String,
@@ -80,13 +81,11 @@ fun AboutNavigation(
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     SharedTransitionLayout {
-        val navController = rememberNavController()
-
         NavHost(
             navController = navController,
             startDestination = "about"
         ) {
-            composable(route = "about") {
+            composable<AboutScreens.Overview> {
                 AboutScreen(
                     animatedContentScope = this,
                     icon = icon,
@@ -94,26 +93,15 @@ fun AboutNavigation(
                     version = version,
                     info = info,
                     libraries = libraries,
-                    libraryOnClick = { partyId, libraryId ->
-                        navController.navigate("details/$partyId/$libraryId")
-                    },
+                    libraryOnClick = { library -> navController.navigate(library) },
                     colors = aboutColors,
                     padding = aboutPadding,
                     extras = aboutExtras,
                     textStyles = aboutTextStyles,
                 )
             }
-            composable(
-                route = "details/{partyId}/{libraryId}",
-                arguments = listOf(
-                    navArgument("partyId") { type = NavType.StringType },
-                    navArgument("libraryId") { type = NavType.StringType},
-                ),
-            ) { backStackEntry ->
-                val partyId = backStackEntry.arguments?.getString("partyId")!!
-                val libraryId = backStackEntry.arguments?.getString("libraryId")!!
-                val libs = libraries[LibraryPartyInfo from partyId]!!
-                val library = libs.find { it.uniqueId == libraryId }!!
+            composable<AboutScreens.LibraryDetails> { backStackEntry ->
+                val library: Library = backStackEntry.toRoute()
 
                 LibraryScreen(
                     animatedContentScope = this,
@@ -127,10 +115,4 @@ fun AboutNavigation(
             }
         }
     }
-}
-
-context(SharedTransitionScope)
-@OptIn(ExperimentalSharedTransitionApi::class)
-fun NavGraphBuilder.aboutNavigation() {
-
 }
