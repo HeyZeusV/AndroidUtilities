@@ -8,30 +8,26 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.heyzeusv.androidutilities.R
+import com.heyzeusv.androidutilities.compose.util.pRes
 
 object LibraryDefaults {
     private val ItemBorderWidth = 2.dp
     private val DividerThickness = 2.dp
-    private val ItemCornerRadius = 12.dp
+    private val CornerRadius = 12.dp
     private val ContentPadding = 12.dp
-    val ContentSpacing = 8.dp
-    private val HalfContentSpacing = 4.dp
-    val ItemBodyHeight = 75.dp
-    private val ScreenBorderWidth = 0.dp
-    private val ScreenCornerRadius = 0.dp
+    private val ContentSpacedBy = 8.dp
+    private val ActionIconSize = 32.dp
+    val ActionIconRippleRadius = 24.dp
 
-    private val ContentPV = PaddingValues(start = ContentPadding, end = ContentPadding)
-    private val NamePV = PaddingValues(top = ContentPadding, bottom = HalfContentSpacing)
-    private val DeveloperPV = PaddingValues(vertical = HalfContentSpacing)
-    private val BodyPV = PaddingValues(vertical = HalfContentSpacing)
-    private val FooterPV = PaddingValues(vertical = HalfContentSpacing)
-    private val PageIndicatorPV = PaddingValues(top = HalfContentSpacing, bottom = ContentPadding)
+    private val ItemContentPV = PaddingValues(all = ContentPadding)
 
     @Composable
-    fun libraryItemColors(
+    fun libraryColors(
         borderColor: Color = MaterialTheme.colorScheme.onSurface,
         backgroundColor: Color = MaterialTheme.colorScheme.surface,
         contentColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -44,29 +40,18 @@ object LibraryDefaults {
     )
 
     @Composable
-    fun libraryScreenColors(
-        borderColor: Color = Color.Transparent,
-        backgroundColor: Color = MaterialTheme.colorScheme.surface,
-        contentColor: Color = MaterialTheme.colorScheme.onSurface,
-        dividerColor: Color = MaterialTheme.colorScheme.onSurface,
-    ): LibraryColors = DefaultLibraryColors(
-        borderColor = borderColor,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
-        dividerColor = dividerColor
-    )
-
-    @Composable
     fun libraryPadding(
-        contentPadding: PaddingValues = ContentPV,
-        namePadding: PaddingValues = NamePV,
-        developerPadding: PaddingValues = DeveloperPV,
-        bodyPadding: PaddingValues = BodyPV,
-        footerPadding: PaddingValues = FooterPV,
-        pageIndicatorPadding: PaddingValues = PageIndicatorPV,
+        contentPadding: PaddingValues = ItemContentPV,
+        namePadding: PaddingValues = PaddingValues(),
+        actionIconPadding: PaddingValues = PaddingValues(),
+        developerPadding: PaddingValues = PaddingValues(),
+        bodyPadding: PaddingValues = PaddingValues(),
+        footerPadding: PaddingValues = PaddingValues(),
+        pageIndicatorPadding: PaddingValues = PaddingValues(),
     ): LibraryPadding = DefaultLibraryPadding(
         contentPadding = contentPadding,
         namePadding = namePadding,
+        actionIconPadding = actionIconPadding,
         developerPadding = developerPadding,
         bodyPadding = bodyPadding,
         footerPadding = footerPadding,
@@ -74,25 +59,45 @@ object LibraryDefaults {
     )
 
     @Composable
-    fun libraryItemDimensions(
-        shape: Shape = RoundedCornerShape(ItemCornerRadius),
+    fun libraryItemExtras(
+        shape: Shape = RoundedCornerShape(CornerRadius),
         borderWidth: Dp = ItemBorderWidth,
+        contentSpacedBy: Dp = ContentSpacedBy,
         dividerThickness: Dp = DividerThickness,
-    ): LibraryDimensions = DefaultLibraryDimensions(
+        actionIcon: Painter = pRes(R.drawable.icon_expand),
+        actionIconSize: Dp = ActionIconSize,
+        titleMaxLines: Int = 1,
+        developersMaxLines: Int = 1,
+    ): LibraryExtras = DefaultLibraryExtras(
         shape = shape,
         borderWidth = borderWidth,
+        contentSpacedBy = contentSpacedBy,
         dividerThickness = dividerThickness,
+        actionIconSize = actionIconSize,
+        actionIcon = actionIcon,
+        titleMaxLines = titleMaxLines,
+        developersMaxLines = developersMaxLines,
     )
 
     @Composable
-    fun libraryScreenDimensions(
-        shape: Shape = RoundedCornerShape(ScreenCornerRadius),
-        borderWidth: Dp = ScreenBorderWidth,
+    fun libraryScreenExtras(
+        shape: Shape = RoundedCornerShape(CornerRadius),
+        borderWidth: Dp = ItemBorderWidth,
+        contentSpacedBy: Dp = ContentSpacedBy,
         dividerThickness: Dp = DividerThickness,
-    ): LibraryDimensions = DefaultLibraryDimensions(
+        actionIcon: Painter = pRes(R.drawable.icon_collapse),
+        actionIconSize: Dp = ActionIconSize,
+        titleMaxLines: Int = Int.MAX_VALUE,
+        developersMaxLines: Int = Int.MAX_VALUE,
+    ): LibraryExtras = DefaultLibraryExtras(
         shape = shape,
         borderWidth = borderWidth,
+        contentSpacedBy = contentSpacedBy,
         dividerThickness = dividerThickness,
+        actionIcon = actionIcon,
+        actionIconSize = actionIconSize,
+        titleMaxLines = titleMaxLines,
+        developersMaxLines = developersMaxLines,
     )
 
     @Composable
@@ -129,6 +134,7 @@ private data class DefaultLibraryColors(
 interface LibraryPadding {
     val contentPadding: PaddingValues
     val namePadding: PaddingValues
+    val actionIconPadding: PaddingValues
     val developerPadding: PaddingValues
     val bodyPadding: PaddingValues
     val footerPadding: PaddingValues
@@ -139,6 +145,7 @@ interface LibraryPadding {
 private data class DefaultLibraryPadding(
     override val contentPadding: PaddingValues,
     override val namePadding: PaddingValues,
+    override val actionIconPadding: PaddingValues,
     override val developerPadding: PaddingValues,
     override val bodyPadding: PaddingValues,
     override val footerPadding: PaddingValues,
@@ -146,18 +153,28 @@ private data class DefaultLibraryPadding(
 ) : LibraryPadding
 
 @Stable
-interface LibraryDimensions {
+interface LibraryExtras {
     val shape: Shape
     val borderWidth: Dp
+    val contentSpacedBy: Dp
     val dividerThickness: Dp
+    val actionIcon: Painter
+    val actionIconSize: Dp
+    val titleMaxLines: Int
+    val developersMaxLines: Int
 }
 
 @Immutable
-private data class DefaultLibraryDimensions(
+private data class DefaultLibraryExtras(
     override val shape: Shape,
     override val borderWidth: Dp,
+    override val contentSpacedBy: Dp,
     override val dividerThickness: Dp,
-) : LibraryDimensions
+    override val actionIcon: Painter,
+    override val actionIconSize: Dp,
+    override val titleMaxLines: Int,
+    override val developersMaxLines: Int,
+) : LibraryExtras
 
 @Stable
 interface LibraryTextStyles {

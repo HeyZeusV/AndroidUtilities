@@ -14,10 +14,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorColors
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDefaults
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDimensions
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorExtras
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryDimensions
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryExtras
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
 
@@ -26,7 +26,7 @@ object AboutDefaults {
     private val AppInfoItemSpacing = 8.dp
     private val InfoHeight = 75.dp
     private val DividerThickness = 2.dp
-    private val ItemPadding = 16.dp
+    private val ContentPadding = 16.dp
 
     @Composable
     fun aboutColors(
@@ -37,7 +37,7 @@ object AboutDefaults {
         pagerIndicatorColors: PagerIndicatorColors = PagerIndicatorDefaults.pagerIndicatorColors(),
         dividerColor: Color = MaterialTheme.colorScheme.onSurface,
         libraryHeaderColor: Color = MaterialTheme.colorScheme.onSurface,
-        libraryItemColors: LibraryColors = LibraryDefaults.libraryItemColors()
+        libraryItemColors: LibraryColors = LibraryDefaults.libraryColors()
     ): AboutColors = DefaultAboutColors(
         backgroundColor = backgroundColor,
         titleColor = titleColor,
@@ -51,7 +51,7 @@ object AboutDefaults {
 
     @Composable
     fun aboutPadding(
-        contentPadding: PaddingValues = PaddingValues(ItemPadding),
+        contentPadding: PaddingValues = PaddingValues(ContentPadding),
         titlePadding: PaddingValues = PaddingValues(),
         versionPadding: PaddingValues = PaddingValues(),
         infoPadding: PaddingValues = PaddingValues(),
@@ -67,20 +67,20 @@ object AboutDefaults {
     )
 
     @Composable
-    fun aboutDimensions(
+    fun aboutExtras(
         itemSpacing: Dp = ItemSpacing,
         appInfoItemSpacing: Dp = AppInfoItemSpacing,
         infoHeight: Dp = InfoHeight,
-        pagerIndicatorDimensions: PagerIndicatorDimensions = PagerIndicatorDefaults.pagerIndicatorDimensions(),
+        pagerIndicatorExtras: PagerIndicatorExtras = PagerIndicatorDefaults.pagerIndicatorExtras(),
         dividerThickness: Dp = DividerThickness,
-        libraryItemDimensions: LibraryDimensions = LibraryDefaults.libraryItemDimensions(),
-    ): AboutDimensions = DefaultAboutDimensions(
+        libraryItemExtras: LibraryExtras = LibraryDefaults.libraryItemExtras(),
+    ): AboutExtras = DefaultAboutExtras(
         itemSpacing = itemSpacing,
         appInfoItemSpacing = appInfoItemSpacing,
         infoHeight = infoHeight,
-        pagerIndicatorDimensions = pagerIndicatorDimensions,
+        pagerIndicatorExtras = pagerIndicatorExtras,
         dividerThickness = dividerThickness,
-        libraryItemDimensions = libraryItemDimensions,
+        libraryItemExtras = libraryItemExtras,
     )
 
     @Composable
@@ -147,24 +147,24 @@ private data class DefaultAboutPadding(
 ) : AboutPadding
 
 @Stable
-interface AboutDimensions {
+interface AboutExtras {
     val itemSpacing: Dp
     val appInfoItemSpacing: Dp
     val infoHeight: Dp
-    val pagerIndicatorDimensions: PagerIndicatorDimensions
+    val pagerIndicatorExtras: PagerIndicatorExtras
     val dividerThickness: Dp
-    val libraryItemDimensions: LibraryDimensions
+    val libraryItemExtras: LibraryExtras
 }
 
 @Immutable
-private data class DefaultAboutDimensions(
+private data class DefaultAboutExtras(
     override val itemSpacing: Dp,
     override val appInfoItemSpacing: Dp,
     override val infoHeight: Dp,
-    override val pagerIndicatorDimensions: PagerIndicatorDimensions,
+    override val pagerIndicatorExtras: PagerIndicatorExtras,
     override val dividerThickness: Dp,
-    override val libraryItemDimensions: LibraryDimensions,
-) : AboutDimensions
+    override val libraryItemExtras: LibraryExtras,
+) : AboutExtras
 
 @Stable
 interface AboutTextStyles {

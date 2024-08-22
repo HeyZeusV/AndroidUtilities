@@ -22,12 +22,12 @@ object PagerIndicatorDefaults {
     )
 
     @Composable
-    fun pagerIndicatorDimensions(
+    fun pagerIndicatorExtras(
         indicatorWidth: Dp = 8.dp,
         indicatorHeight: Dp = indicatorWidth,
         indicatorSpacing: Dp = indicatorWidth,
         indicatorShape: Shape = CircleShape
-    ): PagerIndicatorDimensions = DefaultPagerIndicatorDimensions(
+    ): PagerIndicatorExtras = DefaultPagerIndicatorExtras(
         indicatorWidth = indicatorWidth,
         indicatorHeight = indicatorHeight,
         indicatorSpacing = indicatorSpacing,
@@ -48,7 +48,7 @@ private data class DefaultPagerIndicatorColors(
 ) : PagerIndicatorColors
 
 @Stable
-interface PagerIndicatorDimensions {
+interface PagerIndicatorExtras {
     val indicatorWidth: Dp
     val indicatorHeight: Dp
     val indicatorSpacing: Dp
@@ -56,9 +56,9 @@ interface PagerIndicatorDimensions {
 }
 
 @Immutable
-private data class DefaultPagerIndicatorDimensions(
+private data class DefaultPagerIndicatorExtras(
     override val indicatorWidth: Dp,
     override val indicatorHeight: Dp,
     override val indicatorSpacing: Dp,
     override val indicatorShape: Shape,
-) : PagerIndicatorDimensions
+) : PagerIndicatorExtras

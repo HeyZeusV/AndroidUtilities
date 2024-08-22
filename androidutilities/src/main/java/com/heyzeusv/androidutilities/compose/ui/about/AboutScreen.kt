@@ -5,12 +5,18 @@ package com.heyzeusv.androidutilities.compose.ui.about
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -21,11 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryList
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryDetails
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
+import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
+context(AnimatedContentScope)
 @Composable
 internal fun SharedTransitionScope.AboutScreen(
     animatedContentScope: AnimatedContentScope,
@@ -34,17 +43,17 @@ internal fun SharedTransitionScope.AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (String, String, Int) -> Unit,
+    libraryOnClick: (String, String) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
-    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    extras: AboutExtras = AboutDefaults.aboutExtras(),
     textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
 ) {
     Column(
         modifier = Modifier
             .padding(padding.contentPadding)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(dimensions.itemSpacing)
+        verticalArrangement = Arrangement.spacedBy(extras.itemSpacing)
     ) {
         AppInfo(
             icon = icon,
@@ -53,7 +62,7 @@ internal fun SharedTransitionScope.AboutScreen(
             info = info,
             colors = colors,
             padding = padding,
-            dimensions = dimensions,
+            extras = extras,
             textStyles = textStyles,
         )
         LibraryList(
@@ -62,12 +71,13 @@ internal fun SharedTransitionScope.AboutScreen(
             libraryOnClick = libraryOnClick,
             colors = colors,
             padding = padding.libraryItemPadding,
-            dimensions = dimensions.libraryItemDimensions,
+            extras = extras,
             textStyles = textStyles,
         )
     }
 }
 
+context(AnimatedContentScope)
 @Composable
 internal fun SharedTransitionScope.AppInfo(
     icon: @Composable () -> Unit = { },
@@ -76,18 +86,23 @@ internal fun SharedTransitionScope.AppInfo(
     info: List<String> = listOf(),
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
-    dimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    extras: AboutExtras = AboutDefaults.aboutExtras(),
     textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
 ) {
     val pagerState = rememberPagerState(pageCount = { info.size })
 
     Surface(
-        modifier = Modifier.renderInSharedTransitionScopeOverlay(zIndexInOverlay = 10f),
+        modifier = Modifier
+            .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 10f)
+            .animateEnterExit(
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(),
+            ),
         color = colors.backgroundColor
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(dimensions.appInfoItemSpacing),
+            verticalArrangement = Arrangement.spacedBy(extras.appInfoItemSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             icon()
@@ -108,7 +123,7 @@ internal fun SharedTransitionScope.AppInfo(
                     text = info[pagerState.currentPage],
                     modifier = Modifier
                         .padding(padding.infoPadding)
-                        .height(dimensions.infoHeight)
+                        .height(extras.infoHeight)
                         .verticalScroll(rememberScrollState()),
                     color = colors.infoColor,
                     style = textStyles.infoStyle,
@@ -121,16 +136,58 @@ internal fun SharedTransitionScope.AppInfo(
                     modifier = Modifier.padding(padding.pageIndicatorPadding),
                     activeColor = colors.pagerIndicatorColors.activeColor,
                     inactiveColor = colors.pagerIndicatorColors.inactiveColor,
-                    indicatorWidth = dimensions.pagerIndicatorDimensions.indicatorWidth,
-                    indicatorHeight = dimensions.pagerIndicatorDimensions.indicatorHeight,
-                    indicatorSpacing = dimensions.pagerIndicatorDimensions.indicatorSpacing,
-                    indicatorShape = dimensions.pagerIndicatorDimensions.indicatorShape,
+                    indicatorWidth = extras.pagerIndicatorExtras.indicatorWidth,
+                    indicatorHeight = extras.pagerIndicatorExtras.indicatorHeight,
+                    indicatorSpacing = extras.pagerIndicatorExtras.indicatorSpacing,
+                    indicatorShape = extras.pagerIndicatorExtras.indicatorShape,
                 )
             }
             HorizontalDivider(
-                thickness = dimensions.dividerThickness,
+                thickness = extras.dividerThickness,
                 color = colors.dividerColor,
             )
+        }
+    }
+}
+
+@Composable
+internal fun SharedTransitionScope.LibraryList(
+    animatedContentScope: AnimatedContentScope,
+    libraries: Map<LibraryPartyInfo, List<Library>>,
+    libraryOnClick: (String, String) -> Unit,
+    colors: AboutColors,
+    padding: LibraryPadding,
+    extras: AboutExtras,
+    textStyles: AboutTextStyles,
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(extras.itemSpacing)
+    ) {
+        libraries.forEach { (info, libs) ->
+            item {
+                Text(
+                    text = sRes(info.headerId),
+                    modifier = Modifier.fillMaxWidth(),
+                    color = colors.libraryHeaderColor,
+                    style = textStyles.libraryHeaderStyle,
+                )
+            }
+            items(
+                items = libs,
+                key = { it.uniqueId }
+            ) { library ->
+                LibraryDetails(
+                    animatedContentScope = animatedContentScope,
+                    isFullscreen = false,
+                    actionOnClick = { libraryOnClick(info.id, library.uniqueId) },
+                    library = library,
+                    colors = colors.libraryItemColors,
+                    padding = padding,
+                    extras = extras.libraryItemExtras,
+                    textStyles = textStyles.libraryItemStyles,
+                )
+            }
         }
     }
 }

@@ -2,8 +2,6 @@ package com.heyzeusv.androidutilities.compose.ui.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
@@ -13,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryDimensions
+import com.heyzeusv.androidutilities.compose.ui.library.LibraryExtras
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryScreen
@@ -30,11 +28,11 @@ fun AboutNavigation(
     separateByParty: Boolean = true,
     aboutColors: AboutColors = AboutDefaults.aboutColors(),
     aboutPadding: AboutPadding = AboutDefaults.aboutPadding(),
-    aboutDimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    aboutExtras: AboutExtras = AboutDefaults.aboutExtras(),
     aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
-    libraryColors: LibraryColors = LibraryDefaults.libraryScreenColors(),
+    libraryColors: LibraryColors = LibraryDefaults.libraryColors(),
     libraryPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    libraryDimensions: LibraryDimensions = LibraryDefaults.libraryScreenDimensions(),
+    libraryExtras: LibraryExtras = LibraryDefaults.libraryScreenExtras(),
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
@@ -47,11 +45,11 @@ fun AboutNavigation(
         libraries = libraries,
         aboutColors = aboutColors,
         aboutPadding = aboutPadding,
-        aboutDimensions = aboutDimensions,
+        aboutExtras = aboutExtras,
         aboutTextStyles = aboutTextStyles,
         libraryColors = libraryColors,
         libraryPadding = libraryPadding,
-        libraryDimensions = libraryDimensions,
+        libraryExtras = libraryExtras,
         libraryTextStyles = libraryTextStyles,
     )
 }
@@ -66,11 +64,11 @@ fun AboutNavigation(
     libraries: Map<LibraryPartyInfo, List<Library>>,
     aboutColors: AboutColors = AboutDefaults.aboutColors(),
     aboutPadding: AboutPadding = AboutDefaults.aboutPadding(),
-    aboutDimensions: AboutDimensions = AboutDefaults.aboutDimensions(),
+    aboutExtras: AboutExtras = AboutDefaults.aboutExtras(),
     aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
-    libraryColors: LibraryColors = LibraryDefaults.libraryScreenColors(),
+    libraryColors: LibraryColors = LibraryDefaults.libraryColors(),
     libraryPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    libraryDimensions: LibraryDimensions = LibraryDefaults.libraryScreenDimensions(),
+    libraryExtras: LibraryExtras = LibraryDefaults.libraryScreenExtras(),
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     SharedTransitionLayout {
@@ -80,11 +78,7 @@ fun AboutNavigation(
             navController = navController,
             startDestination = "about"
         ) {
-            composable(
-                route = "about",
-                enterTransition = { slideInVertically(initialOffsetY = { -it }) },
-                exitTransition = { slideOutVertically(targetOffsetY = { -it }) },
-            ) {
+            composable(route = "about") {
                 AboutScreen(
                     animatedContentScope = this,
                     icon = icon,
@@ -92,37 +86,34 @@ fun AboutNavigation(
                     version = version,
                     info = info,
                     libraries = libraries,
-                    libraryOnClick = { partyId, libraryId, pagerPage ->
-                        navController.navigate("details/$partyId/$libraryId/$pagerPage")
+                    libraryOnClick = { partyId, libraryId ->
+                        navController.navigate("details/$partyId/$libraryId")
                     },
                     colors = aboutColors,
                     padding = aboutPadding,
-                    dimensions = aboutDimensions,
+                    extras = aboutExtras,
                     textStyles = aboutTextStyles,
                 )
             }
             composable(
-                route = "details/{partyId}/{libraryId}/{pagerPage}",
+                route = "details/{partyId}/{libraryId}",
                 arguments = listOf(
                     navArgument("partyId") { type = NavType.StringType },
                     navArgument("libraryId") { type = NavType.StringType},
-                    navArgument("pagerPage") { type = NavType.IntType},
-                )
+                ),
             ) { backStackEntry ->
                 val partyId = backStackEntry.arguments?.getString("partyId")!!
                 val libraryId = backStackEntry.arguments?.getString("libraryId")!!
-                val initialPagerPage = backStackEntry.arguments?.getInt("pagerPage")!!
                 val libs = libraries[LibraryPartyInfo from partyId]!!
                 val library = libs.find { it.uniqueId == libraryId }!!
 
                 LibraryScreen(
                     animatedContentScope = this,
-                    backOnClick = { navController.navigate("about") },
+                    backOnClick = { navController.navigateUp() },
                     library = library,
-                    initialPagerPage = initialPagerPage,
                     colors = libraryColors,
                     padding = libraryPadding,
-                    dimensions = libraryDimensions,
+                    extras = libraryExtras,
                     textStyles = libraryTextStyles,
                 )
             }
