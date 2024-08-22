@@ -93,7 +93,9 @@ fun AboutNavigation(
                     version = version,
                     info = info,
                     libraries = libraries,
-                    libraryOnClick = { library -> navController.navigate(library) },
+                    libraryOnClick = { partyId, libraryId ->
+                        navController.navigate(AboutScreens.LibraryDetails(partyId, libraryId))
+                    },
                     colors = aboutColors,
                     padding = aboutPadding,
                     extras = aboutExtras,
@@ -101,7 +103,9 @@ fun AboutNavigation(
                 )
             }
             composable<AboutScreens.LibraryDetails> { backStackEntry ->
-                val library: Library = backStackEntry.toRoute()
+                val libraryDetails: AboutScreens.LibraryDetails = backStackEntry.toRoute()
+                val libs = libraries[LibraryPartyInfo from libraryDetails.partyId]!!
+                val library = libs.find { it.uniqueId == libraryDetails.libraryId }!!
 
                 LibraryScreen(
                     animatedContentScope = this,

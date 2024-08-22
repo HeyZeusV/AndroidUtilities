@@ -46,7 +46,7 @@ internal fun SharedTransitionScope.AboutScreen(
     version: String = "1.0.0",
     info: List<String> = listOf(),
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (Library) -> Unit,
+    libraryOnClick: (String, String) -> Unit,
     colors: AboutColors = AboutDefaults.aboutColors(),
     padding: AboutPadding = AboutDefaults.aboutPadding(),
     extras: AboutExtras = AboutDefaults.aboutExtras(),
@@ -154,7 +154,7 @@ internal fun SharedTransitionScope.AppInfo(
 internal fun SharedTransitionScope.LibraryList(
     animatedContentScope: AnimatedContentScope,
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (Library) -> Unit,
+    libraryOnClick: (String, String) -> Unit,
     colors: AboutColors,
     padding: AboutPadding,
     extras: AboutExtras,
@@ -191,7 +191,7 @@ internal fun SharedTransitionScope.LibraryList(
                 LibraryDetails(
                     animatedContentScope = animatedContentScope,
                     isFullscreen = false,
-                    actionOnClick = { libraryOnClick(library) },
+                    actionOnClick = { libraryOnClick(info.id, library.uniqueId) },
                     library = library,
                     colors = colors.libraryItemColors,
                     padding = padding.libraryItemPadding,

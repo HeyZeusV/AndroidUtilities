@@ -1,6 +1,5 @@
 package com.heyzeusv.androidutilities.compose.ui.about
 
-import com.mikepenz.aboutlibraries.entity.Library
 import kotlinx.serialization.Serializable
 
 sealed interface AboutScreens {
@@ -8,5 +7,5 @@ sealed interface AboutScreens {
     data object Overview : AboutScreens
 
     @Serializable
-    data class LibraryDetails(val library: Library) : AboutScreens
+    data class LibraryDetails(val partyId: String, val libraryId: String) : AboutScreens
 }
