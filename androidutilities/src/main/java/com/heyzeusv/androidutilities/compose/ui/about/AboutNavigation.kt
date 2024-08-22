@@ -2,8 +2,10 @@ package com.heyzeusv.androidutilities.compose.ui.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -125,4 +127,10 @@ fun AboutNavigation(
             }
         }
     }
+}
+
+context(SharedTransitionScope)
+@OptIn(ExperimentalSharedTransitionApi::class)
+fun NavGraphBuilder.aboutNavigation() {
+
 }

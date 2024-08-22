@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
     id("maven-publish")
 }
 
@@ -72,6 +73,9 @@ dependencies {
 
     // AboutLibraries
     implementation(libs.aboutlibraries.core)
+
+    // Kotlin Serialization
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
