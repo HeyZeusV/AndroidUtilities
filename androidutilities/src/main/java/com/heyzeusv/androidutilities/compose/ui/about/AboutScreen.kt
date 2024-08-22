@@ -5,8 +5,12 @@ package com.heyzeusv.androidutilities.compose.ui.about
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryDetails
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.sRes
@@ -49,12 +52,7 @@ internal fun SharedTransitionScope.AboutScreen(
     extras: AboutExtras = AboutDefaults.aboutExtras(),
     textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
 ) {
-    Column(
-        modifier = Modifier
-            .padding(padding.contentPadding)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(extras.itemSpacing)
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         AppInfo(
             icon = icon,
             title = title,
@@ -70,7 +68,7 @@ internal fun SharedTransitionScope.AboutScreen(
             libraries = libraries,
             libraryOnClick = libraryOnClick,
             colors = colors,
-            padding = padding.libraryItemPadding,
+            padding = padding,
             extras = extras,
             textStyles = textStyles,
         )
@@ -93,6 +91,7 @@ internal fun SharedTransitionScope.AppInfo(
 
     Surface(
         modifier = Modifier
+            .padding(padding.appInfoPadding)
             .renderInSharedTransitionScopeOverlay(zIndexInOverlay = 10f)
             .animateEnterExit(
                 enter = fadeIn() + slideInVertically(),
@@ -143,6 +142,7 @@ internal fun SharedTransitionScope.AppInfo(
                 )
             }
             HorizontalDivider(
+                modifier = Modifier.padding(padding.dividerPadding),
                 thickness = extras.dividerThickness,
                 color = colors.dividerColor,
             )
@@ -156,26 +156,37 @@ internal fun SharedTransitionScope.LibraryList(
     libraries: Map<LibraryPartyInfo, List<Library>>,
     libraryOnClick: (String, String) -> Unit,
     colors: AboutColors,
-    padding: LibraryPadding,
+    padding: AboutPadding,
     extras: AboutExtras,
     textStyles: AboutTextStyles,
 ) {
+    val scaleSpring = spring<Float>(stiffness = Spring.StiffnessMedium)
+
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(extras.itemSpacing)
+        modifier = Modifier
+            .padding(padding.libraryListPadding)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(extras.itemSpacing),
     ) {
         libraries.forEach { (info, libs) ->
             item {
-                Text(
-                    text = sRes(info.headerId),
-                    modifier = Modifier.fillMaxWidth(),
-                    color = colors.libraryHeaderColor,
-                    style = textStyles.libraryHeaderStyle,
-                )
+                with(animatedContentScope) {
+                    Text(
+                        text = sRes(info.headerId),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateEnterExit(
+                                enter = scaleIn(scaleSpring),
+                                exit = scaleOut(scaleSpring),
+                            ),
+                        color = colors.libraryHeaderColor,
+                        style = textStyles.libraryHeaderStyle,
+                    )
+                }
             }
             items(
                 items = libs,
-                key = { it.uniqueId }
+                key = { it.uniqueId },
             ) { library ->
                 LibraryDetails(
                     animatedContentScope = animatedContentScope,
@@ -183,7 +194,7 @@ internal fun SharedTransitionScope.LibraryList(
                     actionOnClick = { libraryOnClick(info.id, library.uniqueId) },
                     library = library,
                     colors = colors.libraryItemColors,
-                    padding = padding,
+                    padding = padding.libraryItemPadding,
                     extras = extras.libraryItemExtras,
                     textStyles = textStyles.libraryItemStyles,
                 )

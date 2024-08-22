@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryExtras
@@ -17,6 +18,7 @@ import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryScreen
 import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
 import com.heyzeusv.androidutilities.compose.ui.library.produceLibraryState
+import com.heyzeusv.androidutilities.compose.util.pRes
 import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
@@ -31,8 +33,10 @@ fun AboutNavigation(
     aboutExtras: AboutExtras = AboutDefaults.aboutExtras(),
     aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
     libraryColors: LibraryColors = LibraryDefaults.libraryColors(),
-    libraryPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    libraryExtras: LibraryExtras = LibraryDefaults.libraryScreenExtras(),
+    libraryPadding: LibraryPadding =
+        LibraryDefaults.libraryPadding(outerPadding = LibraryDefaults.ScreenOuterPV),
+    libraryExtras: LibraryExtras =
+        LibraryDefaults.libraryExtras(actionIcon = pRes(R.drawable.icon_collapse)),
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
@@ -67,8 +71,10 @@ fun AboutNavigation(
     aboutExtras: AboutExtras = AboutDefaults.aboutExtras(),
     aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
     libraryColors: LibraryColors = LibraryDefaults.libraryColors(),
-    libraryPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    libraryExtras: LibraryExtras = LibraryDefaults.libraryScreenExtras(),
+    libraryPadding: LibraryPadding =
+        LibraryDefaults.libraryPadding(outerPadding = LibraryDefaults.ScreenOuterPV),
+    libraryExtras: LibraryExtras =
+        LibraryDefaults.libraryExtras(actionIcon = pRes(R.drawable.icon_collapse)),
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
     SharedTransitionLayout {

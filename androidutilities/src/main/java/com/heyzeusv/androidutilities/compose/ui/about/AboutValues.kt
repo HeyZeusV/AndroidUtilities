@@ -28,6 +28,11 @@ object AboutDefaults {
     private val DividerThickness = 2.dp
     private val ContentPadding = 16.dp
 
+    private val AppInfoPadding =
+        PaddingValues(start = ContentPadding, top = ContentPadding, end = ContentPadding)
+    private val LibraryListPadding =
+        PaddingValues(start = ContentPadding, end = ContentPadding, bottom = ContentPadding)
+
     @Composable
     fun aboutColors(
         backgroundColor: Color = MaterialTheme.colorScheme.surface,
@@ -37,7 +42,7 @@ object AboutDefaults {
         pagerIndicatorColors: PagerIndicatorColors = PagerIndicatorDefaults.pagerIndicatorColors(),
         dividerColor: Color = MaterialTheme.colorScheme.onSurface,
         libraryHeaderColor: Color = MaterialTheme.colorScheme.onSurface,
-        libraryItemColors: LibraryColors = LibraryDefaults.libraryColors()
+        libraryItemColors: LibraryColors = LibraryDefaults.libraryColors(),
     ): AboutColors = DefaultAboutColors(
         backgroundColor = backgroundColor,
         titleColor = titleColor,
@@ -51,18 +56,22 @@ object AboutDefaults {
 
     @Composable
     fun aboutPadding(
-        contentPadding: PaddingValues = PaddingValues(ContentPadding),
+        appInfoPadding: PaddingValues = AppInfoPadding,
         titlePadding: PaddingValues = PaddingValues(),
         versionPadding: PaddingValues = PaddingValues(),
         infoPadding: PaddingValues = PaddingValues(),
         pageIndicatorPadding: PaddingValues = PaddingValues(),
+        dividerPadding: PaddingValues = PaddingValues(bottom = ContentPadding),
+        libraryListPadding: PaddingValues = LibraryListPadding,
         libraryItemPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
     ): AboutPadding = DefaultAboutPadding(
-        contentPadding = contentPadding,
+        appInfoPadding = appInfoPadding,
         titlePadding = titlePadding,
         versionPadding = versionPadding,
         infoPadding = infoPadding,
         pageIndicatorPadding = pageIndicatorPadding,
+        dividerPadding = dividerPadding,
+        libraryListPadding = libraryListPadding,
         libraryItemPadding = libraryItemPadding,
     )
 
@@ -73,7 +82,7 @@ object AboutDefaults {
         infoHeight: Dp = InfoHeight,
         pagerIndicatorExtras: PagerIndicatorExtras = PagerIndicatorDefaults.pagerIndicatorExtras(),
         dividerThickness: Dp = DividerThickness,
-        libraryItemExtras: LibraryExtras = LibraryDefaults.libraryItemExtras(),
+        libraryItemExtras: LibraryExtras = LibraryDefaults.libraryExtras(),
     ): AboutExtras = DefaultAboutExtras(
         itemSpacing = itemSpacing,
         appInfoItemSpacing = appInfoItemSpacing,
@@ -128,21 +137,25 @@ private data class DefaultAboutColors(
 
 @Stable
 interface AboutPadding {
-    val contentPadding: PaddingValues
+    val appInfoPadding: PaddingValues
     val titlePadding: PaddingValues
     val versionPadding: PaddingValues
     val infoPadding: PaddingValues
     val pageIndicatorPadding: PaddingValues
+    val dividerPadding: PaddingValues
+    val libraryListPadding: PaddingValues
     val libraryItemPadding: LibraryPadding
 }
 
 @Immutable
 private data class DefaultAboutPadding(
-    override val contentPadding: PaddingValues,
+    override val appInfoPadding: PaddingValues,
     override val titlePadding: PaddingValues,
     override val versionPadding: PaddingValues,
     override val infoPadding: PaddingValues,
     override val pageIndicatorPadding: PaddingValues,
+    override val dividerPadding: PaddingValues,
+    override val libraryListPadding: PaddingValues,
     override val libraryItemPadding: LibraryPadding,
 ) : AboutPadding
 

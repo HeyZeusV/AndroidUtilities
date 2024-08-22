@@ -13,6 +13,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.R
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorColors
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDefaults
+import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorExtras
 import com.heyzeusv.androidutilities.compose.util.pRes
 
 object LibraryDefaults {
@@ -23,7 +26,9 @@ object LibraryDefaults {
     private val ContentSpacedBy = 8.dp
     private val ActionIconSize = 32.dp
     val ActionIconRippleRadius = 24.dp
+    private val ScreenOuterPadding = 12.dp
 
+    val ScreenOuterPV = PaddingValues(all = ScreenOuterPadding)
     private val ItemContentPV = PaddingValues(all = ContentPadding)
 
     @Composable
@@ -32,16 +37,19 @@ object LibraryDefaults {
         backgroundColor: Color = MaterialTheme.colorScheme.surface,
         contentColor: Color = MaterialTheme.colorScheme.onSurface,
         dividerColor: Color = MaterialTheme.colorScheme.onSurface,
+        pagerIndicatorColors: PagerIndicatorColors = PagerIndicatorDefaults.pagerIndicatorColors(),
     ): LibraryColors = DefaultLibraryColors(
         borderColor = borderColor,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
-        dividerColor = dividerColor
+        dividerColor = dividerColor,
+        pagerIndicatorColors = pagerIndicatorColors,
     )
 
     @Composable
     fun libraryPadding(
-        contentPadding: PaddingValues = ItemContentPV,
+        outerPadding: PaddingValues = PaddingValues(),
+        innerPadding: PaddingValues = ItemContentPV,
         namePadding: PaddingValues = PaddingValues(),
         actionIconPadding: PaddingValues = PaddingValues(),
         developerPadding: PaddingValues = PaddingValues(),
@@ -49,7 +57,8 @@ object LibraryDefaults {
         footerPadding: PaddingValues = PaddingValues(),
         pageIndicatorPadding: PaddingValues = PaddingValues(),
     ): LibraryPadding = DefaultLibraryPadding(
-        contentPadding = contentPadding,
+        outerPadding = outerPadding,
+        innerPadding = innerPadding,
         namePadding = namePadding,
         actionIconPadding = actionIconPadding,
         developerPadding = developerPadding,
@@ -59,15 +68,14 @@ object LibraryDefaults {
     )
 
     @Composable
-    fun libraryItemExtras(
+    fun libraryExtras(
         shape: Shape = RoundedCornerShape(CornerRadius),
         borderWidth: Dp = ItemBorderWidth,
         contentSpacedBy: Dp = ContentSpacedBy,
         dividerThickness: Dp = DividerThickness,
         actionIcon: Painter = pRes(R.drawable.icon_expand),
         actionIconSize: Dp = ActionIconSize,
-        titleMaxLines: Int = 1,
-        developersMaxLines: Int = 1,
+        pagerIndicatorExtras: PagerIndicatorExtras = PagerIndicatorDefaults.pagerIndicatorExtras(),
     ): LibraryExtras = DefaultLibraryExtras(
         shape = shape,
         borderWidth = borderWidth,
@@ -75,29 +83,7 @@ object LibraryDefaults {
         dividerThickness = dividerThickness,
         actionIconSize = actionIconSize,
         actionIcon = actionIcon,
-        titleMaxLines = titleMaxLines,
-        developersMaxLines = developersMaxLines,
-    )
-
-    @Composable
-    fun libraryScreenExtras(
-        shape: Shape = RoundedCornerShape(CornerRadius),
-        borderWidth: Dp = ItemBorderWidth,
-        contentSpacedBy: Dp = ContentSpacedBy,
-        dividerThickness: Dp = DividerThickness,
-        actionIcon: Painter = pRes(R.drawable.icon_collapse),
-        actionIconSize: Dp = ActionIconSize,
-        titleMaxLines: Int = Int.MAX_VALUE,
-        developersMaxLines: Int = Int.MAX_VALUE,
-    ): LibraryExtras = DefaultLibraryExtras(
-        shape = shape,
-        borderWidth = borderWidth,
-        contentSpacedBy = contentSpacedBy,
-        dividerThickness = dividerThickness,
-        actionIcon = actionIcon,
-        actionIconSize = actionIconSize,
-        titleMaxLines = titleMaxLines,
-        developersMaxLines = developersMaxLines,
+        pagerIndicatorExtras = pagerIndicatorExtras,
     )
 
     @Composable
@@ -120,6 +106,7 @@ interface LibraryColors {
     val backgroundColor: Color
     val contentColor: Color
     val dividerColor: Color
+    val pagerIndicatorColors: PagerIndicatorColors
 }
 
 @Immutable
@@ -127,12 +114,14 @@ private data class DefaultLibraryColors(
     override val borderColor: Color,
     override val backgroundColor: Color,
     override val contentColor: Color,
-    override val dividerColor: Color
+    override val dividerColor: Color,
+    override val pagerIndicatorColors: PagerIndicatorColors,
 ) : LibraryColors
 
 @Stable
 interface LibraryPadding {
-    val contentPadding: PaddingValues
+    val outerPadding: PaddingValues
+    val innerPadding: PaddingValues
     val namePadding: PaddingValues
     val actionIconPadding: PaddingValues
     val developerPadding: PaddingValues
@@ -143,7 +132,8 @@ interface LibraryPadding {
 
 @Immutable
 private data class DefaultLibraryPadding(
-    override val contentPadding: PaddingValues,
+    override val outerPadding: PaddingValues,
+    override val innerPadding: PaddingValues,
     override val namePadding: PaddingValues,
     override val actionIconPadding: PaddingValues,
     override val developerPadding: PaddingValues,
@@ -160,8 +150,7 @@ interface LibraryExtras {
     val dividerThickness: Dp
     val actionIcon: Painter
     val actionIconSize: Dp
-    val titleMaxLines: Int
-    val developersMaxLines: Int
+    val pagerIndicatorExtras: PagerIndicatorExtras
 }
 
 @Immutable
@@ -172,8 +161,7 @@ private data class DefaultLibraryExtras(
     override val dividerThickness: Dp,
     override val actionIcon: Painter,
     override val actionIconSize: Dp,
-    override val titleMaxLines: Int,
-    override val developersMaxLines: Int,
+    override val pagerIndicatorExtras: PagerIndicatorExtras,
 ) : LibraryExtras
 
 @Stable

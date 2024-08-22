@@ -5,6 +5,10 @@ package com.heyzeusv.androidutilities.compose.ui.library
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -37,7 +41,6 @@ import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
-
 @Composable
 internal fun SharedTransitionScope.LibraryScreen(
     animatedContentScope: AnimatedContentScope,
@@ -48,7 +51,7 @@ internal fun SharedTransitionScope.LibraryScreen(
     extras: LibraryExtras,
     textStyles: LibraryTextStyles,
 ) {
-    Column(modifier = Modifier.padding(padding.contentPadding)) {
+    Column(modifier = Modifier.padding(padding.outerPadding)) {
         LibraryScreen(
             animatedContentScope = animatedContentScope,
             backOnClick = backOnClick,
@@ -72,7 +75,6 @@ internal fun ColumnScope.LibraryScreen(
     extras: LibraryExtras,
     textStyles: LibraryTextStyles,
 ) {
-
     LibraryDetails(
         animatedContentScope = animatedContentScope,
         modifier = Modifier.fillMaxSize(),
@@ -118,7 +120,7 @@ internal fun SharedTransitionScope.LibraryDetails(
         border = BorderStroke(width = extras.borderWidth, color = colors.borderColor),
     ) {
         Column(
-            modifier = Modifier.padding(padding.contentPadding),
+            modifier = Modifier.padding(padding.innerPadding),
             verticalArrangement = Arrangement.spacedBy(extras.contentSpacedBy),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -161,45 +163,67 @@ internal fun SharedTransitionScope.LibraryDetails(
                     ),
                 style = textStyles.developerStyle,
             )
+            if (isFullscreen) {
+                val pagerState = rememberPagerState(pageCount = { 2 })
+                val scaleSpring = spring<Float>(stiffness = Spring.StiffnessMedium)
+
+                with(animatedContentScope) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .animateEnterExit(
+                                enter = scaleIn(scaleSpring),
+                                exit = scaleOut(scaleSpring),
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(extras.contentSpacedBy),
+                    ) {
+                        HorizontalDivider(
+                            thickness = extras.dividerThickness,
+                            color = colors.dividerColor,
+                        )
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .weight(1f),
+                        ) { page ->
+                            val body: String = if (page == 0) description else licenseContent
+                            Text(
+                                text = body.formatContent(),
+                                modifier = Modifier
+                                    .padding(padding.bodyPadding)
+                                    .fillMaxSize()
+                                    .skipToLookaheadSize()
+                                    .verticalScroll(rememberScrollState()),
+                                color = colors.contentColor,
+                                style = textStyles.bodyStyle,
+                            )
+                        }
+
+                        HorizontalPagerIndicator(
+                            pagerState = pagerState,
+                            pageCount = 2,
+                            modifier = Modifier
+                                .padding(padding.pageIndicatorPadding)
+                                .align(Alignment.CenterHorizontally),
+                            activeColor = colors.pagerIndicatorColors.activeColor,
+                            inactiveColor = colors.pagerIndicatorColors.inactiveColor,
+                            indicatorWidth = extras.pagerIndicatorExtras.indicatorWidth,
+                            indicatorHeight = extras.pagerIndicatorExtras.indicatorHeight,
+                            indicatorSpacing = extras.pagerIndicatorExtras.indicatorSpacing,
+                            indicatorShape = extras.pagerIndicatorExtras.indicatorShape,
+                        )
+                    }
+                }
+            }
             HorizontalDivider(
                 modifier = Modifier.sharedElement(
-                    state = librarySCS(TOP_DIVIDER, library.uniqueId),
+                    state = librarySCS(BOTTOM_DIVIDER, library.uniqueId),
                     animatedVisibilityScope = animatedContentScope,
                     zIndexInOverlay = 2f,
                 ),
                 thickness = extras.dividerThickness,
                 color = colors.dividerColor,
             )
-            if (isFullscreen) {
-                val pagerState = rememberPagerState(pageCount = { 2 })
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.weight(1f),
-                ) { page ->
-                    val body: String = if (page == 0) description else licenseContent
-                    Text(
-                        text = body.formatContent(),
-                        modifier = Modifier
-                            .padding(padding.bodyPadding)
-                            .fillMaxSize()
-                            .skipToLookaheadSize()
-                            .verticalScroll(rememberScrollState()),
-                        color = colors.contentColor,
-                        style = textStyles.bodyStyle,
-                    )
-                }
-                HorizontalPagerIndicator(
-                    pagerState = pagerState,
-                    pageCount = 2,
-                    modifier = Modifier
-                        .padding(padding.pageIndicatorPadding)
-                        .align(Alignment.CenterHorizontally)
-                )
-                HorizontalDivider(
-                    thickness = extras.dividerThickness,
-                    color = colors.dividerColor,
-                )
-            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
