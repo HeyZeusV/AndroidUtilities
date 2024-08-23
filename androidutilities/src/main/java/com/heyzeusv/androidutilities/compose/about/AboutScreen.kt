@@ -16,7 +16,7 @@ import com.heyzeusv.androidutilities.compose.about.library.LibraryDefaults
 import com.heyzeusv.androidutilities.compose.about.library.LibraryExtras
 import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
-import com.heyzeusv.androidutilities.compose.about.library.LibraryScreen
+import com.heyzeusv.androidutilities.compose.about.library.AboutLibrary
 import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewColors
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewDefaults
@@ -112,7 +112,7 @@ fun AboutScreen(
                 val libs = libraries[libraryDetails.libraryGroup]!!
                 val library = libs.find { it.uniqueId == libraryDetails.libraryId }!!
 
-                LibraryScreen(
+                AboutLibrary(
                     animatedContentScope = this,
                     backOnClick = { navController.navigateUp() },
                     library = library,

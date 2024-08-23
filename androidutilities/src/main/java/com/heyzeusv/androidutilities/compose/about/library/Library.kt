@@ -14,7 +14,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,31 +41,7 @@ import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
-internal fun SharedTransitionScope.LibraryScreen(
-    animatedContentScope: AnimatedContentScope,
-    backOnClick: () -> Unit,
-    library: Library,
-    colors: LibraryColors,
-    padding: LibraryPadding,
-    extras: LibraryExtras,
-    textStyles: LibraryTextStyles,
-) {
-    Column(modifier = Modifier.padding(padding.outerPadding)) {
-        LibraryScreen(
-            animatedContentScope = animatedContentScope,
-            backOnClick = backOnClick,
-            library = library,
-            colors = colors,
-            padding = padding,
-            extras = extras,
-            textStyles = textStyles,
-        )
-    }
-}
-
-context(SharedTransitionScope)
-@Composable
-internal fun ColumnScope.LibraryScreen(
+internal fun SharedTransitionScope.AboutLibrary(
     animatedContentScope: AnimatedContentScope,
     backOnClick: () -> Unit,
     library: Library,
@@ -100,8 +75,8 @@ internal fun SharedTransitionScope.LibraryDetails(
     extras: LibraryExtras,
     textStyles: LibraryTextStyles,
 ) {
-    // TODO: Maybe add string if blank developers
     val developers = library.developers.map { it.name }.joinToString(separator = ", ")
+        .ifBlank { sRes(R.string.library_developer_empty) }
     val description = library.description.ifNullOrBlank(sRes(R.string.library_description_empty))
     val version = library.artifactVersion.ifNullOrBlank(sRes(R.string.library_version_empty))
     val license = library.licenses.firstOrNull()
@@ -110,6 +85,7 @@ internal fun SharedTransitionScope.LibraryDetails(
 
     Surface(
         modifier = modifier
+            .padding(padding.outerPadding)
             .fillMaxWidth()
             .sharedElement(
                 state = librarySCS(SURFACE, library.uniqueId),
@@ -198,7 +174,6 @@ internal fun SharedTransitionScope.LibraryDetails(
                                 style = textStyles.bodyStyle,
                             )
                         }
-
                         HorizontalPagerIndicator(
                             pagerState = pagerState,
                             pageCount = 2,
