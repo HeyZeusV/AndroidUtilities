@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class)
 
-package com.heyzeusv.androidutilities.compose.ui.library
+package com.heyzeusv.androidutilities.compose.about.library
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -34,7 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.R
-import com.heyzeusv.androidutilities.compose.ui.library.LibrarySharedContentPrefix.*
+import com.heyzeusv.androidutilities.compose.about.library.LibrarySharedContentKeyPrefix.*
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.formatContent
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank

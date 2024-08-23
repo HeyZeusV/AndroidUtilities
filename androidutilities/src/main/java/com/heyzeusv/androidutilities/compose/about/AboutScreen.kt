@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.compose.ui.about
+package com.heyzeusv.androidutilities.compose.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -10,29 +10,35 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.heyzeusv.androidutilities.R
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryExtras
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryScreen
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
-import com.heyzeusv.androidutilities.compose.ui.library.produceLibraryState
+import com.heyzeusv.androidutilities.compose.about.overview.AboutOverview
+import com.heyzeusv.androidutilities.compose.about.library.LibraryColors
+import com.heyzeusv.androidutilities.compose.about.library.LibraryDefaults
+import com.heyzeusv.androidutilities.compose.about.library.LibraryExtras
+import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
+import com.heyzeusv.androidutilities.compose.about.library.LibraryPartyInfo
+import com.heyzeusv.androidutilities.compose.about.library.LibraryScreen
+import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
+import com.heyzeusv.androidutilities.compose.about.library.produceLibraryState
+import com.heyzeusv.androidutilities.compose.about.overview.OverviewColors
+import com.heyzeusv.androidutilities.compose.about.overview.OverviewDefaults
+import com.heyzeusv.androidutilities.compose.about.overview.OverviewExtras
+import com.heyzeusv.androidutilities.compose.about.overview.OverviewPadding
+import com.heyzeusv.androidutilities.compose.about.overview.OverviewTextStyles
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.mikepenz.aboutlibraries.entity.Library
 
 @Composable
-fun AboutNavigation(
+fun AboutScreen(
     navController: NavHostController = rememberNavController(),
     icon: @Composable () -> Unit = { },
     title: String,
     version: String,
     info: List<String>,
     separateByParty: Boolean = true,
-    aboutColors: AboutColors = AboutDefaults.aboutColors(),
-    aboutPadding: AboutPadding = AboutDefaults.aboutPadding(),
-    aboutExtras: AboutExtras = AboutDefaults.aboutExtras(),
-    aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
+    overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
+    overviewExtras: OverviewExtras = OverviewDefaults.overviewExtras(),
+    overviewTextStyles: OverviewTextStyles = OverviewDefaults.overviewTextStyles(),
     libraryColors: LibraryColors = LibraryDefaults.libraryColors(),
     libraryPadding: LibraryPadding =
         LibraryDefaults.libraryPadding(outerPadding = LibraryDefaults.ScreenOuterPV),
@@ -42,17 +48,17 @@ fun AboutNavigation(
 ) {
     val libraries by produceLibraryState(separateByParty = separateByParty)
 
-    AboutNavigation(
+    AboutScreen(
         navController = navController,
         icon = icon,
         title = title,
         version = version,
         info = info,
         libraries = libraries,
-        aboutColors = aboutColors,
-        aboutPadding = aboutPadding,
-        aboutExtras = aboutExtras,
-        aboutTextStyles = aboutTextStyles,
+        overviewColors = overviewColors,
+        overviewPadding = overviewPadding,
+        overviewExtras = overviewExtras,
+        overviewTextStyles = overviewTextStyles,
         libraryColors = libraryColors,
         libraryPadding = libraryPadding,
         libraryExtras = libraryExtras,
@@ -62,17 +68,17 @@ fun AboutNavigation(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun AboutNavigation(
+fun AboutScreen(
     navController: NavHostController = rememberNavController(),
     icon: @Composable () -> Unit = { },
     title: String,
     version: String,
     info: List<String>,
     libraries: Map<LibraryPartyInfo, List<Library>>,
-    aboutColors: AboutColors = AboutDefaults.aboutColors(),
-    aboutPadding: AboutPadding = AboutDefaults.aboutPadding(),
-    aboutExtras: AboutExtras = AboutDefaults.aboutExtras(),
-    aboutTextStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
+    overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
+    overviewExtras: OverviewExtras = OverviewDefaults.overviewExtras(),
+    overviewTextStyles: OverviewTextStyles = OverviewDefaults.overviewTextStyles(),
     libraryColors: LibraryColors = LibraryDefaults.libraryColors(),
     libraryPadding: LibraryPadding =
         LibraryDefaults.libraryPadding(outerPadding = LibraryDefaults.ScreenOuterPV),
@@ -83,10 +89,10 @@ fun AboutNavigation(
     SharedTransitionLayout {
         NavHost(
             navController = navController,
-            startDestination = "about"
+            startDestination = AboutScreens.Overview
         ) {
             composable<AboutScreens.Overview> {
-                AboutScreen(
+                AboutOverview(
                     animatedContentScope = this,
                     icon = icon,
                     title = title,
@@ -94,16 +100,16 @@ fun AboutNavigation(
                     info = info,
                     libraries = libraries,
                     libraryOnClick = { partyId, libraryId ->
-                        navController.navigate(AboutScreens.LibraryDetails(partyId, libraryId))
+                        navController.navigate(AboutScreens.Library(partyId, libraryId))
                     },
-                    colors = aboutColors,
-                    padding = aboutPadding,
-                    extras = aboutExtras,
-                    textStyles = aboutTextStyles,
+                    colors = overviewColors,
+                    padding = overviewPadding,
+                    extras = overviewExtras,
+                    textStyles = overviewTextStyles,
                 )
             }
-            composable<AboutScreens.LibraryDetails> { backStackEntry ->
-                val libraryDetails: AboutScreens.LibraryDetails = backStackEntry.toRoute()
+            composable<AboutScreens.Library> { backStackEntry ->
+                val libraryDetails: AboutScreens.Library = backStackEntry.toRoute()
                 val libs = libraries[LibraryPartyInfo from libraryDetails.partyId]!!
                 val library = libs.find { it.uniqueId == libraryDetails.libraryId }!!
 

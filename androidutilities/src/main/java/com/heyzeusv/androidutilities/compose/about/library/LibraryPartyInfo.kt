@@ -1,8 +1,9 @@
-package com.heyzeusv.androidutilities.compose.ui.library
+package com.heyzeusv.androidutilities.compose.about.library
 
 import androidx.annotation.StringRes
 import com.heyzeusv.androidutilities.R
 
+// TODO: Create interface and extend it, so users can create custom enums if needed
 enum class LibraryPartyInfo(
     val id: String,
     @StringRes val headerId: Int,

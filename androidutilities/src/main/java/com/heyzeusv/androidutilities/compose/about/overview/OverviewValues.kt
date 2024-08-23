@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.compose.ui.about
+package com.heyzeusv.androidutilities.compose.about.overview
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorColors
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDefaults
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorExtras
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryColors
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryDefaults
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryExtras
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryPadding
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryTextStyles
+import com.heyzeusv.androidutilities.compose.about.library.LibraryColors
+import com.heyzeusv.androidutilities.compose.about.library.LibraryDefaults
+import com.heyzeusv.androidutilities.compose.about.library.LibraryExtras
+import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
+import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
 
-object AboutDefaults {
+object OverviewDefaults {
     private val ItemSpacing = 12.dp
     private val AppInfoItemSpacing = 8.dp
     private val InfoHeight = 75.dp
@@ -34,7 +34,7 @@ object AboutDefaults {
         PaddingValues(start = ContentPadding, end = ContentPadding, bottom = ContentPadding)
 
     @Composable
-    fun aboutColors(
+    fun overviewColors(
         backgroundColor: Color = MaterialTheme.colorScheme.surface,
         titleColor: Color = MaterialTheme.colorScheme.onSurface,
         versionColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -43,7 +43,7 @@ object AboutDefaults {
         dividerColor: Color = MaterialTheme.colorScheme.onSurface,
         libraryHeaderColor: Color = MaterialTheme.colorScheme.onSurface,
         libraryItemColors: LibraryColors = LibraryDefaults.libraryColors(),
-    ): AboutColors = DefaultAboutColors(
+    ): OverviewColors = DefaultOverviewColors(
         backgroundColor = backgroundColor,
         titleColor = titleColor,
         versionColor = versionColor,
@@ -55,7 +55,7 @@ object AboutDefaults {
     )
 
     @Composable
-    fun aboutPadding(
+    fun overviewPadding(
         appInfoPadding: PaddingValues = AppInfoPadding,
         titlePadding: PaddingValues = PaddingValues(),
         versionPadding: PaddingValues = PaddingValues(),
@@ -64,7 +64,7 @@ object AboutDefaults {
         dividerPadding: PaddingValues = PaddingValues(bottom = ContentPadding),
         libraryListPadding: PaddingValues = LibraryListPadding,
         libraryItemPadding: LibraryPadding = LibraryDefaults.libraryPadding(),
-    ): AboutPadding = DefaultAboutPadding(
+    ): OverviewPadding = DefaultOverviewPadding(
         appInfoPadding = appInfoPadding,
         titlePadding = titlePadding,
         versionPadding = versionPadding,
@@ -76,14 +76,14 @@ object AboutDefaults {
     )
 
     @Composable
-    fun aboutExtras(
+    fun overviewExtras(
         itemSpacing: Dp = ItemSpacing,
         appInfoItemSpacing: Dp = AppInfoItemSpacing,
         infoHeight: Dp = InfoHeight,
         pagerIndicatorExtras: PagerIndicatorExtras = PagerIndicatorDefaults.pagerIndicatorExtras(),
         dividerThickness: Dp = DividerThickness,
         libraryItemExtras: LibraryExtras = LibraryDefaults.libraryExtras(),
-    ): AboutExtras = DefaultAboutExtras(
+    ): OverviewExtras = DefaultOverviewExtras(
         itemSpacing = itemSpacing,
         appInfoItemSpacing = appInfoItemSpacing,
         infoHeight = infoHeight,
@@ -93,7 +93,7 @@ object AboutDefaults {
     )
 
     @Composable
-    fun aboutTextStyles(
+    fun overviewTextStyles(
         titleStyle: TextStyle = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
         versionStyle: TextStyle = MaterialTheme.typography.titleMedium,
         infoStyle: TextStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
@@ -102,7 +102,7 @@ object AboutDefaults {
             textAlign = TextAlign.Center
         ),
         libraryItemStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
-    ): AboutTextStyles = DefaultAboutTextStyles(
+    ): OverviewTextStyles = DefaultOverviewTextStyles(
         titleStyle = titleStyle,
         versionStyle = versionStyle,
         infoStyle = infoStyle,
@@ -112,7 +112,7 @@ object AboutDefaults {
 }
 
 @Stable
-interface AboutColors {
+interface OverviewColors {
     val backgroundColor: Color
     val titleColor: Color
     val versionColor: Color
@@ -124,7 +124,7 @@ interface AboutColors {
 }
 
 @Immutable
-private data class DefaultAboutColors(
+private data class DefaultOverviewColors(
     override val backgroundColor: Color,
     override val titleColor: Color,
     override val versionColor: Color,
@@ -133,10 +133,10 @@ private data class DefaultAboutColors(
     override val dividerColor: Color,
     override val libraryHeaderColor: Color,
     override val libraryItemColors: LibraryColors,
-) : AboutColors
+) : OverviewColors
 
 @Stable
-interface AboutPadding {
+interface OverviewPadding {
     val appInfoPadding: PaddingValues
     val titlePadding: PaddingValues
     val versionPadding: PaddingValues
@@ -148,7 +148,7 @@ interface AboutPadding {
 }
 
 @Immutable
-private data class DefaultAboutPadding(
+private data class DefaultOverviewPadding(
     override val appInfoPadding: PaddingValues,
     override val titlePadding: PaddingValues,
     override val versionPadding: PaddingValues,
@@ -157,10 +157,10 @@ private data class DefaultAboutPadding(
     override val dividerPadding: PaddingValues,
     override val libraryListPadding: PaddingValues,
     override val libraryItemPadding: LibraryPadding,
-) : AboutPadding
+) : OverviewPadding
 
 @Stable
-interface AboutExtras {
+interface OverviewExtras {
     val itemSpacing: Dp
     val appInfoItemSpacing: Dp
     val infoHeight: Dp
@@ -170,17 +170,17 @@ interface AboutExtras {
 }
 
 @Immutable
-private data class DefaultAboutExtras(
+private data class DefaultOverviewExtras(
     override val itemSpacing: Dp,
     override val appInfoItemSpacing: Dp,
     override val infoHeight: Dp,
     override val pagerIndicatorExtras: PagerIndicatorExtras,
     override val dividerThickness: Dp,
     override val libraryItemExtras: LibraryExtras,
-) : AboutExtras
+) : OverviewExtras
 
 @Stable
-interface AboutTextStyles {
+interface OverviewTextStyles {
     val titleStyle: TextStyle
     val versionStyle: TextStyle
     val infoStyle: TextStyle
@@ -189,10 +189,10 @@ interface AboutTextStyles {
 }
 
 @Immutable
-private data class DefaultAboutTextStyles(
+private data class DefaultOverviewTextStyles(
     override val titleStyle: TextStyle,
     override val versionStyle: TextStyle,
     override val infoStyle: TextStyle,
     override val libraryHeaderStyle: TextStyle,
     override val libraryItemStyles: LibraryTextStyles,
-) : AboutTextStyles
+) : OverviewTextStyles

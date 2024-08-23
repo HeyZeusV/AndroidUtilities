@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.compose.ui.library
+package com.heyzeusv.androidutilities.compose.about.library
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State

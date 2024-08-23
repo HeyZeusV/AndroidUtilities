@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.heyzeusv.androidutilities.compose.ui.about.AboutNavigation
+import com.heyzeusv.androidutilities.compose.about.AboutScreen
 import com.heyzeusv.androidutilities.compose.util.avRes
 import com.heyzeusv.androidutilities.compose.util.bRes
 import com.heyzeusv.androidutilities.compose.util.cRes
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidUtilitiesLibraryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AboutNavigation(
+                    AboutScreen(
                         icon = {
                             Icon(
                                 painter = pRes(R.drawable.ic_launcher_foreground),

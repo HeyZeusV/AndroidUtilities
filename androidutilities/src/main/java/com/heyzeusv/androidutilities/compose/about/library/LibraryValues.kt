@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.compose.ui.library
+package com.heyzeusv.androidutilities.compose.about.library
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape

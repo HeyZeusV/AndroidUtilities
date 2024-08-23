@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class)
 
-package com.heyzeusv.androidutilities.compose.ui.about
+package com.heyzeusv.androidutilities.compose.about.overview
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -13,6 +13,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,15 +32,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryDetails
-import com.heyzeusv.androidutilities.compose.ui.library.LibraryPartyInfo
+import com.heyzeusv.androidutilities.compose.about.library.LibraryDetails
+import com.heyzeusv.androidutilities.compose.about.library.LibraryPartyInfo
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
 context(AnimatedContentScope)
 @Composable
-internal fun SharedTransitionScope.AboutScreen(
+internal fun SharedTransitionScope.AboutOverview(
     animatedContentScope: AnimatedContentScope,
     icon: @Composable () -> Unit = { },
     title: String = "App name",
@@ -47,12 +48,16 @@ internal fun SharedTransitionScope.AboutScreen(
     info: List<String> = listOf(),
     libraries: Map<LibraryPartyInfo, List<Library>>,
     libraryOnClick: (String, String) -> Unit,
-    colors: AboutColors = AboutDefaults.aboutColors(),
-    padding: AboutPadding = AboutDefaults.aboutPadding(),
-    extras: AboutExtras = AboutDefaults.aboutExtras(),
-    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    colors: OverviewColors = OverviewDefaults.overviewColors(),
+    padding: OverviewPadding = OverviewDefaults.overviewPadding(),
+    extras: OverviewExtras = OverviewDefaults.overviewExtras(),
+    textStyles: OverviewTextStyles = OverviewDefaults.overviewTextStyles(),
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.backgroundColor)
+    ) {
         AppInfo(
             icon = icon,
             title = title,
@@ -82,10 +87,10 @@ internal fun SharedTransitionScope.AppInfo(
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),
-    colors: AboutColors = AboutDefaults.aboutColors(),
-    padding: AboutPadding = AboutDefaults.aboutPadding(),
-    extras: AboutExtras = AboutDefaults.aboutExtras(),
-    textStyles: AboutTextStyles = AboutDefaults.aboutTextStyles(),
+    colors: OverviewColors = OverviewDefaults.overviewColors(),
+    padding: OverviewPadding = OverviewDefaults.overviewPadding(),
+    extras: OverviewExtras = OverviewDefaults.overviewExtras(),
+    textStyles: OverviewTextStyles = OverviewDefaults.overviewTextStyles(),
 ) {
     val pagerState = rememberPagerState(pageCount = { info.size })
 
@@ -155,10 +160,10 @@ internal fun SharedTransitionScope.LibraryList(
     animatedContentScope: AnimatedContentScope,
     libraries: Map<LibraryPartyInfo, List<Library>>,
     libraryOnClick: (String, String) -> Unit,
-    colors: AboutColors,
-    padding: AboutPadding,
-    extras: AboutExtras,
-    textStyles: AboutTextStyles,
+    colors: OverviewColors,
+    padding: OverviewPadding,
+    extras: OverviewExtras,
+    textStyles: OverviewTextStyles,
 ) {
     val scaleSpring = spring<Float>(stiffness = Spring.StiffnessMedium)
 
