@@ -53,8 +53,9 @@ class MainActivity : ComponentActivity() {
                     AboutScreen(
                         icon = {
                             Icon(
-                                painter = pRes(R.drawable.ic_launcher_foreground),
-                                contentDescription = null
+                                painter = pRes(R.drawable.pres_example),
+                                contentDescription = null,
+                                modifier = Modifier.size(50.dp)
                             )
                         },
                         title = sRes(R.string.app_name),

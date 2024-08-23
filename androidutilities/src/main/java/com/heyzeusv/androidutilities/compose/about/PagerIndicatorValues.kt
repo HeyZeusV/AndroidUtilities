@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.compose.ui.pageindicator
+package com.heyzeusv.androidutilities.compose.about
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor

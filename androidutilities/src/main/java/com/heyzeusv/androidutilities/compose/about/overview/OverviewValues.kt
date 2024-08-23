@@ -12,9 +12,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorColors
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDefaults
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorExtras
+import com.heyzeusv.androidutilities.compose.about.PagerIndicatorColors
+import com.heyzeusv.androidutilities.compose.about.PagerIndicatorDefaults
+import com.heyzeusv.androidutilities.compose.about.PagerIndicatorExtras
 import com.heyzeusv.androidutilities.compose.about.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDefaults
 import com.heyzeusv.androidutilities.compose.about.library.LibraryExtras
@@ -24,7 +24,7 @@ import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
 object OverviewDefaults {
     private val ItemSpacing = 12.dp
     private val AppInfoItemSpacing = 8.dp
-    private val InfoHeight = 75.dp
+    private val InfoHeight = 125.dp
     private val DividerThickness = 2.dp
     private val ContentPadding = 16.dp
 

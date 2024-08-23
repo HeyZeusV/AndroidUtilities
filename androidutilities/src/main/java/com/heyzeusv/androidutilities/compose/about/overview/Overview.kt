@@ -34,7 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDetails
 import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
+import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 

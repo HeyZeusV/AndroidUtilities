@@ -13,9 +13,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.R
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorColors
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorDefaults
-import com.heyzeusv.androidutilities.compose.ui.pageindicator.PagerIndicatorExtras
+import com.heyzeusv.androidutilities.compose.about.PagerIndicatorColors
+import com.heyzeusv.androidutilities.compose.about.PagerIndicatorDefaults
+import com.heyzeusv.androidutilities.compose.about.PagerIndicatorExtras
 import com.heyzeusv.androidutilities.compose.util.pRes
 
 object LibraryDefaults {
