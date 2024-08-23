@@ -15,10 +15,9 @@ import com.heyzeusv.androidutilities.compose.about.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDefaults
 import com.heyzeusv.androidutilities.compose.about.library.LibraryExtras
 import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
-import com.heyzeusv.androidutilities.compose.about.library.LibraryPartyInfo
+import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
 import com.heyzeusv.androidutilities.compose.about.library.LibraryScreen
 import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
-import com.heyzeusv.androidutilities.compose.about.library.produceLibraryState
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewColors
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewDefaults
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewExtras
@@ -46,7 +45,7 @@ fun AboutScreen(
         LibraryDefaults.libraryExtras(actionIcon = pRes(R.drawable.icon_collapse)),
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
-    val libraries by produceLibraryState(separateByParty = separateByParty)
+    val libraries by produceLibraryListState(separateByParty = separateByParty)
 
     AboutScreen(
         navController = navController,
@@ -74,7 +73,7 @@ fun AboutScreen(
     title: String,
     version: String,
     info: List<String>,
-    libraries: Map<LibraryPartyInfo, List<Library>>,
+    libraries: Map<LibraryGroup, List<Library>>,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
     overviewExtras: OverviewExtras = OverviewDefaults.overviewExtras(),
@@ -99,8 +98,8 @@ fun AboutScreen(
                     version = version,
                     info = info,
                     libraries = libraries,
-                    libraryOnClick = { partyId, libraryId ->
-                        navController.navigate(AboutScreens.Library(partyId, libraryId))
+                    libraryOnClick = { libraryGroup, libraryId ->
+                        navController.navigate(AboutScreens.Library(libraryGroup, libraryId))
                     },
                     colors = overviewColors,
                     padding = overviewPadding,
@@ -110,7 +109,7 @@ fun AboutScreen(
             }
             composable<AboutScreens.Library> { backStackEntry ->
                 val libraryDetails: AboutScreens.Library = backStackEntry.toRoute()
-                val libs = libraries[LibraryPartyInfo from libraryDetails.partyId]!!
+                val libs = libraries[libraryDetails.libraryGroup]!!
                 val library = libs.find { it.uniqueId == libraryDetails.libraryId }!!
 
                 LibraryScreen(

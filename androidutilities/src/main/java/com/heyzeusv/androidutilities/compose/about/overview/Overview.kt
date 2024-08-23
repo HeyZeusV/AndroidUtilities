@@ -33,7 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDetails
-import com.heyzeusv.androidutilities.compose.about.library.LibraryPartyInfo
+import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
 import com.heyzeusv.androidutilities.compose.ui.pageindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
@@ -46,8 +46,8 @@ internal fun SharedTransitionScope.AboutOverview(
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),
-    libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (String, String) -> Unit,
+    libraries: Map<LibraryGroup, List<Library>>,
+    libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors = OverviewDefaults.overviewColors(),
     padding: OverviewPadding = OverviewDefaults.overviewPadding(),
     extras: OverviewExtras = OverviewDefaults.overviewExtras(),
@@ -158,8 +158,8 @@ internal fun SharedTransitionScope.AppInfo(
 @Composable
 internal fun SharedTransitionScope.LibraryList(
     animatedContentScope: AnimatedContentScope,
-    libraries: Map<LibraryPartyInfo, List<Library>>,
-    libraryOnClick: (String, String) -> Unit,
+    libraries: Map<LibraryGroup, List<Library>>,
+    libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors,
     padding: OverviewPadding,
     extras: OverviewExtras,
@@ -173,11 +173,11 @@ internal fun SharedTransitionScope.LibraryList(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(extras.itemSpacing),
     ) {
-        libraries.forEach { (info, libs) ->
+        libraries.forEach { (libraryGroup, libs) ->
             item {
                 with(animatedContentScope) {
                     Text(
-                        text = sRes(info.headerId),
+                        text = sRes(libraryGroup.headerId),
                         modifier = Modifier
                             .fillMaxWidth()
                             .animateEnterExit(
@@ -196,7 +196,7 @@ internal fun SharedTransitionScope.LibraryList(
                 LibraryDetails(
                     animatedContentScope = animatedContentScope,
                     isFullscreen = false,
-                    actionOnClick = { libraryOnClick(info.id, library.uniqueId) },
+                    actionOnClick = { libraryOnClick(libraryGroup, library.uniqueId) },
                     library = library,
                     colors = colors.libraryItemColors,
                     padding = padding.libraryItemPadding,
