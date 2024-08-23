@@ -26,6 +26,7 @@ import com.heyzeusv.androidutilities.compose.about.overview.OverviewTextStyles
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.mikepenz.aboutlibraries.entity.Library
 
+// TODO: Add chance to add back icon
 @Composable
 fun AboutScreen(
     navController: NavHostController = rememberNavController(),
