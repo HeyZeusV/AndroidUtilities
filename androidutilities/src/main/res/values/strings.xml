@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_empty_header"/>
+    <string name="about_all_header">External Libraries</string>
+    <string name="about_first_party_header">First-Party Libraries</string>
+    <string name="about_third_party_header">Third-Party Libraries</string>
+    <string name="library_developer_empty">No developer was provided…</string>
+    <string name="library_description_empty">No description was provided…</string>
+    <string name="library_version_empty">No version was provided…</string>
+    <string name="library_license_empty">No license was provided…</string>
+</resources>
