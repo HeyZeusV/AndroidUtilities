@@ -10,5 +10,11 @@ sealed interface Screens {
     data object About : Screens
 
     @Serializable
+    data object AboutNoIcon: Screens
+
+    @Serializable
+    data object AboutNoBackOrIcon: Screens
+
+    @Serializable
     data object ComposableResources: Screens
 }

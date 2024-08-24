@@ -50,6 +50,12 @@ class MainActivity : ComponentActivity() {
                                 Button(onClick = { navController.navigate(Screens.About) }) {
                                     Text(text = "About Screen")
                                 }
+                                Button(onClick = { navController.navigate(Screens.AboutNoIcon) }) {
+                                    Text(text = "About Screen Without Icon")
+                                }
+                                Button(onClick = { navController.navigate(Screens.AboutNoBackOrIcon) }) {
+                                    Text(text = "About Screen Without Icon or Back")
+                                }
                                 Button(onClick = { navController.navigate(Screens.ComposableResources) }) {
                                     Text(text = "Composable Resources")
                                 }
@@ -77,6 +83,31 @@ class MainActivity : ComponentActivity() {
                                             .size(50.dp)
                                     )
                                 },
+                                title = sRes(R.string.app_name),
+                                version = "v1.0.0",
+                                info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
+                            )
+                        }
+                        composable<Screens.AboutNoIcon> {
+                            AboutScreen(
+                                backButton = {
+                                    IconButton(
+                                        onClick = { navController.navigateUp() },
+                                        modifier = Modifier.padding(all = 6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
+                                title = sRes(R.string.app_name),
+                                version = "v1.0.0",
+                                info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
+                            )
+                        }
+                        composable<Screens.AboutNoBackOrIcon> {
+                            AboutScreen(
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
                                 info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
