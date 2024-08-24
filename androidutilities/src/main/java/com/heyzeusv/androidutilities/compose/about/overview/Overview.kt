@@ -15,7 +15,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +45,8 @@ context(AnimatedContentScope)
 @Composable
 internal fun SharedTransitionScope.AboutOverview(
     animatedContentScope: AnimatedContentScope,
-    icon: @Composable () -> Unit = { },
+    backButton: @Composable () -> Unit = { },
+    icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),
@@ -59,6 +63,7 @@ internal fun SharedTransitionScope.AboutOverview(
             .background(colors.backgroundColor)
     ) {
         AppInfo(
+            backButton = backButton,
             icon = icon,
             title = title,
             version = version,
@@ -83,7 +88,8 @@ internal fun SharedTransitionScope.AboutOverview(
 context(AnimatedContentScope)
 @Composable
 internal fun SharedTransitionScope.AppInfo(
-    icon: @Composable () -> Unit = { },
+    backButton: @Composable () -> Unit = { },
+    icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
     info: List<String> = listOf(),
@@ -109,13 +115,21 @@ internal fun SharedTransitionScope.AppInfo(
             verticalArrangement = Arrangement.spacedBy(extras.appInfoItemSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            icon()
-            Text(
-                text = title,
-                modifier = Modifier.padding(padding.titlePadding),
-                color = colors.titleColor,
-                style = textStyles.titleStyle,
-            )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                icon?.let {
+                    backButton()
+                    it()
+                }
+            }
+            Row {
+                if (icon == null) backButton()
+                Text(
+                    text = title,
+                    modifier = Modifier.padding(padding.titlePadding),
+                    color = colors.titleColor,
+                    style = textStyles.titleStyle,
+                )
+            }
             Text(
                 text = version,
                 modifier = Modifier.padding(padding.versionPadding),

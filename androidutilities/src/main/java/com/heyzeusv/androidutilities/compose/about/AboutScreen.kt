@@ -2,9 +2,9 @@ package com.heyzeusv.androidutilities.compose.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,11 +26,10 @@ import com.heyzeusv.androidutilities.compose.about.overview.OverviewTextStyles
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.mikepenz.aboutlibraries.entity.Library
 
-// TODO: Add chance to add back icon
 @Composable
 fun AboutScreen(
-    navController: NavHostController = rememberNavController(),
-    icon: @Composable () -> Unit = { },
+    backButton: @Composable () -> Unit = { },
+    icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
     info: List<String>,
@@ -49,7 +48,7 @@ fun AboutScreen(
     val libraries by produceLibraryListState(separateByParty = separateByParty)
 
     AboutScreen(
-        navController = navController,
+        backButton = backButton,
         icon = icon,
         title = title,
         version = version,
@@ -69,8 +68,8 @@ fun AboutScreen(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AboutScreen(
-    navController: NavHostController = rememberNavController(),
-    icon: @Composable () -> Unit = { },
+    backButton: @Composable () -> Unit = { },
+    icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
     info: List<String>,
@@ -86,6 +85,8 @@ fun AboutScreen(
         LibraryDefaults.libraryExtras(actionIcon = pRes(R.drawable.icon_collapse)),
     libraryTextStyles: LibraryTextStyles = LibraryDefaults.libraryTextStyles(),
 ) {
+    val navController = rememberNavController()
+
     SharedTransitionLayout {
         NavHost(
             navController = navController,
@@ -94,6 +95,7 @@ fun AboutScreen(
             composable<AboutScreens.Overview> {
                 AboutOverview(
                     animatedContentScope = this,
+                    backButton = backButton,
                     icon = icon,
                     title = title,
                     version = version,

@@ -7,9 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -53,11 +57,24 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<Screens.About> {
                             AboutScreen(
+                                backButton = {
+                                    IconButton(
+                                        onClick = { navController.navigateUp() },
+                                        modifier = Modifier.padding(all = 6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                },
                                 icon = {
                                     Icon(
                                         painter = pRes(R.drawable.pres_example),
                                         contentDescription = null,
-                                        modifier = Modifier.size(50.dp)
+                                        modifier = Modifier
+                                            .align(Alignment.TopCenter)
+                                            .size(50.dp)
                                     )
                                 },
                                 title = sRes(R.string.app_name),
