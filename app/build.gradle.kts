@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.FileInputStream
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,19 +9,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        create("release") {
-            val props = Properties()
-            val fileInputStream = FileInputStream(file("../private/signing.properties"))
-            props.load(fileInputStream)
-            fileInputStream.close()
-
-            storeFile = file(props["storeFilePath"] as String)
-            storePassword = props["storePassword"] as String
-            keyPassword = props["keyPassword"] as String
-            keyAlias = props["keyAlias"] as String
-        }
-    }
     namespace = "com.heyzeusv.androidutilitieslibrary"
     compileSdk = 34
 
@@ -47,7 +32,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
             applicationIdSuffix = ".dev"
