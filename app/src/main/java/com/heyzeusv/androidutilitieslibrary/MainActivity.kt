@@ -19,14 +19,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
 import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
-import com.heyzeusv.androidutilities.compose.annotatedstring.hyperlinkAnnotatedString
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
@@ -71,16 +69,13 @@ class MainActivity : ComponentActivity() {
                                         "test" to "https://medium.com"
                                     ),
                                 )
-                                Text(
-                                    hyperlinkAnnotatedString(
-                                        context = LocalContext.current,
-                                        textId = R.string.hyperlink_example,
-                                        textStyle = MaterialTheme.typography.headlineLarge,
-                                        linkTextToHyperlinks = mapOf(
-                                            "LINK1" to "github.com",
-                                            "LINK2" to "https://medium.com"
-                                        ),
-                                    )
+                                HyperlinkText(
+                                    textId = R.string.hyperlink_example,
+                                    textStyle = MaterialTheme.typography.headlineLarge,
+                                    linkTextToHyperlinks = mapOf(
+                                        "LINK1" to "github.com",
+                                        "LINK2" to "https://medium.com"
+                                    ),
                                 )
                             }
                         }
