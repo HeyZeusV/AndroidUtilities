@@ -39,10 +39,12 @@ fun HyperlinkText(
     Text(
         text = annotatedString,
         modifier = modifier,
+        lineHeight = textStyle.lineHeight.coerceAtLeast(linkStyle?.lineHeight),
         overflow = overflow,
         softWrap = softWrap,
         maxLines = maxLines,
         minLines = minLines,
+        style = textStyle,
     )
 }
 
@@ -75,9 +77,11 @@ fun HyperlinkText(
     Text(
         text = annotatedString,
         modifier = modifier,
+        lineHeight = textStyle.lineHeight.coerceAtLeast(linkStyle?.lineHeight),
         overflow = overflow,
         softWrap = softWrap,
         maxLines = maxLines,
         minLines = minLines,
+        style = textStyle,
     )
 }

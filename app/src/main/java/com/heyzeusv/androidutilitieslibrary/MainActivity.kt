@@ -58,25 +58,12 @@ class MainActivity : ComponentActivity() {
                                 Button(onClick = { navController.navigate(Screens.AboutNoBackOrIcon) }) {
                                     Text(text = "About Screen Without Icon or Back")
                                 }
+                                Button(onClick = { navController.navigate(Screens.AnnotatedString) }) {
+                                    Text(text = "Annotated String")
+                                }
                                 Button(onClick = { navController.navigate(Screens.ComposableResources) }) {
                                     Text(text = "Composable Resources")
                                 }
-                                HyperlinkText(
-                                    text = "Testing hyper link test",
-                                    textStyle = MaterialTheme.typography.headlineLarge,
-                                    linkTextToHyperlinks = mapOf(
-                                        "Testing" to "github.com",
-                                        "test" to "https://medium.com"
-                                    ),
-                                )
-                                HyperlinkText(
-                                    textId = R.string.hyperlink_example,
-                                    textStyle = MaterialTheme.typography.headlineLarge,
-                                    linkTextToHyperlinks = mapOf(
-                                        "LINK1" to "github.com",
-                                        "LINK2" to "https://medium.com"
-                                    ),
-                                )
                             }
                         }
                         composable<Screens.About> {
@@ -130,6 +117,9 @@ class MainActivity : ComponentActivity() {
                                 version = "v1.0.0",
                                 info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
                             )
+                        }
+                        composable<Screens.AnnotatedString> {
+                            AnnotatedStringScreen()
                         }
                         composable<Screens.ComposableResources> {
                             ComposableResources()

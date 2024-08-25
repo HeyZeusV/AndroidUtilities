@@ -18,5 +18,5 @@
     </plurals>
 
     <!-- Hyperlink Annotation String -->
-    <string name="hyperlink_example">This string contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
+    <string name="hyperlink_example">This string resource contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
 </resources>
