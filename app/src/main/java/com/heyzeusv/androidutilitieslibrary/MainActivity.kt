@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -69,6 +70,17 @@ class MainActivity : ComponentActivity() {
                                             "Testing" to "github.com",
                                             "test" to "https://old.reddit.com"
                                         )
+                                    )
+                                )
+                                Text(
+                                    hyperLinkAnnotatedString(
+                                        context = LocalContext.current,
+                                        textId = R.string.hyperlink_example,
+                                        textStyle = MaterialTheme.typography.headlineLarge,
+                                        linkTextToHyperlinks = mapOf(
+                                            "LINK1" to "github.com",
+                                            "LINK2" to "https://old.reddit.com"
+                                        ),
                                     )
                                 )
                             }
