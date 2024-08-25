@@ -25,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
+import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
 import com.heyzeusv.androidutilities.compose.annotatedstring.hyperlinkAnnotatedString
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
@@ -62,15 +63,13 @@ class MainActivity : ComponentActivity() {
                                 Button(onClick = { navController.navigate(Screens.ComposableResources) }) {
                                     Text(text = "Composable Resources")
                                 }
-                                Text(
-                                    hyperlinkAnnotatedString(
-                                        text = "Testing hyper link test",
-                                        textStyle = MaterialTheme.typography.headlineLarge,
-                                        linkTextToHyperlinks = mapOf(
-                                            "Testing" to "github.com",
-                                            "test" to "https://old.reddit.com"
-                                        )
-                                    )
+                                HyperlinkText(
+                                    text = "Testing hyper link test",
+                                    textStyle = MaterialTheme.typography.headlineLarge,
+                                    linkTextToHyperlinks = mapOf(
+                                        "Testing" to "github.com",
+                                        "test" to "https://medium.com"
+                                    ),
                                 )
                                 Text(
                                     hyperlinkAnnotatedString(
@@ -79,7 +78,7 @@ class MainActivity : ComponentActivity() {
                                         textStyle = MaterialTheme.typography.headlineLarge,
                                         linkTextToHyperlinks = mapOf(
                                             "LINK1" to "github.com",
-                                            "LINK2" to "https://old.reddit.com"
+                                            "LINK2" to "https://medium.com"
                                         ),
                                     )
                                 )
