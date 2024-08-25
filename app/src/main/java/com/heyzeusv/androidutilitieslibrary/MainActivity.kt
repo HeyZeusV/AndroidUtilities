@@ -14,7 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -24,11 +23,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
-import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
-import com.heyzeusv.androidutilitieslibrary.util.lorem
+import com.heyzeusv.androidutilitieslibrary.util.lorenAnnotated
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -90,7 +88,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
-                                info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
+                                info = listOf(lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated),
                             )
                         }
                         composable<Screens.AboutNoIcon> {
@@ -108,14 +106,14 @@ class MainActivity : ComponentActivity() {
                                 },
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
-                                info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
+                                info = listOf(lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated),
                             )
                         }
                         composable<Screens.AboutNoBackOrIcon> {
                             AboutScreen(
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
-                                info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
+                                info = listOf(lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated),
                             )
                         }
                         composable<Screens.AnnotatedString> {

@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDetails
 import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
 import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
@@ -49,7 +50,7 @@ internal fun SharedTransitionScope.AboutOverview(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    info: List<String> = listOf(),
+    info: List<AnnotatedString> = listOf(),
     libraries: Map<LibraryGroup, List<Library>>,
     libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors = OverviewDefaults.overviewColors(),
@@ -92,7 +93,7 @@ internal fun SharedTransitionScope.AppInfo(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    info: List<String> = listOf(),
+    info: List<AnnotatedString> = listOf(),
     colors: OverviewColors = OverviewDefaults.overviewColors(),
     padding: OverviewPadding = OverviewDefaults.overviewPadding(),
     extras: OverviewExtras = OverviewDefaults.overviewExtras(),

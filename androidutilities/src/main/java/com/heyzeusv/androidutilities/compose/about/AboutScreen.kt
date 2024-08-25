@@ -5,6 +5,7 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.AnnotatedString
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,7 +33,7 @@ fun AboutScreen(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
-    info: List<String>,
+    info: List<AnnotatedString>,
     separateByParty: Boolean = true,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
@@ -72,7 +73,7 @@ fun AboutScreen(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
-    info: List<String>,
+    info: List<AnnotatedString>,
     libraries: Map<LibraryGroup, List<Library>>,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),

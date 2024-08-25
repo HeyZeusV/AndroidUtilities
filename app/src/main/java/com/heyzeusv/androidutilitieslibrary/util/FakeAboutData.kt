@@ -1,5 +1,6 @@
 package com.heyzeusv.androidutilitieslibrary.util
 
+import androidx.compose.ui.text.buildAnnotatedString
 import com.mikepenz.aboutlibraries.entity.Developer
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
@@ -26,6 +27,10 @@ const val lorem = "Lorem ipsum odor amet, consectetuer adipiscing elit. Sapien s
         "At elementum diam gravida inceptos ad. Vivamus at nullam libero pharetra interdum. Natoque facilisi felis ac condimentum; finibus parturient consequat. Amet eros nisl lacus ornare quam dolor. Sagittis consequat libero quisque netus netus, mus convallis. Accumsan a tempor quis lacus, finibus ultrices parturient. Dui consequat tortor dolor nullam et faucibus class.\n" +
         "\n" +
         "Nullam laoreet faucibus bibendum phasellus netus blandit egestas per. Auctor massa turpis aptent in varius fames. Commodo parturient consequat vestibulum ad tortor velit nunc ridiculus. Ac eget libero cras rhoncus molestie suscipit lectus vestibulum. Aliquet orci duis semper aptent per. Finibus integer ultrices commodo elementum libero. Ornare facilisi malesuada purus ex diam litora laoreet euismod. Hendrerit amet ultricies risus erat eros phasellus augue."
+
+val lorenAnnotated = buildAnnotatedString {
+    append(lorem)
+}
 
 val fakeDeveloper = Developer(
     name = "Fake Developer",
