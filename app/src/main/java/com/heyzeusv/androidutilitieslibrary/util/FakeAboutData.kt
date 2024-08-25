@@ -1,6 +1,11 @@
 package com.heyzeusv.androidutilitieslibrary.util
 
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import com.heyzeusv.androidutilities.compose.about.overview.InfoEntry
 import com.mikepenz.aboutlibraries.entity.Developer
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
@@ -28,9 +33,23 @@ const val lorem = "Lorem ipsum odor amet, consectetuer adipiscing elit. Sapien s
         "\n" +
         "Nullam laoreet faucibus bibendum phasellus netus blandit egestas per. Auctor massa turpis aptent in varius fames. Commodo parturient consequat vestibulum ad tortor velit nunc ridiculus. Ac eget libero cras rhoncus molestie suscipit lectus vestibulum. Aliquet orci duis semper aptent per. Finibus integer ultrices commodo elementum libero. Ornare facilisi malesuada purus ex diam litora laoreet euismod. Hendrerit amet ultricies risus erat eros phasellus augue."
 
-val lorenAnnotated = buildAnnotatedString {
-    append(lorem)
-}
+val lorenEntry = InfoEntry(text = lorem)
+
+val lorenHyperlinkEntry = InfoEntry(
+    text = lorem,
+    linkTextToHyperlinks = mapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
+)
+
+@Composable
+fun lorenHyperlinkCustomEntry(): InfoEntry = InfoEntry(
+    text = lorem,
+    textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    linkStyle = MaterialTheme.typography.titleLarge,
+    linkTextToHyperlinks = mapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
+    linkTextColor = MaterialTheme.colorScheme.primary,
+    linkTextFontWeight = FontWeight.Bold,
+    linkTextDecoration = TextDecoration.LineThrough,
+)
 
 val fakeDeveloper = Developer(
     name = "Fake Developer",

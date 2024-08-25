@@ -26,7 +26,9 @@ import com.heyzeusv.androidutilities.compose.about.AboutScreen
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
-import com.heyzeusv.androidutilitieslibrary.util.lorenAnnotated
+import com.heyzeusv.androidutilitieslibrary.util.lorenEntry
+import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkCustomEntry
+import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkEntry
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -88,7 +90,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
-                                info = listOf(lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated),
+                                infoList = listOf(lorenHyperlinkEntry, lorenHyperlinkCustomEntry(), lorenHyperlinkEntry, lorenEntry, lorenEntry, lorenEntry, lorenEntry),
                             )
                         }
                         composable<Screens.AboutNoIcon> {
@@ -106,14 +108,14 @@ class MainActivity : ComponentActivity() {
                                 },
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
-                                info = listOf(lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated),
+                                infoList = listOf(lorenHyperlinkEntry, lorenHyperlinkCustomEntry(), lorenHyperlinkEntry, lorenEntry, lorenEntry, lorenEntry, lorenEntry),
                             )
                         }
                         composable<Screens.AboutNoBackOrIcon> {
                             AboutScreen(
                                 title = sRes(R.string.app_name),
                                 version = "v1.0.0",
-                                info = listOf(lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated, lorenAnnotated),
+                                infoList = listOf(lorenHyperlinkEntry, lorenHyperlinkCustomEntry(), lorenHyperlinkEntry, lorenEntry, lorenEntry, lorenEntry, lorenEntry),
                             )
                         }
                         composable<Screens.AnnotatedString> {

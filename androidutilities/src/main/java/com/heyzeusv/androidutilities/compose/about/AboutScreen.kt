@@ -5,7 +5,6 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.AnnotatedString
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +18,7 @@ import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
 import com.heyzeusv.androidutilities.compose.about.library.AboutLibrary
 import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
+import com.heyzeusv.androidutilities.compose.about.overview.InfoEntry
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewColors
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewDefaults
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewExtras
@@ -33,7 +33,7 @@ fun AboutScreen(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
-    info: List<AnnotatedString>,
+    infoList: List<InfoEntry>,
     separateByParty: Boolean = true,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
@@ -53,7 +53,7 @@ fun AboutScreen(
         icon = icon,
         title = title,
         version = version,
-        info = info,
+        infoList = infoList,
         libraries = libraries,
         overviewColors = overviewColors,
         overviewPadding = overviewPadding,
@@ -73,7 +73,7 @@ fun AboutScreen(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
-    info: List<AnnotatedString>,
+    infoList: List<InfoEntry>,
     libraries: Map<LibraryGroup, List<Library>>,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
@@ -100,7 +100,7 @@ fun AboutScreen(
                     icon = icon,
                     title = title,
                     version = version,
-                    info = info,
+                    infoList = infoList,
                     libraries = libraries,
                     libraryOnClick = { libraryGroup, libraryId ->
                         navController.navigate(AboutScreens.Library(libraryGroup, libraryId))
