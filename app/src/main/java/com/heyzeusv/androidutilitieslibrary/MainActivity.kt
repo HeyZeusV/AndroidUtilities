@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
+import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
@@ -55,6 +57,9 @@ class MainActivity : ComponentActivity() {
                                 }
                                 Button(onClick = { navController.navigate(Screens.AboutNoBackOrIcon) }) {
                                     Text(text = "About Screen Without Icon or Back")
+                                }
+                                Button(onClick = { navController.navigate(Screens.AnnotatedString) }) {
+                                    Text(text = "Annotated String")
                                 }
                                 Button(onClick = { navController.navigate(Screens.ComposableResources) }) {
                                     Text(text = "Composable Resources")
@@ -112,6 +117,9 @@ class MainActivity : ComponentActivity() {
                                 version = "v1.0.0",
                                 info = listOf(lorem, lorem, lorem, lorem, lorem, lorem, lorem),
                             )
+                        }
+                        composable<Screens.AnnotatedString> {
+                            AnnotatedStringScreen()
                         }
                         composable<Screens.ComposableResources> {
                             ComposableResources()

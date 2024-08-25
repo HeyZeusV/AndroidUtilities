@@ -52,7 +52,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.heyzeusv"
             artifactId = "androidutilities"
-            version = "2.0.0"
+            version = "4.0.0"
 
             afterEvaluate {
                 from(components["release"])

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Android Utilities Library</string>
+
+    <!-- Composable Resources -->
     <string name="sRes_example">This string is loaded using sRes()</string>
     <string name="sRes_args_example">This string is also loaded using sRes() %1$s %2$s</string>
     <string-array name="saRes_example">
@@ -14,4 +16,7 @@
         <item quantity="one">This string is loaded using psRes()</item>
         <item quantity="other">This string is also loaded using psRes() %1$s %2$s</item>
     </plurals>
+
+    <!-- Hyperlink Annotation String -->
+    <string name="hyperlink_example">This string resource contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
 </resources>
