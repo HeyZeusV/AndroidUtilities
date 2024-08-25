@@ -19,7 +19,7 @@ private fun String.checkForHttps(): String {
     return if (!this.contains(HTTPS)) "$HTTPS$this" else this
 }
 
-fun hyperLinkAnnotatedString(
+fun hyperlinkAnnotatedString(
     text: String,
     textStyle: TextStyle,
     linkStyle: TextStyle? = null,
@@ -34,14 +34,14 @@ fun hyperLinkAnnotatedString(
         start = 0,
         end = text.length
     )
-    for ((linkText, hyperLink) in linkTextToHyperlinks) {
+    for ((linkText, hyperlink) in linkTextToHyperlinks) {
         val startIndex = text.indexOf(linkText)
         val endIndex = startIndex + linkText.length
         val linkTextStyle = linkStyle ?: textStyle
 
         addLink(
             url = LinkAnnotation.Url(
-                url = hyperLink.checkForHttps(),
+                url = hyperlink.checkForHttps(),
                 styles = TextLinkStyles(
                     style = linkTextStyle.copy(
                         color = linkTextColor,
@@ -56,7 +56,7 @@ fun hyperLinkAnnotatedString(
     }
 }
 
-fun hyperLinkAnnotatedString(
+fun hyperlinkAnnotatedString(
     context: Context,
     @StringRes textId: Int,
     textStyle: TextStyle,
@@ -75,7 +75,7 @@ fun hyperLinkAnnotatedString(
         start = 0,
         end = text.length
     )
-    for ((linkText, hyperLink) in linkTextToHyperlinks) {
+    for ((linkText, hyperlink) in linkTextToHyperlinks) {
         annotations?.find { it.value == linkText }?.let {
             val startIndex = text.getSpanStart(it)
             val endIndex = text.getSpanEnd(it)
@@ -83,7 +83,7 @@ fun hyperLinkAnnotatedString(
 
             addLink(
                 url = LinkAnnotation.Url(
-                    url = hyperLink.checkForHttps(),
+                    url = hyperlink.checkForHttps(),
                     styles = TextLinkStyles(
                         style = linkTextStyle.copy(
                             color = linkTextColor,

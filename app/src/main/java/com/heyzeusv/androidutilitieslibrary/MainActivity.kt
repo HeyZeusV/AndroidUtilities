@@ -25,7 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
-import com.heyzeusv.androidutilities.compose.annotatedstring.hyperLinkAnnotatedString
+import com.heyzeusv.androidutilities.compose.annotatedstring.hyperlinkAnnotatedString
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                                     Text(text = "Composable Resources")
                                 }
                                 Text(
-                                    hyperLinkAnnotatedString(
+                                    hyperlinkAnnotatedString(
                                         text = "Testing hyper link test",
                                         textStyle = MaterialTheme.typography.headlineLarge,
                                         linkTextToHyperlinks = mapOf(
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 )
                                 Text(
-                                    hyperLinkAnnotatedString(
+                                    hyperlinkAnnotatedString(
                                         context = LocalContext.current,
                                         textId = R.string.hyperlink_example,
                                         textStyle = MaterialTheme.typography.headlineLarge,
