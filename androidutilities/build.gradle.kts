@@ -75,8 +75,9 @@ dependencies {
     // AboutLibraries
     implementation(libs.aboutlibraries.core)
 
-    // Kotlin Serialization
+    // Kotlin
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
