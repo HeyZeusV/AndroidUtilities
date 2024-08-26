@@ -138,20 +138,38 @@ internal fun SharedTransitionScope.AppInfo(
                 style = textStyles.versionStyle,
             )
             HorizontalPager(state = pagerState) { page ->
-                val info = infoList[page]
-                HyperlinkText(
-                    modifier = Modifier
-                        .padding(padding.infoPadding)
-                        .height(extras.infoHeight)
-                        .verticalScroll(rememberScrollState()),
-                    text = info.text,
-                    textStyle = info.textStyle ?: textStyles.infoStyle,
-                    linkStyle = info.linkStyle,
-                    linkTextToHyperlinks = info.linkTextToHyperlinks,
-                    linkTextColor = info.linkTextColor,
-                    linkTextFontWeight = info.linkTextFontWeight,
-                    linkTextDecoration = info.linkTextDecoration,
-                )
+                when (val info = infoList[page]) {
+                    is StringInfoEntry -> {
+                        HyperlinkText(
+                            modifier = Modifier
+                                .padding(padding.infoPadding)
+                                .height(extras.infoHeight)
+                                .verticalScroll(rememberScrollState()),
+                            text = info.text,
+                            textStyle = info.textStyle ?: textStyles.infoStyle,
+                            linkStyle = info.linkStyle,
+                            linkTextToHyperlinks = info.linkTextToHyperlinks,
+                            linkTextColor = info.linkTextColor,
+                            linkTextFontWeight = info.linkTextFontWeight,
+                            linkTextDecoration = info.linkTextDecoration,
+                        )
+                    }
+                    is StringResourceInfoEntry -> {
+                        HyperlinkText(
+                            modifier = Modifier
+                                .padding(padding.infoPadding)
+                                .height(extras.infoHeight)
+                                .verticalScroll(rememberScrollState()),
+                            textId = info.textId,
+                            textStyle = info.textStyle ?: textStyles.infoStyle,
+                            linkStyle = info.linkStyle,
+                            linkTextToHyperlinks = info.linkTextToHyperlinks,
+                            linkTextColor = info.linkTextColor,
+                            linkTextFontWeight = info.linkTextFontWeight,
+                            linkTextDecoration = info.linkTextDecoration,
+                        )
+                    }
+                }
             }
             if (infoList.size > 1) {
                 HorizontalPagerIndicator(

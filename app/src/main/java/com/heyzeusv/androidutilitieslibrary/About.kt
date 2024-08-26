@@ -13,8 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
+import com.heyzeusv.androidutilitieslibrary.util.hyperlinkCustomStringResourceEntry
+import com.heyzeusv.androidutilitieslibrary.util.hyperlinkStringResource
 import com.heyzeusv.androidutilitieslibrary.util.lorenEntry
-import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkCustomEntry
+import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkCustomStringEntry
 import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkEntry
 
 @Composable
@@ -46,9 +48,9 @@ fun AppAboutScreen(
         version = "v1.0.0",
         infoList = listOf(
             lorenHyperlinkEntry,
-            lorenHyperlinkCustomEntry(),
-            lorenHyperlinkEntry,
-            lorenEntry,
+            lorenHyperlinkCustomStringEntry(),
+            hyperlinkStringResource,
+            hyperlinkCustomStringResourceEntry(),
             lorenEntry,
             lorenEntry,
             lorenEntry
@@ -76,9 +78,9 @@ fun AppAboutScreenNoIcon(
         version = "v1.0.0",
         infoList = listOf(
             lorenHyperlinkEntry,
-            lorenHyperlinkCustomEntry(),
-            lorenHyperlinkEntry,
-            lorenEntry,
+            lorenHyperlinkCustomStringEntry(),
+            hyperlinkStringResource,
+            hyperlinkCustomStringResourceEntry(),
             lorenEntry,
             lorenEntry,
             lorenEntry
@@ -91,6 +93,14 @@ fun AppAboutScreenNoBackOrIcon() {
     AboutScreen(
         title = sRes(R.string.app_name),
         version = "v1.0.0",
-        infoList = listOf(lorenHyperlinkEntry, lorenHyperlinkCustomEntry(), lorenHyperlinkEntry, lorenEntry, lorenEntry, lorenEntry, lorenEntry),
+        infoList = listOf(
+            lorenHyperlinkEntry,
+            lorenHyperlinkCustomStringEntry(),
+            hyperlinkStringResource,
+            hyperlinkCustomStringResourceEntry(),
+            lorenEntry,
+            lorenEntry,
+            lorenEntry
+        ),
     )
 }
