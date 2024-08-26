@@ -1,5 +1,13 @@
 package com.heyzeusv.androidutilitieslibrary.util
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import com.heyzeusv.androidutilities.compose.about.overview.StringInfoEntry
+import com.heyzeusv.androidutilities.compose.about.overview.StringResourceInfoEntry
+import com.heyzeusv.androidutilitieslibrary.R
 import com.mikepenz.aboutlibraries.entity.Developer
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
@@ -26,6 +34,40 @@ const val lorem = "Lorem ipsum odor amet, consectetuer adipiscing elit. Sapien s
         "At elementum diam gravida inceptos ad. Vivamus at nullam libero pharetra interdum. Natoque facilisi felis ac condimentum; finibus parturient consequat. Amet eros nisl lacus ornare quam dolor. Sagittis consequat libero quisque netus netus, mus convallis. Accumsan a tempor quis lacus, finibus ultrices parturient. Dui consequat tortor dolor nullam et faucibus class.\n" +
         "\n" +
         "Nullam laoreet faucibus bibendum phasellus netus blandit egestas per. Auctor massa turpis aptent in varius fames. Commodo parturient consequat vestibulum ad tortor velit nunc ridiculus. Ac eget libero cras rhoncus molestie suscipit lectus vestibulum. Aliquet orci duis semper aptent per. Finibus integer ultrices commodo elementum libero. Ornare facilisi malesuada purus ex diam litora laoreet euismod. Hendrerit amet ultricies risus erat eros phasellus augue."
+
+val lorenEntry = StringInfoEntry(text = lorem)
+
+val lorenHyperlinkEntry = StringInfoEntry(
+    text = lorem,
+    linkTextToHyperlinks = mapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
+)
+
+@Composable
+fun lorenHyperlinkCustomStringEntry(): StringInfoEntry = StringInfoEntry(
+    text = lorem,
+    textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    linkStyle = MaterialTheme.typography.titleLarge,
+    linkTextToHyperlinks = mapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
+    linkTextColor = MaterialTheme.colorScheme.primary,
+    linkTextFontWeight = FontWeight.Bold,
+    linkTextDecoration = TextDecoration.LineThrough,
+)
+
+val hyperlinkStringResource = StringResourceInfoEntry(
+    textId = R.string.hyperlink_example,
+    linkTextToHyperlinks = mapOf("LINK1" to "google.com", "LINK2" to "github.com"),
+)
+
+@Composable
+fun hyperlinkCustomStringResourceEntry(): StringResourceInfoEntry = StringResourceInfoEntry(
+    textId = R.string.hyperlink_example,
+    textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+    linkStyle = MaterialTheme.typography.titleLarge,
+    linkTextToHyperlinks = mapOf("LINK1" to "google.com", "LINK2" to "github.com"),
+    linkTextColor = MaterialTheme.colorScheme.primary,
+    linkTextFontWeight = FontWeight.Bold,
+    linkTextDecoration = TextDecoration.LineThrough,
+)
 
 val fakeDeveloper = Developer(
     name = "Fake Developer",

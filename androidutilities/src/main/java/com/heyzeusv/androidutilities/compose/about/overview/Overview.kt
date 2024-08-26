@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDetails
 import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
+import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
 import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
@@ -49,7 +50,7 @@ internal fun SharedTransitionScope.AboutOverview(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    info: List<String> = listOf(),
+    infoList: List<InfoEntry> = listOf(),
     libraries: Map<LibraryGroup, List<Library>>,
     libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors = OverviewDefaults.overviewColors(),
@@ -67,7 +68,7 @@ internal fun SharedTransitionScope.AboutOverview(
             icon = icon,
             title = title,
             version = version,
-            info = info,
+            infoList = infoList,
             colors = colors,
             padding = padding,
             extras = extras,
@@ -92,13 +93,13 @@ internal fun SharedTransitionScope.AppInfo(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    info: List<String> = listOf(),
+    infoList: List<InfoEntry> = listOf(),
     colors: OverviewColors = OverviewDefaults.overviewColors(),
     padding: OverviewPadding = OverviewDefaults.overviewPadding(),
     extras: OverviewExtras = OverviewDefaults.overviewExtras(),
     textStyles: OverviewTextStyles = OverviewDefaults.overviewTextStyles(),
 ) {
-    val pagerState = rememberPagerState(pageCount = { info.size })
+    val pagerState = rememberPagerState(pageCount = { infoList.size })
 
     Surface(
         modifier = Modifier
@@ -136,21 +137,44 @@ internal fun SharedTransitionScope.AppInfo(
                 color = colors.versionColor,
                 style = textStyles.versionStyle,
             )
-            HorizontalPager(state = pagerState) {
-                Text(
-                    text = info[pagerState.currentPage],
-                    modifier = Modifier
-                        .padding(padding.infoPadding)
-                        .height(extras.infoHeight)
-                        .verticalScroll(rememberScrollState()),
-                    color = colors.infoColor,
-                    style = textStyles.infoStyle,
-                )
+            HorizontalPager(state = pagerState) { page ->
+                when (val info = infoList[page]) {
+                    is StringInfoEntry -> {
+                        HyperlinkText(
+                            modifier = Modifier
+                                .padding(padding.infoPadding)
+                                .height(extras.infoHeight)
+                                .verticalScroll(rememberScrollState()),
+                            text = info.text,
+                            textStyle = info.textStyle ?: textStyles.infoStyle,
+                            linkStyle = info.linkStyle,
+                            linkTextToHyperlinks = info.linkTextToHyperlinks,
+                            linkTextColor = info.linkTextColor,
+                            linkTextFontWeight = info.linkTextFontWeight,
+                            linkTextDecoration = info.linkTextDecoration,
+                        )
+                    }
+                    is StringResourceInfoEntry -> {
+                        HyperlinkText(
+                            modifier = Modifier
+                                .padding(padding.infoPadding)
+                                .height(extras.infoHeight)
+                                .verticalScroll(rememberScrollState()),
+                            textId = info.textId,
+                            textStyle = info.textStyle ?: textStyles.infoStyle,
+                            linkStyle = info.linkStyle,
+                            linkTextToHyperlinks = info.linkTextToHyperlinks,
+                            linkTextColor = info.linkTextColor,
+                            linkTextFontWeight = info.linkTextFontWeight,
+                            linkTextDecoration = info.linkTextDecoration,
+                        )
+                    }
+                }
             }
-            if (info.size > 1) {
+            if (infoList.size > 1) {
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
-                    pageCount = info.size,
+                    pageCount = infoList.size,
                     modifier = Modifier.padding(padding.pageIndicatorPadding),
                     activeColor = colors.pagerIndicatorColors.activeColor,
                     inactiveColor = colors.pagerIndicatorColors.inactiveColor,

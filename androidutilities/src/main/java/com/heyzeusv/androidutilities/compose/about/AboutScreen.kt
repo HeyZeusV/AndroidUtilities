@@ -18,6 +18,7 @@ import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.about.library.LibraryGroup
 import com.heyzeusv.androidutilities.compose.about.library.AboutLibrary
 import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
+import com.heyzeusv.androidutilities.compose.about.overview.InfoEntry
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewColors
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewDefaults
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewExtras
@@ -32,7 +33,7 @@ fun AboutScreen(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
-    info: List<String>,
+    infoList: List<InfoEntry>,
     separateByParty: Boolean = true,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
@@ -52,7 +53,7 @@ fun AboutScreen(
         icon = icon,
         title = title,
         version = version,
-        info = info,
+        infoList = infoList,
         libraries = libraries,
         overviewColors = overviewColors,
         overviewPadding = overviewPadding,
@@ -72,7 +73,7 @@ fun AboutScreen(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String,
     version: String,
-    info: List<String>,
+    infoList: List<InfoEntry>,
     libraries: Map<LibraryGroup, List<Library>>,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
@@ -99,7 +100,7 @@ fun AboutScreen(
                     icon = icon,
                     title = title,
                     version = version,
-                    info = info,
+                    infoList = infoList,
                     libraries = libraries,
                     libraryOnClick = { libraryGroup, libraryId ->
                         navController.navigate(AboutScreens.Library(libraryGroup, libraryId))
