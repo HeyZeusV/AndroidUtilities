@@ -26,6 +26,8 @@ import com.heyzeusv.androidutilities.compose.about.overview.OverviewPadding
 import com.heyzeusv.androidutilities.compose.about.overview.OverviewTextStyles
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.mikepenz.aboutlibraries.entity.Library
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 
 @Composable
 fun AboutScreen(
@@ -74,7 +76,7 @@ fun AboutScreen(
     title: String,
     version: String,
     infoList: List<InfoEntry>,
-    libraries: Map<LibraryGroup, List<Library>>,
+    libraries: ImmutableMap<LibraryGroup, ImmutableList<Library>>,
     overviewColors: OverviewColors = OverviewDefaults.overviewColors(),
     overviewPadding: OverviewPadding = OverviewDefaults.overviewPadding(),
     overviewExtras: OverviewExtras = OverviewDefaults.overviewExtras(),
