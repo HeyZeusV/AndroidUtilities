@@ -5,8 +5,9 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.maven.publish)
-    alias(libs.plugins.gradleup.nmcp)
+//    alias(libs.plugins.maven.publish)
+    id("com.vanniktech.maven.publish") version "0.29.0"
+//    alias(libs.plugins.gradleup.nmcp)
 //    id("maven-publish")
 }
 
