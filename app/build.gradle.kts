@@ -52,6 +52,11 @@ android {
     }
 }
 
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+    metricsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_1_8)

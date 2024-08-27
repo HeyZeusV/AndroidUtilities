@@ -41,6 +41,9 @@ import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
 import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
 
 context(AnimatedContentScope)
 @Composable
@@ -50,8 +53,8 @@ internal fun SharedTransitionScope.AboutOverview(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    infoList: List<InfoEntry> = listOf(),
-    libraries: Map<LibraryGroup, List<Library>>,
+    infoList: ImmutableList<InfoEntry> = persistentListOf(),
+    libraries: ImmutableMap<LibraryGroup, ImmutableList<Library>>,
     libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors = OverviewDefaults.overviewColors(),
     padding: OverviewPadding = OverviewDefaults.overviewPadding(),
@@ -93,7 +96,7 @@ internal fun SharedTransitionScope.AppInfo(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    infoList: List<InfoEntry> = listOf(),
+    infoList: ImmutableList<InfoEntry> = persistentListOf(),
     colors: OverviewColors = OverviewDefaults.overviewColors(),
     padding: OverviewPadding = OverviewDefaults.overviewPadding(),
     extras: OverviewExtras = OverviewDefaults.overviewExtras(),
@@ -196,7 +199,7 @@ internal fun SharedTransitionScope.AppInfo(
 @Composable
 internal fun SharedTransitionScope.LibraryList(
     animatedContentScope: AnimatedContentScope,
-    libraries: Map<LibraryGroup, List<Library>>,
+    libraries: ImmutableMap<LibraryGroup, ImmutableList<Library>>,
     libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors,
     padding: OverviewPadding,

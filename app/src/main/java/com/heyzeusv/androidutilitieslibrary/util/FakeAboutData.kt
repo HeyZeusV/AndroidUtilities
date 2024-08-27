@@ -13,6 +13,7 @@ import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
 import com.mikepenz.aboutlibraries.entity.Organization
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.persistentSetOf
 
 const val lorem = "Lorem ipsum odor amet, consectetuer adipiscing elit. Sapien scelerisque porttitor morbi nunc efficitur feugiat. Hac risus integer morbi hac amet molestie hendrerit turpis leo. Arcu scelerisque quisque ornare adipiscing est fringilla, sociosqu condimentum habitant. Auctor quam pulvinar lorem lectus mi metus tincidunt. Potenti sem pharetra vulputate hac congue. Iaculis neque varius sapien augue quis; aptent a morbi. Nostra faucibus porttitor ultrices penatibus aenean ultricies.\n" +
@@ -39,7 +40,7 @@ val lorenEntry = StringInfoEntry(text = lorem)
 
 val lorenHyperlinkEntry = StringInfoEntry(
     text = lorem,
-    linkTextToHyperlinks = mapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
+    linkTextToHyperlinks = persistentMapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
 )
 
 @Composable
@@ -47,7 +48,7 @@ fun lorenHyperlinkCustomStringEntry(): StringInfoEntry = StringInfoEntry(
     text = lorem,
     textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
     linkStyle = MaterialTheme.typography.titleLarge,
-    linkTextToHyperlinks = mapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
+    linkTextToHyperlinks = persistentMapOf("consectetuer" to "google.com", "Sapien" to "github.com"),
     linkTextColor = MaterialTheme.colorScheme.primary,
     linkTextFontWeight = FontWeight.Bold,
     linkTextDecoration = TextDecoration.LineThrough,
@@ -55,7 +56,7 @@ fun lorenHyperlinkCustomStringEntry(): StringInfoEntry = StringInfoEntry(
 
 val hyperlinkStringResource = StringResourceInfoEntry(
     textId = R.string.hyperlink_example,
-    linkTextToHyperlinks = mapOf("LINK1" to "google.com", "LINK2" to "github.com"),
+    linkTextToHyperlinks = persistentMapOf("LINK1" to "google.com", "LINK2" to "github.com"),
 )
 
 @Composable
@@ -63,7 +64,7 @@ fun hyperlinkCustomStringResourceEntry(): StringResourceInfoEntry = StringResour
     textId = R.string.hyperlink_example,
     textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
     linkStyle = MaterialTheme.typography.titleLarge,
-    linkTextToHyperlinks = mapOf("LINK1" to "google.com", "LINK2" to "github.com"),
+    linkTextToHyperlinks = persistentMapOf("LINK1" to "google.com", "LINK2" to "github.com"),
     linkTextColor = MaterialTheme.colorScheme.primary,
     linkTextFontWeight = FontWeight.Bold,
     linkTextDecoration = TextDecoration.LineThrough,

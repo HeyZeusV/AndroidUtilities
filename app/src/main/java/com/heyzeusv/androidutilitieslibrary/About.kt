@@ -18,6 +18,7 @@ import com.heyzeusv.androidutilitieslibrary.util.hyperlinkStringResource
 import com.heyzeusv.androidutilitieslibrary.util.lorenEntry
 import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkCustomStringEntry
 import com.heyzeusv.androidutilitieslibrary.util.lorenHyperlinkEntry
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun AppAboutScreen(
@@ -46,7 +47,7 @@ fun AppAboutScreen(
         },
         title = sRes(R.string.app_name),
         version = "v1.0.0",
-        infoList = listOf(
+        infoList = persistentListOf(
             lorenHyperlinkEntry,
             lorenHyperlinkCustomStringEntry(),
             hyperlinkStringResource,
@@ -76,7 +77,7 @@ fun AppAboutScreenNoIcon(
         },
         title = sRes(R.string.app_name),
         version = "v1.0.0",
-        infoList = listOf(
+        infoList = persistentListOf(
             lorenHyperlinkEntry,
             lorenHyperlinkCustomStringEntry(),
             hyperlinkStringResource,
@@ -93,7 +94,7 @@ fun AppAboutScreenNoBackOrIcon() {
     AboutScreen(
         title = sRes(R.string.app_name),
         version = "v1.0.0",
-        infoList = listOf(
+        infoList = persistentListOf(
             lorenHyperlinkEntry,
             lorenHyperlinkCustomStringEntry(),
             hyperlinkStringResource,
