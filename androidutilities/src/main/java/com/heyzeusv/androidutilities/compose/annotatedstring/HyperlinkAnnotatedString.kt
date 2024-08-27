@@ -12,6 +12,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.text.toSpanned
+import kotlinx.collections.immutable.ImmutableMap
 
 private const val HTTPS = "https://"
 
@@ -23,7 +24,7 @@ fun hyperlinkAnnotatedString(
     text: String,
     textStyle: TextStyle,
     linkStyle: TextStyle? = null,
-    linkTextToHyperlinks: Map<String, String>,
+    linkTextToHyperlinks: ImmutableMap<String, String>,
     linkTextColor: Color = Color.Blue,
     linkTextFontWeight: FontWeight = FontWeight.Normal,
     linkTextDecoration: TextDecoration = TextDecoration.Underline,
@@ -61,7 +62,7 @@ fun hyperlinkAnnotatedString(
     @StringRes textId: Int,
     textStyle: TextStyle,
     linkStyle: TextStyle? = null,
-    linkTextToHyperlinks: Map<String, String>,
+    linkTextToHyperlinks: ImmutableMap<String, String>,
     linkTextColor: Color = Color.Blue,
     linkTextFontWeight: FontWeight = FontWeight.Normal,
     linkTextDecoration: TextDecoration = TextDecoration.Underline,

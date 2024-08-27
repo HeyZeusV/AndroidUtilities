@@ -10,6 +10,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import kotlinx.collections.immutable.ImmutableMap
 
 @Composable
 fun HyperlinkText(
@@ -17,7 +18,7 @@ fun HyperlinkText(
     text: String,
     textStyle: TextStyle,
     linkStyle: TextStyle? = null,
-    linkTextToHyperlinks: Map<String, String>,
+    linkTextToHyperlinks: ImmutableMap<String, String>,
     linkTextColor: Color = Color.Blue,
     linkTextFontWeight: FontWeight = FontWeight.Normal,
     linkTextDecoration: TextDecoration = TextDecoration.Underline,
@@ -54,7 +55,7 @@ fun HyperlinkText(
     @StringRes textId: Int,
     textStyle: TextStyle,
     linkStyle: TextStyle? = null,
-    linkTextToHyperlinks: Map<String, String>,
+    linkTextToHyperlinks: ImmutableMap<String, String>,
     linkTextColor: Color = Color.Blue,
     linkTextFontWeight: FontWeight = FontWeight.Normal,
     linkTextDecoration: TextDecoration = TextDecoration.Underline,

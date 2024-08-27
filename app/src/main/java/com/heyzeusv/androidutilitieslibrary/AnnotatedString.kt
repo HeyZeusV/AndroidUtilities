@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
+import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun AnnotatedStringScreen() {
@@ -22,7 +23,7 @@ fun AnnotatedStringScreen() {
         HyperlinkText(
             text = "Testing hyper link composable",
             textStyle = MaterialTheme.typography.headlineLarge,
-            linkTextToHyperlinks = mapOf(
+            linkTextToHyperlinks = persistentMapOf(
                 "Testing" to "github.com",
                 "composable" to "https://medium.com",
             ),
@@ -31,7 +32,7 @@ fun AnnotatedStringScreen() {
             text = "Testing hyper link composable",
             textStyle = MaterialTheme.typography.bodySmall,
             linkStyle = MaterialTheme.typography.displayLarge,
-            linkTextToHyperlinks = mapOf(
+            linkTextToHyperlinks = persistentMapOf(
                 "Testing" to "github.com",
                 "composable" to "https://medium.com",
             ),
@@ -42,7 +43,7 @@ fun AnnotatedStringScreen() {
         HyperlinkText(
             textId = R.string.hyperlink_example,
             textStyle = MaterialTheme.typography.headlineLarge,
-            linkTextToHyperlinks = mapOf(
+            linkTextToHyperlinks = persistentMapOf(
                 "LINK1" to "github.com",
                 "LINK2" to "https://medium.com",
             ),
