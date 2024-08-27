@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.maven.publish) apply false
+    alias(libs.plugins.gradleup.nmcp) apply false
     id("maven-publish")
 }
 

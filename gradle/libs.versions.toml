@@ -15,6 +15,8 @@ composeBom = "2024.04.01"
 appcompat = "1.7.0"
 material = "1.12.0"
 navigationCompose = "2.8.0-rc01"
+mavenPublish = "0.28.0"
+gradleupNmcp = "0.0.7"
 
 [libraries]
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
@@ -47,4 +49,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 aboutlibraries-plugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries"}
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+gradleup-nmcp = { id = "com.gradleup.nmcp", version.ref = "gradleupNmcp" }
 
