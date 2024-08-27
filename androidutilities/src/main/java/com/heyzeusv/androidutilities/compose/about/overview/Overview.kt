@@ -43,6 +43,7 @@ import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
 
 context(AnimatedContentScope)
 @Composable
@@ -52,7 +53,7 @@ internal fun SharedTransitionScope.AboutOverview(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    infoList: List<InfoEntry> = listOf(),
+    infoList: ImmutableList<InfoEntry> = persistentListOf(),
     libraries: ImmutableMap<LibraryGroup, ImmutableList<Library>>,
     libraryOnClick: (LibraryGroup, String) -> Unit,
     colors: OverviewColors = OverviewDefaults.overviewColors(),
@@ -95,7 +96,7 @@ internal fun SharedTransitionScope.AppInfo(
     icon: @Composable (BoxScope.() -> Unit)? = null,
     title: String = "App name",
     version: String = "1.0.0",
-    infoList: List<InfoEntry> = listOf(),
+    infoList: ImmutableList<InfoEntry> = persistentListOf(),
     colors: OverviewColors = OverviewDefaults.overviewColors(),
     padding: OverviewPadding = OverviewDefaults.overviewPadding(),
     extras: OverviewExtras = OverviewDefaults.overviewExtras(),
