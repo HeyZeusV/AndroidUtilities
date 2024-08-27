@@ -5,9 +5,9 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.maven.publish) apply false
-    alias(libs.plugins.gradleup.nmcp) apply false
-    id("maven-publish")
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.gradleup.nmcp)
+//    id("maven-publish")
 }
 
 android {
@@ -37,9 +37,9 @@ android {
     buildFeatures {
         compose = true
     }
-    publishing {
-        singleVariant("release")
-    }
+//    publishing {
+//        singleVariant("release")
+//    }
 }
 
 composeCompiler {
@@ -54,19 +54,19 @@ kotlin {
     }
 }
 
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            groupId = "com.heyzeusv"
-            artifactId = "androidutilities"
-            version = "4.0.0"
-
-            afterEvaluate {
-                from(components["release"])
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        register<MavenPublication>("release") {
+//            groupId = "com.heyzeusv"
+//            artifactId = "androidutilities"
+//            version = "4.0.0"
+//
+//            afterEvaluate {
+//                from(components["release"])
+//            }
+//        }
+//    }
+//}
 
 dependencies {
     implementation(libs.androidx.core.ktx)

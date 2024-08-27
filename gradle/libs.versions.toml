@@ -15,7 +15,7 @@ composeBom = "2024.04.01"
 appcompat = "1.7.0"
 material = "1.12.0"
 navigationCompose = "2.8.0-rc01"
-mavenPublish = "0.28.0"
+mavenPublish = "0.29.0"
 gradleupNmcp = "0.0.7"
 
 [libraries]
