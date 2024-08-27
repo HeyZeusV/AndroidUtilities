@@ -6,7 +6,5 @@ plugins {
     alias(libs.plugins.aboutlibraries.plugin) apply false
     alias(libs.plugins.jetbrains.kotlin.serialization) apply false
     alias(libs.plugins.compose.compiler) apply false
-    id("com.vanniktech.maven.publish") version "0.29.0" apply false
-//    alias(libs.plugins.maven.publish) apply false
-//    alias(libs.plugins.gradleup.nmcp) apply false
+    alias(libs.plugins.maven.publish) apply false
 }
