@@ -159,8 +159,7 @@ internal fun SharedTransitionScope.LibraryDetails(
                         )
                         HorizontalPager(
                             state = pagerState,
-                            modifier = Modifier
-                                .weight(1f),
+                            modifier = Modifier.weight(1f),
                         ) { page ->
                             val body: String = if (page == 0) description else licenseContent
                             Text(
