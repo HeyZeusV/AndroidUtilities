@@ -151,22 +151,55 @@ HyperlinkText(
 <img src="/images/HyperlinkSample.gif" width="225" height="500"/>
 </details>
 
+## Horizontal Pager Indicator
+
+Google implemented Pagers, but did not implement PagerIndicators. This is taken from
+[Accompanist][2].
+
+<details><summary><b>Usage</b></summary>
+
+```kotlin
+HorizontalPagerIndicator(    
+    // used to observe list state
+    pagerState, // PagerState
+    // number of indicators to be displayed
+    pageCount, // Int
+    modifier, // Modifier = Modifier
+    // how to get position of current indicator if pageCount != pagerState.pageCount
+    pageIndexMapping, // (Int) -> Int = { it }
+    // indicator styling
+    activeColor, // Color = LocalContentColor.current.copy(alpha = 0.9f)
+    inactiveColor, // Color = activeColor.copy(alpha = 0.38f)
+    indicatorWidth, // Dp = 8.dp
+    indicatorHeight, // Dp = indicatorWidth
+    indicatorSpacing, // Dp = indicatorWidth
+    indicatorShape, // Shape = CircleShape
+)
+```
+
+</details>
+<details><summary><b>Screenshots</b></summary>
+Watch HorizontalPagerIndicator in action under AboutScreen screenshots! 
+</details>
+
+[2]: https://github.com/google/accompanist/blob/main/pager-indicators/src/main/java/com/google/accompanist/pager/PagerIndicator.kt
+
 ## Compose Resources
 
 Composable resource functions, ie stringResource(), have longer than necessary names (in my eyes...).
 
-[ComposeResources.kt][2] contains all variants of Composable resource functions, but with shortened names.
+[ComposeResources.kt][3] contains all variants of Composable resource functions, but with shortened names.
 That's it... They save space! :)
 
 I personally use them in combination with Live Templates available on Android Studio (not sure about other IDEs).
-If you know the location of your Android Studio configuration directory, you can copy [ComposeResources.xml][3] into your templates folder.
-Or you can import [ComposeResources.zip][4] using File -> Manage IDE Settings -> Import Settings... (Does not edit any settings, only adds Live Templates).
+If you know the location of your Android Studio configuration directory, you can copy [ComposeResources.xml][4] into your templates folder.
+Or you can import [ComposeResources.zip][5] using File -> Manage IDE Settings -> Import Settings... (Does not edit any settings, only adds Live Templates).
 
 <img src="/images/ComposeResourcesSample.gif" width="225" height="500"/>
 
-[2]: /androidutilities/src/main/java/com/heyzeusv/androidutilities/compose/util/ComposeResources.kt
-[3]: /livetemplates/ComposeResources.xml
-[4]: /livetemplates/ComposeResources.zip
+[3]: /androidutilities/src/main/java/com/heyzeusv/androidutilities/compose/util/ComposeResources.kt
+[4]: /livetemplates/ComposeResources.xml
+[5]: /livetemplates/ComposeResources.zip
 
 ## Installation
 
