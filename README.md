@@ -4,6 +4,7 @@
 A collection of Android utilities I find myself reusing across my apps.
 
 ## About Screen
+### Requires Kotlinx Immutable Collections (See installation instructions)
 
 Full screen Composable that splits the screen into two parts. 
 
@@ -58,9 +59,7 @@ AboutScreen(
 
 </details>
 <details><summary><b>Screenshots</b></summary>
-
 <img src="/images/AboutScreenExamples.png"/>
-
 <img src="/images/AboutScreenSample.gif" width="225" height="500"/>
 </details>
 
@@ -74,6 +73,83 @@ id("com.mikepenz.aboutlibraries.plugin") version "$latestAboutLibsRelease" apply
 // App build.gradle
 id("com.mikepenz.aboutlibraries.plugin")
 ```
+
+## Annotated Strings (Hyperlinks)
+### Requires Kotlinx Immutable Collections (See installation instructions)
+
+Quickly build Annotated Strings or Composable Texts with clickable hyperlinks.
+
+<details><summary><b>Usage</b></summary>
+
+Use the below versions if you want to use a regular string.
+```kotlin
+// returns AnnotatedString
+hyperlinkAnnotatedString(
+    // full string to be displayed
+    text, // String,
+    // style to be used by non-hyperlink text
+    textStyle, // TextStyle,
+    // style to be used by hyperlink text
+    linkStyle, // TextStyle? = null,
+    // map of link text to urls they link to
+    // link text must match text found in text string passed 
+    linkTextToHyperlinks, // ImmutableMap<String, String>,
+    // further styling for hyperlink text
+    linkTextColor, // Color = Color.Blue,
+    linkTextFontWeight, // FontWeight = FontWeight.Normal,
+    linkTextDecoration, // TextDecoration = TextDecoration.Underline,
+)
+
+// or
+
+// Text Composable
+HyperlinkText(
+    modifier, // Modifier = Modifier,
+    // ...
+    // styling for Text Composable
+    overflow, // TextOverflow = TextOverflow.Clip,
+    softWrap, // Boolean = true,
+    maxLines, // Int = Int.MAX_VALUE,
+    minLines, // Int = 1,
+)
+
+```
+
+Use the below versions if you want to use a string resource.
+```xml
+<!-- Hyperlink Annotation String -->
+<string name="hyperlink_example">This string resource contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
+```
+
+```kotlin
+// returns AnnotationString
+hyperlinkAnnotatedString(
+    // used to retrieve string resource
+    context, // Context
+    // string resource to be displayed
+    textId, // Int
+    // ...
+    // map for hyperlink_example shown above
+    // persistentMapOf("LINK1" to "www.url.com, "LINK2" to "www.url2.com")
+    linkTextToHyperlinks // ImmutableMap<String, String>
+    // ...
+)
+
+// or
+
+// Text Composable
+HyperlinkText(
+    modifier, // Modifier = Modifier
+    // string resource to be displayed
+    textId, // Int
+    // ...
+)
+```
+
+</details>
+<details><summary><b>Screenshots</b></summary>
+<img src="/images/HyperlinkSample.gif" width="225" height="500"/>
+</details>
 
 ## Compose Resources
 
@@ -120,3 +196,13 @@ dependencies {
     implementation("io.github.heyzeusv:androidutilities:$androidUtilitiesVersion")
 }
 ```
+
+**Step 3.** Multiple features use [Kotlinx Immutable Collections][5] in order to make Composables
+stable and skippable. Add dependency to your module's build.gradle
+```kotlin
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxImmutableCollections")
+}
+```
+
+[5]: https://github.com/Kotlin/kotlinx.collections.immutable
