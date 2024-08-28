@@ -195,7 +195,9 @@ I personally use them in combination with Live Templates available on Android St
 If you know the location of your Android Studio configuration directory, you can copy [ComposeResources.xml][4] into your templates folder.
 Or you can import [ComposeResources.zip][5] using File -> Manage IDE Settings -> Import Settings... (Does not edit any settings, only adds Live Templates).
 
+<details><summary><b>Screenshots</b></summary>
 <img src="/images/ComposeResourcesSample.gif" width="225" height="500"/>
+</details>
 
 [3]: /androidutilities/src/main/java/com/heyzeusv/androidutilities/compose/util/ComposeResources.kt
 [4]: /livetemplates/ComposeResources.xml
