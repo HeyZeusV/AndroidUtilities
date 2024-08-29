@@ -23,6 +23,22 @@ import kotlin.math.sign
 
 /**
  *  Taken from deprecated [Accompanist Pager library.](https://github.com/google/accompanist/blob/main/pager-indicators/src/main/java/com/google/accompanist/pager/PagerIndicator.kt)
+ *
+ * A horizontally laid out indicator for a [androidx.compose.foundation.pager.HorizontalPager] or
+ * [androidx.compose.foundation.pager.VerticalPager], representing the currently active page and
+ * total pages drawn using a [Shape].
+ *
+ * @param pagerState the state object of your pager to be used to observe the list's state.
+ * @param modifier the modifier to apply to this layout.
+ * @param pageCount the size of indicators should be displayed, defaults to [PagerState.pageCount].
+ * @param pageIndexMapping describe how to get the position of active indicator by the giving page
+ * from [PagerState.currentPage], if [pageCount] is not equals to [PagerState.pageCount].
+ * @param activeColor the color of the active Page indicator
+ * @param inactiveColor the color of page indicators that are inactive.
+ * @param indicatorWidth the width of each indicator in [Dp].
+ * @param indicatorHeight the height of each indicator in [Dp]. Defaults to [indicatorWidth].
+ * @param indicatorSpacing the spacing between each indicator in [Dp].
+ * @param indicatorShape the shape representing each indicator. This defaults to [CircleShape].
  */
 @Composable
 fun HorizontalPagerIndicator(
