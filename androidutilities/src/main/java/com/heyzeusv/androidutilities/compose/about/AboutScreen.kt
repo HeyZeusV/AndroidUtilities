@@ -30,16 +30,15 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
 /**
- *  Full screen Composable that splits the screen into two parts.
+ *  Full screen Composable that contains a NavGraph that contains 2 screens. Transition between
+ *  screens is done using Shared Element Transitions.
  *
- *  The top part displays information about the app: an [icon] (optional), [title], [version], and
- *  any other [infoList] (changelog, contact info, etc.).
+ *  [AboutOverview] displays app info and list of libraries.
  *
- *  The bottom part displays all libraries used with the help of [AboutLibraries](https://github.com/mikepenz/AboutLibraries),
- *  which does require including its plugin. Users can expand a library item to display its
- *  description and its license on its own screen. This version gives the option to either list
- *  all libraries under one header or separate by first party (Google, Jetbrains, Kotlin) and third
- *  party libraries using [separateByParty].
+ *  [AboutLibrary] displays full library information including its description and full license.
+ *
+ *  This version gives the option to either list all libraries under one header or separate by
+ *  first party (Google, Jetbrains, Kotlin) and third party libraries using [separateByParty].
  *
  *  @param backButton Allows for back button if not using TopAppBar navigation.
  *  @param icon Optional icon displayed above [title] Text.
@@ -98,15 +97,14 @@ fun AboutScreen(
 }
 
 /**
- *  Full screen Composable that splits the screen into two parts.
+ *  Full screen Composable that contains a NavGraph that contains 2 screens. Transition between
+ *  screens is done using Shared Element Transitions.
  *
- *  The top part displays information about the app: an [icon] (optional), [title], [version], and
- *  any other [infoList] (changelog, contact info, etc.).
+ *  [AboutOverview] displays app info and list of libraries.
  *
- *  The bottom part displays all libraries used with the help of [AboutLibraries](https://github.com/mikepenz/AboutLibraries),
- *  which does require including its plugin. Users can expand a library item to display its
- *  description and its license on its own screen. This version allows for custom listing of
- *  libraries by passing [libraries].
+ *  [AboutLibrary] displays full library information including its description and full license.
+ *
+ *  This version allows for custom listing of libraries by passing [libraries].
  *
  *  @param backButton Allows for back button if not using TopAppBar navigation.
  *  @param icon Optional icon displayed above [title] Text.

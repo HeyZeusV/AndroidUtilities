@@ -10,6 +10,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 
+/**
+ *  Represents hyperlinks and styling values needed for info list in [AppInfo].
+ *
+ *  @property textStyle Text style of non-hyperlink text.
+ *  @property linkStyle Text style of hyperlink text.
+ *  @property linkTextToHyperlinks Map of text to the link its connects to.
+ *  @property linkTextColor Color of hyperlink text.
+ *  @property linkTextFontWeight Weight of hyperlink text.
+ *  @property linkTextDecoration Any decoration that should applied to hyperlink text.
+ */
 @Stable
 interface InfoEntry {
     val textStyle: TextStyle?
@@ -20,6 +30,17 @@ interface InfoEntry {
     val linkTextDecoration: TextDecoration
 }
 
+/**
+ *  Used when text to be styled is a [String].
+ *
+ *  @param text Text to be styled.
+ *  @param textStyle Text style of non-hyperlink text.
+ *  @param linkStyle Text style of hyperlink text.
+ *  @param linkTextToHyperlinks Map of text to the link its connects to.
+ *  @param linkTextColor Color of hyperlink text.
+ *  @param linkTextFontWeight Weight of hyperlink text.
+ *  @param linkTextDecoration Any decoration that should applied to hyperlink text.
+ */
 @Immutable
 data class StringInfoEntry(
     val text: String,
@@ -31,6 +52,17 @@ data class StringInfoEntry(
     override val linkTextDecoration: TextDecoration = TextDecoration.Underline,
 ) : InfoEntry
 
+/**
+ *  Used when text to be styled is a string resource.
+ *
+ *  @param textId Id of string resource to be styled.
+ *  @param textStyle Text style of non-hyperlink text.
+ *  @param linkStyle Text style of hyperlink text.
+ *  @param linkTextToHyperlinks Map of text to the link its connects to.
+ *  @param linkTextColor Color of hyperlink text.
+ *  @param linkTextFontWeight Weight of hyperlink text.
+ *  @param linkTextDecoration Any decoration that should applied to hyperlink text.
+ */
 @Immutable
 data class StringResourceInfoEntry(
     @StringRes val textId: Int,

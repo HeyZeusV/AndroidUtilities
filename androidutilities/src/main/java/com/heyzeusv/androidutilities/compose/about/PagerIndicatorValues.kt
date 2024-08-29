@@ -33,7 +33,7 @@ object PagerIndicatorDefaults {
     )
 
     /**
-     *  Creates a [PagerIndicatorExtras] that represents dimensions and the shape used by
+     *  Creates a [PagerIndicatorExtras] that represents the dimensions and the shape used by
      *  [HorizontalPagerIndicator].
      *
      *  @param indicatorWidth The width of each individual indicator in [Dp].
@@ -80,7 +80,7 @@ private data class DefaultPagerIndicatorColors(
 ) : PagerIndicatorColors
 
 /**
- *  Represents the dimensions used by [HorizontalPagerIndicator].
+ *  Represents dimensions and shape used by [HorizontalPagerIndicator].
  *
  *  @property indicatorWidth The width of each individual indicator in [Dp].
  *  @property indicatorHeight The height of each individual indicator in [Dp].
