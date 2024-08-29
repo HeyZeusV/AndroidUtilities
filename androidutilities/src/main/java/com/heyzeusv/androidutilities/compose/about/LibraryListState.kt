@@ -22,6 +22,14 @@ private const val JETBRAINS = "org.jetbrains"
 private const val GOOGLE = "com.google"
 private val firstPartyIds = listOf(ANDROID, JETBRAINS, GOOGLE)
 
+/**
+ *  Creates an [ImmutableMap] with each [LibraryGroup] paired with their [ImmutableList] of
+ *  [Library]. [LibraryGroup]s are determined by [separateByParty], true returns first and third
+ *  party libraries separated, while false returns all libraries together. The [ImmutableMap] is
+ *  returned in a [State] in order to be observed.
+ *
+ *  @param separateByParty Determines how to group [Library].
+ */
 @Composable
 fun produceLibraryListState(
     separateByParty: Boolean,

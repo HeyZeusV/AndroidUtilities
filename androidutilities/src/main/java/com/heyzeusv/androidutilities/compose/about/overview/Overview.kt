@@ -45,6 +45,30 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 
+/**
+ *  Full screen Composable that splits the screen into two parts.
+ *
+ *  The top part displays information about the app: an [icon] (optional), [title], [version], and
+ *  any other [InfoEntry] in a [infoList] (changelog, contact info, etc.).
+ *
+ *  The bottom part displays all libraries used with the help of [AboutLibraries](https://github.com/mikepenz/AboutLibraries),
+ *  which does require including its plugin.
+ *
+ *  @param animatedContentScope Scope used to animate shared elements between screens.
+ *  @param backButton Allows for back button if not using TopAppBar navigation.
+ *  @param icon Optional icon displayed above [title] Text.
+ *  @param title Title for screen.
+ *  @param version Text meant to display current version of app.
+ *  @param infoList String or String Resource, along with its styling, to be displayed in
+ *  HorizontalPager.
+ *  @param libraries Map of libraries where each [LibraryGroup] is paired to the list of
+ *  [Library] to be displayed under it.
+ *  @param libraryOnClick Expands [LibraryDetails] to full screen.
+ *  @param colors Colors to be used.
+ *  @param padding Padding to be used.
+ *  @param extras Additional values to be used.
+ *  @param textStyles Text styles to be used.
+ */
 context(AnimatedContentScope)
 @Composable
 internal fun SharedTransitionScope.AboutOverview(
@@ -89,6 +113,21 @@ internal fun SharedTransitionScope.AboutOverview(
     }
 }
 
+/**
+ *  Top portion of [AboutOverview] that displays information about the app: an [icon] (optional),
+ *  [title], [version], and any other [InfoEntry] in a [infoList] (changelog, contact info, etc.).
+ *
+ *  @param backButton Allows for back button if not using TopAppBar navigation.
+ *  @param icon Optional icon displayed above [title] Text.
+ *  @param title Title for screen.
+ *  @param version Text meant to display current version of app.
+ *  @param infoList String or String Resource, along with its styling, to be displayed in
+ *  HorizontalPager.
+ *  @param colors Colors to be used.
+ *  @param padding Padding to be used.
+ *  @param extras Additional values to be used.
+ *  @param textStyles Text Styles to be used.
+ */
 context(AnimatedContentScope)
 @Composable
 internal fun SharedTransitionScope.AppInfo(
@@ -196,6 +235,19 @@ internal fun SharedTransitionScope.AppInfo(
     }
 }
 
+/**
+ *  Bottom portion of [AboutOverview] that displays libraries used by app separated by
+ *  [LibraryGroup].
+ *
+ *  @param animatedContentScope Scope used to animate shared elements between screens.
+ *  @param libraries Map of libraries where each [LibraryGroup] is paired to the list of
+ *  [Library] to be displayed under it.
+ *  @param libraryOnClick Expands [LibraryDetails] to full screen.
+ *  @param colors Colors to be used.
+ *  @param padding Padding to be used.
+ *  @param extras Additional values to be used.
+ *  @param textStyles Text Styles to be used.
+ */
 @Composable
 internal fun SharedTransitionScope.LibraryList(
     animatedContentScope: AnimatedContentScope,

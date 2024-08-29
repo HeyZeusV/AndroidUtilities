@@ -16,8 +16,12 @@ import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.about.PagerIndicatorColors
 import com.heyzeusv.androidutilities.compose.about.PagerIndicatorDefaults
 import com.heyzeusv.androidutilities.compose.about.PagerIndicatorExtras
+import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.pRes
 
+/**
+ *  Contains the defaults values used by [AboutLibrary].
+ */
 object LibraryDefaults {
     private val ItemBorderWidth = 2.dp
     private val DividerThickness = 2.dp
@@ -31,6 +35,15 @@ object LibraryDefaults {
     val ScreenOuterPV = PaddingValues(all = ScreenOuterPadding)
     private val ItemContentPV = PaddingValues(all = ContentPadding)
 
+    /**
+     *  Creates [LibraryColors] that represents the colors used by [AboutLibrary].
+     *
+     *  @param borderColor Color of border.
+     *  @param backgroundColor Color of background surface.
+     *  @param contentColor Color of text content.
+     *  @param dividerColor Color of dividers.
+     *  @param pagerIndicatorColors Colors used by [HorizontalPagerIndicator].
+     */
     @Composable
     fun libraryColors(
         borderColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -46,6 +59,18 @@ object LibraryDefaults {
         pagerIndicatorColors = pagerIndicatorColors,
     )
 
+    /**
+     *  Creates a [LibraryPadding] that represents the padding used by [AboutLibrary] Composables.
+     *
+     *  @param outerPadding Padding values of outside surface.
+     *  @param innerPadding Padding values of inner content.
+     *  @param namePadding Padding values of name Text.
+     *  @param actionIconPadding Padding values of action Icon.
+     *  @param developerPadding Padding values of developer Text.
+     *  @param bodyPadding Padding values of body Text.
+     *  @param footerPadding Padding values of footer Text.
+     *  @param pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+     */
     @Composable
     fun libraryPadding(
         outerPadding: PaddingValues = PaddingValues(),
@@ -67,6 +92,17 @@ object LibraryDefaults {
         pageIndicatorPadding = pageIndicatorPadding,
     )
 
+    /**
+     *  Creates a [LibraryExtras] that represents various values used by [AboutLibrary].
+     *
+     *  @param shape Shape of surface.
+     *  @param borderWidth Thickness of border in [Dp].
+     *  @param contentSpacedBy Vertical spacing between Composables in [Dp].
+     *  @param dividerThickness Thickness of Dividers in [Dp].
+     *  @param actionIcon Icon used for action button.
+     *  @param actionIconSize Size of action Icon.
+     *  @param pagerIndicatorExtras Values used by [HorizontalPagerIndicator].
+     */
     @Composable
     fun libraryExtras(
         shape: Shape = RoundedCornerShape(CornerRadius),
@@ -86,6 +122,14 @@ object LibraryDefaults {
         pagerIndicatorExtras = pagerIndicatorExtras,
     )
 
+    /**
+     *  Creates a [LibraryTextStyles] that represents the text styles used by [AboutLibrary].
+     *
+     *  @param nameStyle Text style used by name Text.
+     *  @param developerStyle Text style used by developer Text.
+     *  @param bodyStyle Text style used by body Text.
+     *  @param footerStyle Text style used by body Text.
+     */
     @Composable
     fun libraryTextStyles(
         nameStyle: TextStyle = MaterialTheme.typography.headlineSmall,
@@ -100,6 +144,15 @@ object LibraryDefaults {
     )
 }
 
+/**
+ *  Represents the colors used by [AboutLibrary].
+ *
+ *  @property borderColor Color of border.
+ *  @property backgroundColor Color of background surface.
+ *  @property contentColor Color of text content.
+ *  @property dividerColor Color of dividers.
+ *  @property pagerIndicatorColors Colors used by [HorizontalPagerIndicator].
+ */
 @Stable
 interface LibraryColors {
     val borderColor: Color
@@ -109,6 +162,15 @@ interface LibraryColors {
     val pagerIndicatorColors: PagerIndicatorColors
 }
 
+/**
+ *  Default [LibraryColors].
+ *
+ *  @param borderColor Color of border.
+ *  @param backgroundColor Color of background surface.
+ *  @param contentColor Color of text content.
+ *  @param dividerColor Color of dividers.
+ *  @param pagerIndicatorColors Colors used by [HorizontalPagerIndicator].
+ */
 @Immutable
 private data class DefaultLibraryColors(
     override val borderColor: Color,
@@ -118,6 +180,18 @@ private data class DefaultLibraryColors(
     override val pagerIndicatorColors: PagerIndicatorColors,
 ) : LibraryColors
 
+/**
+ *  Represents paddings used by [AboutLibrary].
+ *
+ *  @property outerPadding Padding values of outside surface.
+ *  @property innerPadding Padding values of inner content.
+ *  @property namePadding Padding values of name Text.
+ *  @property actionIconPadding Padding values of action Icon.
+ *  @property developerPadding Padding values of developer Text.
+ *  @property bodyPadding Padding values of body Text.
+ *  @property footerPadding Padding values of footer Text.
+ *  @property pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+ */
 @Stable
 interface LibraryPadding {
     val outerPadding: PaddingValues
@@ -130,6 +204,18 @@ interface LibraryPadding {
     val pageIndicatorPadding: PaddingValues
 }
 
+/**
+ *  Default [LibraryPadding].
+ *
+ *  @param outerPadding Padding values of outside surface.
+ *  @param innerPadding Padding values of inner content.
+ *  @param namePadding Padding values of name Text.
+ *  @param actionIconPadding Padding values of action Icon.
+ *  @param developerPadding Padding values of developer Text.
+ *  @param bodyPadding Padding values of body Text.
+ *  @param footerPadding Padding values of footer Text.
+ *  @param pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+ */
 @Immutable
 private data class DefaultLibraryPadding(
     override val outerPadding: PaddingValues,
@@ -142,6 +228,17 @@ private data class DefaultLibraryPadding(
     override val pageIndicatorPadding: PaddingValues,
 ) : LibraryPadding
 
+/**
+ *  Represents various values used by [AboutLibrary].
+ *
+ *  @property shape Shape of surface.
+ *  @property borderWidth Thickness of border in [Dp].
+ *  @property contentSpacedBy Vertical spacing between Composables in [Dp].
+ *  @property dividerThickness Thickness of Dividers in [Dp].
+ *  @property actionIcon Icon used for action button.
+ *  @property actionIconSize Size of action Icon.
+ *  @property pagerIndicatorExtras Values used by [HorizontalPagerIndicator].
+ */
 @Stable
 interface LibraryExtras {
     val shape: Shape
@@ -153,6 +250,17 @@ interface LibraryExtras {
     val pagerIndicatorExtras: PagerIndicatorExtras
 }
 
+/**
+ *  Default [LibraryExtras].
+ *
+ *  @param shape Shape of surface.
+ *  @param borderWidth Thickness of border in [Dp].
+ *  @param contentSpacedBy Vertical spacing between Composables in [Dp].
+ *  @param dividerThickness Thickness of Dividers in [Dp].
+ *  @param actionIcon Icon used for action button.
+ *  @param actionIconSize Size of action Icon.
+ *  @param pagerIndicatorExtras Values used by [HorizontalPagerIndicator].
+ */
 @Immutable
 private data class DefaultLibraryExtras(
     override val shape: Shape,
@@ -164,6 +272,14 @@ private data class DefaultLibraryExtras(
     override val pagerIndicatorExtras: PagerIndicatorExtras,
 ) : LibraryExtras
 
+/**
+ *  Represents text styles used by [AboutLibrary].
+ *
+ *  @property nameStyle Text style used by name Text.
+ *  @property developerStyle Text style used by developer Text.
+ *  @property bodyStyle Text style used by body Text.
+ *  @property footerStyle Text style used by body Text.
+ */
 @Stable
 interface LibraryTextStyles {
     val nameStyle: TextStyle
@@ -172,6 +288,14 @@ interface LibraryTextStyles {
     val footerStyle: TextStyle
 }
 
+/**
+ *  Default [LibraryTextStyles].
+ *
+ *  @param nameStyle Text style used by name Text.
+ *  @param developerStyle Text style used by developer Text.
+ *  @param bodyStyle Text style used by body Text.
+ *  @param footerStyle Text style used by body Text.
+ */
 @Immutable
 private data class DefaultLibraryTextStyles(
     override val nameStyle: TextStyle,

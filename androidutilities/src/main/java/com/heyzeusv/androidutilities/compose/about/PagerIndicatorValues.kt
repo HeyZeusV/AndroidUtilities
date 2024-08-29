@@ -9,9 +9,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 
+/**
+ *  Contains the default values used by [HorizontalPagerIndicator] on [AboutScreen].
+ */
 object PagerIndicatorDefaults {
 
+    /**
+     *  Creates a [PagerIndicatorColors] that represents the colors used by
+     *  [HorizontalPagerIndicator].
+     *
+     *  @param activeColor Color of indicator of currently displayed page.
+     *  @param inactiveColor Color of indicator of page when not displayed.
+     */
     @Composable
     fun pagerIndicatorColors(
         activeColor: Color = LocalContentColor.current.copy(alpha = 0.9f),
@@ -21,6 +32,15 @@ object PagerIndicatorDefaults {
         inactiveColor = inactiveColor
     )
 
+    /**
+     *  Creates a [PagerIndicatorExtras] that represents the dimensions and the shape used by
+     *  [HorizontalPagerIndicator].
+     *
+     *  @param indicatorWidth The width of each individual indicator in [Dp].
+     *  @param indicatorHeight The height of each individual indicator in [Dp].
+     *  @param indicatorSpacing The space between each indicator in [Dp].
+     *  @param indicatorShape The [Shape] of each indicator.
+     */
     @Composable
     fun pagerIndicatorExtras(
         indicatorWidth: Dp = 8.dp,
@@ -35,18 +55,38 @@ object PagerIndicatorDefaults {
     )
 }
 
+/**
+ *  Represents the colors used by [HorizontalPagerIndicator].
+ *
+ *  @property activeColor Color of indicator of currently displayed page.
+ *  @property inactiveColor Color of indicator of page when not displayed.
+ */
 @Stable
 interface PagerIndicatorColors {
     val activeColor: Color
     val inactiveColor: Color
 }
 
+/**
+ *  Default [PagerIndicatorColors].
+ *
+ *  @param activeColor Color of indicator of currently displayed page.
+ *  @param inactiveColor Color of indicator of page when not displayed.
+ */
 @Immutable
 private data class DefaultPagerIndicatorColors(
     override val activeColor: Color,
     override val inactiveColor: Color,
 ) : PagerIndicatorColors
 
+/**
+ *  Represents dimensions and shape used by [HorizontalPagerIndicator].
+ *
+ *  @property indicatorWidth The width of each individual indicator in [Dp].
+ *  @property indicatorHeight The height of each individual indicator in [Dp].
+ *  @property indicatorSpacing The space between each indicator in [Dp].
+ *  @property indicatorShape The [Shape] of each indicator.
+ */
 @Stable
 interface PagerIndicatorExtras {
     val indicatorWidth: Dp
@@ -55,6 +95,14 @@ interface PagerIndicatorExtras {
     val indicatorShape: Shape
 }
 
+/**
+ *  Default [PagerIndicatorExtras].
+ *
+ *  @param indicatorWidth The width of each individual indicator in [Dp].
+ *  @param indicatorHeight The height of each individual indicator in [Dp].
+ *  @param indicatorSpacing The space between each indicator in [Dp].
+ *  @param indicatorShape The [Shape] of each indicator.
+ */
 @Immutable
 private data class DefaultPagerIndicatorExtras(
     override val indicatorWidth: Dp,

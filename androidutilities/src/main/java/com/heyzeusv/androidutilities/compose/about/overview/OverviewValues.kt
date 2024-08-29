@@ -1,6 +1,7 @@
 package com.heyzeusv.androidutilities.compose.about.overview
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -17,10 +18,15 @@ import com.heyzeusv.androidutilities.compose.about.PagerIndicatorDefaults
 import com.heyzeusv.androidutilities.compose.about.PagerIndicatorExtras
 import com.heyzeusv.androidutilities.compose.about.library.LibraryColors
 import com.heyzeusv.androidutilities.compose.about.library.LibraryDefaults
+import com.heyzeusv.androidutilities.compose.about.library.LibraryDetails
 import com.heyzeusv.androidutilities.compose.about.library.LibraryExtras
 import com.heyzeusv.androidutilities.compose.about.library.LibraryPadding
 import com.heyzeusv.androidutilities.compose.about.library.LibraryTextStyles
+import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 
+/**
+ *  Contains the defaults values used by [AboutOverview].
+ */
 object OverviewDefaults {
     private val ItemSpacing = 12.dp
     private val AppInfoItemSpacing = 8.dp
@@ -33,6 +39,18 @@ object OverviewDefaults {
     private val LibraryListPadding =
         PaddingValues(start = ContentPadding, end = ContentPadding, bottom = ContentPadding)
 
+    /**
+     *  Creates an [OverviewColors] that represents the colors used by [AboutOverview].
+     *
+     *  @param backgroundColor Color of background surface.
+     *  @param titleColor Color of title Text.
+     *  @param versionColor Color of version Text.
+     *  @param infoColor Color of each Text in [HorizontalPager].
+     *  @param pagerIndicatorColors Colors used by [HorizontalPagerIndicator].
+     *  @param dividerColor Color of Divider.
+     *  @param libraryHeaderColor Color of Text between each group of libraries.
+     *  @param libraryItemColors Colors used by [LibraryDetails].
+     */
     @Composable
     fun overviewColors(
         backgroundColor: Color = MaterialTheme.colorScheme.surface,
@@ -54,6 +72,18 @@ object OverviewDefaults {
         libraryItemColors = libraryItemColors
     )
 
+    /**
+     *  Creates an [OverviewPadding] that represents the padding used by [AboutOverview] Composables.
+     *
+     *  @param appInfoPadding Padding values of [AppInfo].
+     *  @param titlePadding Padding values of title Text.
+     *  @param versionPadding Padding values of version Text.
+     *  @param infoPadding Padding values of [HorizontalPager].
+     *  @param pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+     *  @param dividerPadding Padding values of Divider.
+     *  @param libraryListPadding Padding values of [LibraryList].
+     *  @param libraryItemPadding Padding values of [LibraryDetails].
+     */
     @Composable
     fun overviewPadding(
         appInfoPadding: PaddingValues = AppInfoPadding,
@@ -75,6 +105,16 @@ object OverviewDefaults {
         libraryItemPadding = libraryItemPadding,
     )
 
+    /**
+     *  Creates an [OverviewExtras] that represents various values used by [AboutOverview].
+     *
+     *  @param itemSpacing Vertical spacing between [AppInfo] and [LibraryList] in [Dp].
+     *  @param appInfoItemSpacing Vertical spacing between [AppInfo] Composables in [Dp].
+     *  @param infoHeight The height of [HorizontalPager] in [AppInfo] in [Dp].
+     *  @param pagerIndicatorExtras Values used by [HorizontalPagerIndicator].
+     *  @param dividerThickness Thickness of Divider in [Dp].
+     *  @param libraryItemExtras Values used by [LibraryDetails].
+     */
     @Composable
     fun overviewExtras(
         itemSpacing: Dp = ItemSpacing,
@@ -92,6 +132,15 @@ object OverviewDefaults {
         libraryItemExtras = libraryItemExtras,
     )
 
+    /**
+     *  Creates an [OverviewTextStyles] that represents the text styles used by [AboutOverview].
+     *
+     *  @param titleStyle Text style used by title Text.
+     *  @param versionStyle Text style used by version Text.
+     *  @param infoStyle Text style used by each Text in [HorizontalPager].
+     *  @param libraryHeaderStyle Text style used by each Text separating libraries.
+     *  @param libraryItemStyles Text style used by [LibraryDetails].
+     */
     @Composable
     fun overviewTextStyles(
         titleStyle: TextStyle = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
@@ -111,6 +160,18 @@ object OverviewDefaults {
     )
 }
 
+/**
+ *  Represents the colors used by [AboutOverview].
+ *
+ *  @property backgroundColor Color of background surface.
+ *  @property titleColor Color of title Text.
+ *  @property versionColor Color of version Text.
+ *  @property infoColor Color of each Text in [HorizontalPager].
+ *  @property pagerIndicatorColors Colors used by [HorizontalPagerIndicator].
+ *  @property dividerColor Color of Divider.
+ *  @property libraryHeaderColor Color of Text between each group of libraries.
+ *  @property libraryItemColors Colors used by [LibraryDetails].
+ */
 @Stable
 interface OverviewColors {
     val backgroundColor: Color
@@ -123,6 +184,18 @@ interface OverviewColors {
     val libraryItemColors: LibraryColors
 }
 
+/**
+ *  Default [OverviewColors].
+ *
+ *  @param backgroundColor Color of background surface.
+ *  @param titleColor Color of title Text.
+ *  @param versionColor Color of version Text.
+ *  @param infoColor Color of each Text in [HorizontalPager].
+ *  @param pagerIndicatorColors Colors used by [HorizontalPagerIndicator].
+ *  @param dividerColor Color of Divider.
+ *  @param libraryHeaderColor Color of Text between each group of libraries.
+ *  @param libraryItemColors Colors used by [LibraryDetails].
+ */
 @Immutable
 private data class DefaultOverviewColors(
     override val backgroundColor: Color,
@@ -135,6 +208,18 @@ private data class DefaultOverviewColors(
     override val libraryItemColors: LibraryColors,
 ) : OverviewColors
 
+/**
+ *  Represents paddings used by [AboutOverview].
+ *
+ *  @property appInfoPadding Padding values of [AppInfo].
+ *  @property titlePadding Padding values of title Text.
+ *  @property versionPadding Padding values of version Text.
+ *  @property infoPadding Padding values of [HorizontalPager].
+ *  @property pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+ *  @property dividerPadding Padding values of Divider.
+ *  @property libraryListPadding Padding values of [LibraryList].
+ *  @property libraryItemPadding Padding values of [LibraryDetails].
+ */
 @Stable
 interface OverviewPadding {
     val appInfoPadding: PaddingValues
@@ -147,6 +232,18 @@ interface OverviewPadding {
     val libraryItemPadding: LibraryPadding
 }
 
+/**
+ *  Default [OverviewPadding].
+ *
+ *  @param appInfoPadding Padding values of [AppInfo].
+ *  @param titlePadding Padding values of title Text.
+ *  @param versionPadding Padding values of version Text.
+ *  @param infoPadding Padding values of [HorizontalPager].
+ *  @param pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+ *  @param dividerPadding Padding values of Divider.
+ *  @param libraryListPadding Padding values of [LibraryList].
+ *  @param libraryItemPadding Padding values of [LibraryDetails].
+ */
 @Immutable
 private data class DefaultOverviewPadding(
     override val appInfoPadding: PaddingValues,
@@ -159,6 +256,16 @@ private data class DefaultOverviewPadding(
     override val libraryItemPadding: LibraryPadding,
 ) : OverviewPadding
 
+/**
+ *  Represents various values used by [AboutOverview].
+ *
+ *  @property itemSpacing Vertical spacing between [AppInfo] and [LibraryList] in [Dp].
+ *  @property appInfoItemSpacing Vertical spacing between [AppInfo] Composables in [Dp].
+ *  @property infoHeight The height of [HorizontalPager] in [AppInfo] in [Dp].
+ *  @property pagerIndicatorExtras Values used by [HorizontalPagerIndicator].
+ *  @property dividerThickness Thickness of Divider in [Dp].
+ *  @property libraryItemExtras Values used by [LibraryDetails].
+ */
 @Stable
 interface OverviewExtras {
     val itemSpacing: Dp
@@ -169,6 +276,16 @@ interface OverviewExtras {
     val libraryItemExtras: LibraryExtras
 }
 
+/**
+ *  Default [OverviewExtras].
+ *
+ *  @param itemSpacing Vertical spacing between [AppInfo] and [LibraryList] in [Dp].
+ *  @param appInfoItemSpacing Vertical spacing between [AppInfo] Composables in [Dp].
+ *  @param infoHeight The height of [HorizontalPager] in [AppInfo] in [Dp].
+ *  @param pagerIndicatorExtras Values used by [HorizontalPagerIndicator].
+ *  @param dividerThickness Thickness of Divider in [Dp].
+ *  @param libraryItemExtras Values used by [LibraryDetails].
+ */
 @Immutable
 private data class DefaultOverviewExtras(
     override val itemSpacing: Dp,
@@ -179,6 +296,15 @@ private data class DefaultOverviewExtras(
     override val libraryItemExtras: LibraryExtras,
 ) : OverviewExtras
 
+/**
+ *  Represents text styles used by [AboutOverview].
+ *
+ *  @property titleStyle Text style used by title Text.
+ *  @property versionStyle Text style used by version Text.
+ *  @property infoStyle Text style used by each Text in [HorizontalPager].
+ *  @property libraryHeaderStyle Text style used by each Text separating libraries.
+ *  @property libraryItemStyles Text style used by [LibraryDetails].
+ */
 @Stable
 interface OverviewTextStyles {
     val titleStyle: TextStyle
@@ -188,6 +314,15 @@ interface OverviewTextStyles {
     val libraryItemStyles: LibraryTextStyles
 }
 
+/**
+ *  Default [OverviewTextStyles].
+ *
+ *  @param titleStyle Text style used by title Text.
+ *  @param versionStyle Text style used by version Text.
+ *  @param infoStyle Text style used by each Text in [HorizontalPager].
+ *  @param libraryHeaderStyle Text style used by each Text separating libraries.
+ *  @param libraryItemStyles Text style used by [LibraryDetails].
+ */
 @Immutable
 private data class DefaultOverviewTextStyles(
     override val titleStyle: TextStyle,

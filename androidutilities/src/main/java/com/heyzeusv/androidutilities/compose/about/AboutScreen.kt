@@ -29,6 +29,34 @@ import com.mikepenz.aboutlibraries.entity.Library
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
+/**
+ *  Full screen Composable that contains a NavGraph that contains 2 screens. Transition between
+ *  screens is done using Shared Element Transitions.
+ *
+ *  [AboutOverview] displays app info and list of libraries.
+ *
+ *  [AboutLibrary] displays full library information including its description and full license.
+ *
+ *  This version gives the option to either list all libraries under one header or separate by
+ *  first party (Google, Jetbrains, Kotlin) and third party libraries using [separateByParty].
+ *
+ *  @param backButton Allows for back button if not using TopAppBar navigation.
+ *  @param icon Optional icon displayed above [title] Text.
+ *  @param title Title for screen.
+ *  @param version Text meant to display current version of app.
+ *  @param infoList String or String Resource, along with its styling, to be displayed in
+ *  HorizontalPager.
+ *  @param separateByParty Used to decide whether to list all libraries under single header or to
+ *  separate by first and third party.
+ *  @param overviewColors Colors to be used on [AboutOverview].
+ *  @param overviewPadding Padding to be used on [AboutOverview].
+ *  @param overviewExtras Additional values to be used on [AboutOverview].
+ *  @param overviewTextStyles Text Styles to be used on [AboutOverview].
+ *  @param libraryColors Colors to be used on [AboutLibrary].
+ *  @param libraryPadding Padding to be used on [AboutLibrary].
+ *  @param libraryExtras Additional values to be used on [AboutLibrary].
+ *  @param libraryTextStyles Text Styles to be used on [AboutLibrary].
+ */
 @Composable
 fun AboutScreen(
     backButton: @Composable () -> Unit = { },
@@ -68,6 +96,33 @@ fun AboutScreen(
     )
 }
 
+/**
+ *  Full screen Composable that contains a NavGraph that contains 2 screens. Transition between
+ *  screens is done using Shared Element Transitions.
+ *
+ *  [AboutOverview] displays app info and list of libraries.
+ *
+ *  [AboutLibrary] displays full library information including its description and full license.
+ *
+ *  This version allows for custom listing of libraries by passing [libraries].
+ *
+ *  @param backButton Allows for back button if not using TopAppBar navigation.
+ *  @param icon Optional icon displayed above [title] Text.
+ *  @param title Title for screen.
+ *  @param version Text meant to display current version of app.
+ *  @param infoList String or String Resource, along with its styling, to be displayed in
+ *  HorizontalPager.
+ *  @param libraries Custom map of libraries where each [LibraryGroup] is paired to the list of
+ *  [Library] to be displayed under it.
+ *  @param overviewColors Colors to be used on [AboutOverview].
+ *  @param overviewPadding Padding to be used on [AboutOverview].
+ *  @param overviewExtras Additional values to be used on [AboutOverview].
+ *  @param overviewTextStyles Text Styles to be used on [AboutOverview].
+ *  @param libraryColors Colors to be used on [AboutLibrary].
+ *  @param libraryPadding Padding to be used on [AboutLibrary].
+ *  @param libraryExtras Additional values to be used on [AboutLibrary].
+ *  @param libraryTextStyles Text Styles to be used on [AboutLibrary].
+ */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AboutScreen(
