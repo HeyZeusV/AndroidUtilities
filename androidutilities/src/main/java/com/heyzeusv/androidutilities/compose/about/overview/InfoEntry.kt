@@ -58,10 +58,10 @@ data class StringInfoEntry(
  *  @param textId Id of string resource to be styled.
  *  @param textStyle Text style of non-hyperlink text.
  *  @param linkStyle Text style of hyperlink text.
- *  @param linkTextToHyperlinks Map of text to the link its connects to.
+ *  @param linkTextToHyperlinks Map of text to the link it connects to.
  *  @param linkTextColor Color of hyperlink text.
  *  @param linkTextFontWeight Weight of hyperlink text.
- *  @param linkTextDecoration Any decoration that should applied to hyperlink text.
+ *  @param linkTextDecoration Any decoration that should be applied to hyperlink text.
  */
 @Immutable
 data class StringResourceInfoEntry(

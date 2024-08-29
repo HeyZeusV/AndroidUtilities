@@ -14,12 +14,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.text.toSpanned
 import kotlinx.collections.immutable.ImmutableMap
 
-private const val HTTPS = "https://"
-
-private fun String.checkForHttps(): String {
-    return if (!this.contains(HTTPS)) "$HTTPS$this" else this
-}
-
+/**
+ *  Creates an [AnnotatedString] with styling and hyperlinks from a [String].
+ *
+ *  @param text String to be styled.
+ *  @param textStyle Text style for non-hyperlink text.
+ *  @param linkStyle Text style for hyperlink text.
+ *  @param linkTextToHyperlinks Map of text to the link it connects to.
+ *  @param linkTextColor Color of hyperlink text.
+ *  @param linkTextFontWeight Weight of hyperlink text.
+ *  @param linkTextDecoration Any decoration that should by applied to hyperlink text.
+ */
 fun hyperlinkAnnotatedString(
     text: String,
     textStyle: TextStyle,
@@ -57,6 +62,18 @@ fun hyperlinkAnnotatedString(
     }
 }
 
+/**
+ *  Creates an [AnnotatedString] with styling and hyperlinks from a string resource.
+ *
+ *  @param context Used to retrieve string resource value.
+ *  @param textId Id of string resource to be styled.
+ *  @param textStyle Text style for non-hyperlink text.
+ *  @param linkStyle Text style for hyperlink text.
+ *  @param linkTextToHyperlinks Map of text to the link it connects to.
+ *  @param linkTextColor Color of hyperlink text.
+ *  @param linkTextFontWeight Weight of hyperlink text.
+ *  @param linkTextDecoration Any decoration that should by applied to hyperlink text.
+ */
 fun hyperlinkAnnotatedString(
     context: Context,
     @StringRes textId: Int,
