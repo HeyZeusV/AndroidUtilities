@@ -228,7 +228,7 @@ dependencyResolutionManagement {
 **Step 2.** Add dependency to your module's build.gradle
 ```kotlin
 dependencies {
-    implementation("io.github.heyzeusv:androidutilities:$androidUtilitiesVersion")
+    implementation("io.github.heyzeusv:androidutilities:4.1.0")
 }
 ```
 
