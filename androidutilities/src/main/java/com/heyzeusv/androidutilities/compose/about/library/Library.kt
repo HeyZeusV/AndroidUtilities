@@ -36,8 +36,8 @@ import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.about.library.LibrarySharedContentKeyPrefix.*
 import com.heyzeusv.androidutilities.compose.about.overview.AboutOverview
 import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
-import com.heyzeusv.androidutilities.compose.util.formatContent
-import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
+import com.heyzeusv.androidutilities.compose.about.formatContent
+import com.heyzeusv.androidutilities.compose.about.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
