@@ -54,6 +54,7 @@ import kotlinx.collections.immutable.persistentListOf
  *  The bottom part displays all libraries used with the help of [AboutLibraries](https://github.com/mikepenz/AboutLibraries),
  *  which does require including its plugin.
  *
+ *  @param animatedContentScope Scope used to animate shared elements between screens.
  *  @param backButton Allows for back button if not using TopAppBar navigation.
  *  @param icon Optional icon displayed above [title] Text.
  *  @param title Title for screen.
@@ -66,7 +67,7 @@ import kotlinx.collections.immutable.persistentListOf
  *  @param colors Colors to be used.
  *  @param padding Padding to be used.
  *  @param extras Additional values to be used.
- *  @param textStyles Text Styles to be used.
+ *  @param textStyles Text styles to be used.
  */
 context(AnimatedContentScope)
 @Composable

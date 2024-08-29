@@ -34,12 +34,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.heyzeusv.androidutilities.R
 import com.heyzeusv.androidutilities.compose.about.library.LibrarySharedContentKeyPrefix.*
+import com.heyzeusv.androidutilities.compose.about.overview.AboutOverview
 import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
 import com.heyzeusv.androidutilities.compose.util.formatContent
 import com.heyzeusv.androidutilities.compose.util.ifNullOrBlank
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.mikepenz.aboutlibraries.entity.Library
 
+/**
+ *  Full screen Composable that displays full library information including its description and full
+ *  license.
+ *
+ *  @param animatedContentScope Scope used to animate shared elements between screens.
+ *  @param backOnClick Action to navigate back to [AboutOverview].
+ *  @param library The [Library] to be shown.
+ *  @param colors Colors to be used.
+ *  @param padding Padding to be used.
+ *  @param extras Additional values to be used.
+ *  @param textStyles Text styles to be used.
+ */
 @Composable
 internal fun SharedTransitionScope.AboutLibrary(
     animatedContentScope: AnimatedContentScope,
@@ -63,6 +76,23 @@ internal fun SharedTransitionScope.AboutLibrary(
     )
 }
 
+/**
+ *  Composable that is used on both [AboutOverview] and [AboutLibrary].
+ *
+ *  On [AboutOverview], it is displayed as an item in its lazy list to display all libraries.
+ *  On [AboutLibrary], it is displayed as a full screen that displays a single library and all its
+ *  content.
+ *
+ *  @param animatedContentScope Scope used to animate shared elements between screens.
+ *  @param modifier Modifier to be applied to the layout corresponding to the surface.
+ *  @param isFullscreen Determines if all information should be displayed.
+ *  @param actionOnClick Action to navigate between [AboutOverview] and [AboutLibrary].
+ *  @param library The [Library] to be shown.
+ *  @param colors Colors to be used.
+ *  @param padding Padding to be used.
+ *  @param extras Additional values to be used.
+ *  @param textStyles Text styles to be used.
+ */
 @Composable
 internal fun SharedTransitionScope.LibraryDetails(
     animatedContentScope: AnimatedContentScope,

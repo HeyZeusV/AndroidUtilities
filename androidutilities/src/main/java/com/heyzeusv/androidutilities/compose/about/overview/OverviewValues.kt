@@ -40,7 +40,7 @@ object OverviewDefaults {
         PaddingValues(start = ContentPadding, end = ContentPadding, bottom = ContentPadding)
 
     /**
-     *  Creates [OverviewColors] that represents the colors used by [AboutOverview].
+     *  Creates an [OverviewColors] that represents the colors used by [AboutOverview].
      *
      *  @param backgroundColor Color of background surface.
      *  @param titleColor Color of title Text.
@@ -73,16 +73,16 @@ object OverviewDefaults {
     )
 
     /**
-     *  Creates a [OverviewPadding] that represents the padding used by [AboutOverview] Composables.
+     *  Creates an [OverviewPadding] that represents the padding used by [AboutOverview] Composables.
      *
-     *  @param appInfoPadding [PaddingValues] of [AppInfo].
-     *  @param titlePadding [PaddingValues] of title Text.
-     *  @param versionPadding [PaddingValues] of version Text.
-     *  @param infoPadding [PaddingValues] of [HorizontalPager].
-     *  @param pageIndicatorPadding [PaddingValues] of [HorizontalPagerIndicator].
-     *  @param dividerPadding [PaddingValues] of Divider.
-     *  @param libraryListPadding [PaddingValues] of [LibraryList].
-     *  @param libraryItemPadding [PaddingValues] of [LibraryDetails].
+     *  @param appInfoPadding Padding values of [AppInfo].
+     *  @param titlePadding Padding values of title Text.
+     *  @param versionPadding Padding values of version Text.
+     *  @param infoPadding Padding values of [HorizontalPager].
+     *  @param pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+     *  @param dividerPadding Padding values of Divider.
+     *  @param libraryListPadding Padding values of [LibraryList].
+     *  @param libraryItemPadding Padding values of [LibraryDetails].
      */
     @Composable
     fun overviewPadding(
@@ -106,7 +106,7 @@ object OverviewDefaults {
     )
 
     /**
-     *  Creates a [OverviewExtras] that represents various values used by [AboutOverview].
+     *  Creates an [OverviewExtras] that represents various values used by [AboutOverview].
      *
      *  @param itemSpacing Vertical spacing between [AppInfo] and [LibraryList] in [Dp].
      *  @param appInfoItemSpacing Vertical spacing between [AppInfo] Composables in [Dp].
@@ -133,7 +133,7 @@ object OverviewDefaults {
     )
 
     /**
-     *  Creates a [OverviewTextStyles] that represents the text styles used by [AboutOverview].
+     *  Creates an [OverviewTextStyles] that represents the text styles used by [AboutOverview].
      *
      *  @param titleStyle Text style used by title Text.
      *  @param versionStyle Text style used by version Text.
@@ -211,14 +211,14 @@ private data class DefaultOverviewColors(
 /**
  *  Represents paddings used by [AboutOverview].
  *
- *  @property appInfoPadding [PaddingValues] of [AppInfo].
- *  @property titlePadding [PaddingValues] of title Text.
- *  @property versionPadding [PaddingValues] of version Text.
- *  @property infoPadding [PaddingValues] of [HorizontalPager].
- *  @property pageIndicatorPadding [PaddingValues] of [HorizontalPagerIndicator].
- *  @property dividerPadding [PaddingValues] of Divider.
- *  @property libraryListPadding [PaddingValues] of [LibraryList].
- *  @property libraryItemPadding [PaddingValues] of [LibraryDetails].
+ *  @property appInfoPadding Padding values of [AppInfo].
+ *  @property titlePadding Padding values of title Text.
+ *  @property versionPadding Padding values of version Text.
+ *  @property infoPadding Padding values of [HorizontalPager].
+ *  @property pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+ *  @property dividerPadding Padding values of Divider.
+ *  @property libraryListPadding Padding values of [LibraryList].
+ *  @property libraryItemPadding Padding values of [LibraryDetails].
  */
 @Stable
 interface OverviewPadding {
@@ -235,14 +235,14 @@ interface OverviewPadding {
 /**
  *  Default [OverviewPadding].
  *
- *  @param appInfoPadding [PaddingValues] of [AppInfo].
- *  @param titlePadding [PaddingValues] of title Text.
- *  @param versionPadding [PaddingValues] of version Text.
- *  @param infoPadding [PaddingValues] of [HorizontalPager].
- *  @param pageIndicatorPadding [PaddingValues] of [HorizontalPagerIndicator].
- *  @param dividerPadding [PaddingValues] of Divider.
- *  @param libraryListPadding [PaddingValues] of [LibraryList].
- *  @param libraryItemPadding [PaddingValues] of [LibraryDetails].
+ *  @param appInfoPadding Padding values of [AppInfo].
+ *  @param titlePadding Padding values of title Text.
+ *  @param versionPadding Padding values of version Text.
+ *  @param infoPadding Padding values of [HorizontalPager].
+ *  @param pageIndicatorPadding Padding values of [HorizontalPagerIndicator].
+ *  @param dividerPadding Padding values of Divider.
+ *  @param libraryListPadding Padding values of [LibraryList].
+ *  @param libraryItemPadding Padding values of [LibraryDetails].
  */
 @Immutable
 private data class DefaultOverviewPadding(
