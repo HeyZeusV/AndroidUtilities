@@ -29,6 +29,35 @@ import com.mikepenz.aboutlibraries.entity.Library
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 
+/**
+ *  Full screen Composable that splits the screen into two parts.
+ *
+ *  The top part displays information about the app: an [icon] (optional), [title], [version], and
+ *  any other [infoList] (changelog, contact info, etc.).
+ *
+ *  The bottom part displays all libraries used with the help of [AboutLibraries](https://github.com/mikepenz/AboutLibraries),
+ *  which does require including its plugin. Users can expand a library item to display its
+ *  description and its license on its own screen. This version gives the option to either list
+ *  all libraries under one header or separate by first party (Google, Jetbrains, Kotlin) and third
+ *  party libraries using [separateByParty].
+ *
+ *  @param backButton Allows for back button if not using TopAppBar navigation.
+ *  @param icon Optional icon displayed above [title] Text.
+ *  @param title Title for screen.
+ *  @param version Text meant to display current version of app.
+ *  @param infoList String or String Resource, along with its styling, to be displayed in
+ *  HorizontalPager.
+ *  @param separateByParty Used to decide whether to list all libraries under single header or to
+ *  separate by first and third party.
+ *  @param overviewColors Colors to be used on [AboutOverview].
+ *  @param overviewPadding Padding to be used on [AboutOverview].
+ *  @param overviewExtras Additional values to be used on [AboutOverview].
+ *  @param overviewTextStyles Text Styles to be used on [AboutOverview].
+ *  @param libraryColors Colors to be used on [AboutLibrary].
+ *  @param libraryPadding Padding to be used on [AboutLibrary].
+ *  @param libraryExtras Additional values to be used on [AboutLibrary].
+ *  @param libraryTextStyles Text Styles to be used on [AboutLibrary].
+ */
 @Composable
 fun AboutScreen(
     backButton: @Composable () -> Unit = { },
@@ -68,6 +97,34 @@ fun AboutScreen(
     )
 }
 
+/**
+ *  Full screen Composable that splits the screen into two parts.
+ *
+ *  The top part displays information about the app: an [icon] (optional), [title], [version], and
+ *  any other [infoList] (changelog, contact info, etc.).
+ *
+ *  The bottom part displays all libraries used with the help of [AboutLibraries](https://github.com/mikepenz/AboutLibraries),
+ *  which does require including its plugin. Users can expand a library item to display its
+ *  description and its license on its own screen. This version allows for custom listing of
+ *  libraries by passing [libraries].
+ *
+ *  @param backButton Allows for back button if not using TopAppBar navigation.
+ *  @param icon Optional icon displayed above [title] Text.
+ *  @param title Title for screen.
+ *  @param version Text meant to display current version of app.
+ *  @param infoList String or String Resource, along with its styling, to be displayed in
+ *  HorizontalPager.
+ *  @param libraries Custom map of libraries where each [LibraryGroup] is paired to the list of
+ *  [Library] to be displayed under it.
+ *  @param overviewColors Colors to be used on [AboutOverview].
+ *  @param overviewPadding Padding to be used on [AboutOverview].
+ *  @param overviewExtras Additional values to be used on [AboutOverview].
+ *  @param overviewTextStyles Text Styles to be used on [AboutOverview].
+ *  @param libraryColors Colors to be used on [AboutLibrary].
+ *  @param libraryPadding Padding to be used on [AboutLibrary].
+ *  @param libraryExtras Additional values to be used on [AboutLibrary].
+ *  @param libraryTextStyles Text Styles to be used on [AboutLibrary].
+ */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AboutScreen(
