@@ -55,3 +55,4 @@ jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serializati
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room-plugin = { id = "androidx.room", version.ref = "room" }

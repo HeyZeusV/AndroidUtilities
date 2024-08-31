@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room.plugin)
 }
 
 android {
@@ -62,6 +63,10 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_1_8)
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
