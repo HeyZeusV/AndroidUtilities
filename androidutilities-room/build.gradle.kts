@@ -45,6 +45,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 
+    // KotlinPoet
+    implementation("com.squareup:kotlinpoet:1.15.0")
+    implementation("com.squareup:kotlinpoet-ksp:1.15.0")
+
+    // KSP
+    implementation("com.google.devtools.ksp:symbol-processing-api:2.0.0-1.0.21")
+
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
 }
