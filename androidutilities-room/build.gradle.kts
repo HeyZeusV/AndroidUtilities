@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.heyzeusv.androidutilitiesroom"
+    namespace = "com.heyzeusv.androidutilities.room"
     compileSdk = 34
 
     defaultConfig {

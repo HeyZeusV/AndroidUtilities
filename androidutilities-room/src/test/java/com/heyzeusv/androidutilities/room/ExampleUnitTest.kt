@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilitiesroom
+package com.heyzeusv.androidutilities.room
 
 import org.junit.Test
 
