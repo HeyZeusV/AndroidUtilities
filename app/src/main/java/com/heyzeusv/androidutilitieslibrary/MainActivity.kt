@@ -2,6 +2,7 @@ package com.heyzeusv.androidutilitieslibrary
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,9 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.heyzeusv.androidutilitieslibrary.database.Database
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -40,6 +44,16 @@ class MainActivity : ComponentActivity() {
                 }
             })
             .build()
+
+        runBlocking {
+            withContext(Dispatchers.IO) {
+                val categories = db.categoryDao().getAll()
+                Log.d("room", "Categories $categories")
+                categories.forEach {
+                    Log.d("room", "$it")
+                }
+            }
+        }
 
         setContent {
             AndroidUtilitiesLibraryTheme {
