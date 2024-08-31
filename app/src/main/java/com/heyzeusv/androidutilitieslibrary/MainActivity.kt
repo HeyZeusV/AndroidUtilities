@@ -36,13 +36,14 @@ class MainActivity : ComponentActivity() {
             Database::class.java,
             "Database.db"
         )
-            .createFromAsset("InitDatabase.db")
+//            .createFromAsset("InitDatabase.db")
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     db.execSQL("INSERT INTO DefaultItemFts(DefaultItemFts) VALUES ('rebuild')")
                 }
             })
+            .fallbackToDestructiveMigration()
             .build()
 
         runBlocking {
