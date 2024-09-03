@@ -16,14 +16,13 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         // get all symbols with Entity
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
-            .minus(resolver.getSymbolsWithAnnotation("androidx.room.Fts4").toSet())
             .toSet()
 
         // filter out symbols that are not classes
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
-                val className = classDeclaration.containingFile?.fileName?.replace(".kt", "").orEmpty()
+                val className = classDeclaration.simpleName.getShortName()
                 val fileName = "${className}Impl"
 
                 logger.info("class name: $className")
