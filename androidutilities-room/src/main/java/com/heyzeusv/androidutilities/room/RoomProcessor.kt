@@ -1,7 +1,5 @@
 package com.heyzeusv.androidutilities.room
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -10,38 +8,38 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.TypeSpec
 
 class RoomProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val logger = environment.logger
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // get all symbols with Entity
-        val symbols = resolver.getSymbolsWithAnnotation(Entity::class.qualifiedName.orEmpty())
-            .plus(resolver.getSymbolsWithAnnotation(ColumnInfo::class.qualifiedName.orEmpty()))
+        val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
+            .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
             .toSet()
 
         // filter out symbols that are not classes
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
-                val packageName = classDeclaration.packageName.toString()
-                val className = classDeclaration.simpleName.toString()
+                val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
+                val className = classDeclaration.containingFile?.fileName?.replace(".kt", "").orEmpty()
                 val fileName = "${className}Impl"
 
-                logger.info("class name: ${classDeclaration.simpleName}")
-                classDeclaration.primaryConstructor?.parameters?.forEach { parameter ->
-                    logger.info("parameter name: ${parameter.name}, type: ${parameter.type}")
+                logger.info("class name: $className")
+                val declarations = classDeclaration.containingFile?.declarations
+                declarations?.forEach { logger.info("declarations $it") }
+                symbol.primaryConstructor?.parameters?.forEach { parameter ->
+                    val name = parameter.name?.getShortName() ?: "empty name"
+                    logger.info("parameter name: ${name}, type: ${parameter.type}")
                 }
-                classDeclaration.getAllProperties().forEach { prop ->
-                    logger.info("property name: ${prop.simpleName}, type: ${prop.type}")
+                symbol.getAllProperties().forEach { prop ->
+                    val name = prop.qualifiedName?.getShortName()
+                    logger.info("property name: ${name}, type: ${prop.type}")
                 }
 
-//                // use KotlinPoet for code generation
-//                val fileSpecBuilder = FileSpec.builder(packageName, fileName)
-//
+                // use KotlinPoet for code generation
+                val fileSpecBuilder = FileSpec.builder(packageName, fileName)
+
 //                // create copy of class
 //                val classBuilder = TypeSpec.classBuilder(className)
 //                    .addModifiers(KModifier.DATA)
@@ -49,15 +47,15 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
 //
 //                fileSpecBuilder.addType(classBuilder.build())
 
-//                // writing the file
-//                environment.codeGenerator.createNewFile(
-//                    dependencies = Dependencies(false, symbol.containingFile!!),
-//                    packageName = packageName,
-//                    fileName = fileName,
-//                    extensionName = "kt",
-//                ).bufferedWriter().use {
-//                    fileSpecBuilder.build().writeTo(it)
-//                }
+                // writing the file
+                environment.codeGenerator.createNewFile(
+                    dependencies = Dependencies(false, symbol.containingFile!!),
+                    packageName = packageName,
+                    fileName = fileName,
+                    extensionName = "kt",
+                ).bufferedWriter().use {
+                    fileSpecBuilder.build().writeTo(it)
+                }
             }
         }
 
