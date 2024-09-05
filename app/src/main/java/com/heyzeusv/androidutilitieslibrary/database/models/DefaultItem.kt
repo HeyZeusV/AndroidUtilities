@@ -1,5 +1,6 @@
 package com.heyzeusv.androidutilitieslibrary.database.models
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
@@ -28,7 +29,12 @@ data class DefaultItem(
     override val quantity: Double = 0.0,
     override val unit: String = "",
     override val memo: String = "",
+    @Embedded
+    val testEmbed: TestEmbed = TestEmbed()
 ) : BaseItem {
+
+    @Ignore
+    val testIgnore: String = ""
 
     override fun editCopy(
         itemId: Long,

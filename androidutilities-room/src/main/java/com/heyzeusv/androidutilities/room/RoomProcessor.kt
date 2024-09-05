@@ -19,28 +19,25 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     private val logger = environment.logger
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        // get all symbols with Entity
+        // get all symbols
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.Ignore"))
+            .plus(resolver.getSymbolsWithAnnotation("androidx.room.Embedded"))
             .toSet()
 
         // filter out symbols that are not classes
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
-                val className = "${classDeclaration.simpleName.getShortName()}RoomUtil"
+                val fileName = "${classDeclaration.simpleName.getShortName()}RoomUtil"
 
-                logger.info("class name: $className")
+                logger.info("class name: $fileName")
 
                 // use KotlinPoet for code generation
-                val fileSpecBuilder = FileSpec.builder(packageName, className)
+                val fileSpecBuilder = FileSpec.builder(packageName, fileName)
 
-                // create copy of class
-                val classBuilder = TypeSpec.classBuilder(className)
-                    .addModifiers(KModifier.DATA)
-                    .primaryConstructor(classDeclaration, logger)
-                    .properties(classDeclaration, logger)
+                val classBuilder = recreateClass(classDeclaration, logger)
 
                 fileSpecBuilder.addType(classBuilder.build())
 
@@ -48,7 +45,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 environment.codeGenerator.createNewFile(
                     dependencies = Dependencies(false, symbol.containingFile!!),
                     packageName = packageName,
-                    fileName = className,
+                    fileName = fileName,
                     extensionName = "kt",
                 ).bufferedWriter().use {
                     fileSpecBuilder.build().writeTo(it)
@@ -62,40 +59,60 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     }
 }
 
-private fun TypeSpec.Builder.primaryConstructor(
+private fun recreateClass(
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
 ): TypeSpec.Builder {
-    val cBuilder = FunSpec.constructorBuilder()
-    classDeclaration.primaryConstructor?.parameters?.forEach { parameter ->
-        parameter.name?.getShortName()?.let { name ->
-            if (!parameter.annotations.any { it.shortName.getShortName() == "Ignore" }) {
-                logger.info("parameter name: ${name}, type: ${parameter.type}")
+    val classBuilder = TypeSpec
+        .classBuilder(classDeclaration.utilName())
+        .addModifiers(KModifier.DATA)
+    val constructorBuilder = FunSpec.constructorBuilder()
 
-                cBuilder.addParameter(name, parameter.type.toTypeName())
+    classDeclaration.getAllProperties().forEach { prop ->
+        prop.qualifiedName?.getShortName()?.let { name ->
+            val annotationNames = prop.annotations.map { it.shortName.getShortName() }
+            if (annotationNames.contains("Ignore")) {
+                logger.info("Ignoring $name of type ${prop.type}")
+            } else if (annotationNames.contains("Embedded")) {
+                logger.info("Embedded class ${prop.type}")
+                val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
+                classBuilder.handleEmbeddedClass(constructorBuilder, embeddedClass, logger)
             } else {
-                logger.info("ignored! name: $name}")
+                constructorBuilder.addParameter(name, prop.type.toTypeName())
+                classBuilder.addProperty(
+                    PropertySpec.builder(name, prop.type.toTypeName()).initializer(name).build()
+                )
             }
         }
     }
-    this.primaryConstructor(cBuilder.build())
 
-    return this
+    return classBuilder.primaryConstructor(constructorBuilder.build())
 }
 
-private fun TypeSpec.Builder.properties(
+// TODO: Handle ColumnInfo annotation
+private fun TypeSpec.Builder.handleEmbeddedClass(
+    constructorBuilder: FunSpec.Builder,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
 ): TypeSpec.Builder {
     classDeclaration.getAllProperties().forEach { prop ->
         prop.qualifiedName?.getShortName()?.let { name ->
-            if (!prop.annotations.any { it.shortName.getShortName() == "Ignore" }) {
-                logger.info("property name: ${name}, type: ${prop.type}")
-                this.addProperty(PropertySpec.builder(name, prop.type.toTypeName()).initializer(name).build())
+            val annotationNames = prop.annotations.map { it.shortName.getShortName() }
+            if (annotationNames.contains("Ignore")) {
+                logger.info("Ignoring $name of type ${prop.type}")
+            } else if (annotationNames.contains("Embedded")) {
+                logger.info("Embedded class ${prop.type}")
+                val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
+                this.handleEmbeddedClass(constructorBuilder, embeddedClass, logger)
             } else {
-                logger.info("ignored! name: $name")
+                constructorBuilder.addParameter(name, prop.type.toTypeName())
+                this.addProperty(
+                    PropertySpec.builder(name, prop.type.toTypeName()).initializer(name).build()
+                )
             }
         }
     }
     return this
 }
+
+fun KSClassDeclaration.utilName(): String = "${simpleName.getShortName()}RoomUtil"

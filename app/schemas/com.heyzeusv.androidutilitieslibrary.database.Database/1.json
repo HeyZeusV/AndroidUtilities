@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "bbe1c6cf9df0b1134ea1c139c7e53947",
+    "identityHash": "9e0aba008ffc12768837974091882cf2",
     "entities": [
       {
         "tableName": "DefaultItem",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `test1` TEXT NOT NULL, `test2` INTEGER NOT NULL, `test3` INTEGER NOT NULL, `dfka` TEXT NOT NULL, `test5` INTEGER NOT NULL, `test6` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -42,6 +42,42 @@
             "fieldPath": "memo",
             "columnName": "memo",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.test1",
+            "columnName": "test1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.test2",
+            "columnName": "test2",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.test3",
+            "columnName": "test3",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test3",
+            "columnName": "dfka",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test5",
+            "columnName": "test5",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test6",
+            "columnName": "test6",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -293,7 +329,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bbe1c6cf9df0b1134ea1c139c7e53947')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e0aba008ffc12768837974091882cf2')"
     ]
   }
 }
