@@ -16,7 +16,7 @@ private val propertyToFieldName = mutableMapOf<String, String>()
 private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
-internal fun recreateClass(
+internal fun recreateEntityClass(
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
 ): TypeSpec.Builder {
@@ -25,31 +25,7 @@ internal fun recreateClass(
         .addModifiers(KModifier.DATA)
     val constructorBuilder = FunSpec.constructorBuilder()
 
-    classDeclaration.getAllProperties().forEach { prop ->
-        prop.qualifiedName?.getShortName()?.let { name ->
-            val annotationNames = prop.annotations.map { it.shortName.getShortName() }
-            if (annotationNames.contains("Ignore")) {
-                logger.info("Ignoring $name of type ${prop.type}")
-            } else if (annotationNames.contains("Embedded")) {
-                logger.info("Embedded class ${prop.type}")
-                val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
-                classBuilder.handleEmbeddedClass(constructorBuilder, embeddedClass, logger)
-            } else {
-                var fieldName = name
-                if (annotationNames.contains("ColumnInfo")) {
-                    val columnName =
-                        prop.annotations.find { it.shortName.getShortName() == "ColumnInfo" }
-                        ?.arguments?.find { it.name?.getShortName() == "name" }?.value.toString()
-                    if (columnName != "[field-name]") fieldName = columnName
-                }
-                constructorBuilder.addParameter(name, prop.type.toTypeName())
-                classBuilder.addProperty(
-                    PropertySpec.builder(name, prop.type.toTypeName()).initializer(name).build()
-                )
-                propertyToFieldName[name] = fieldName
-            }
-        }
-    }
+    classBuilder.recreateClass(constructorBuilder, classDeclaration, logger)
 
     val propertyToFieldNameSpec = PropertySpec.builder(::propertyToFieldName.name, stringMapClass)
         .initializer(buildCodeBlock {
@@ -70,7 +46,7 @@ internal fun recreateClass(
     return classBuilder.primaryConstructor(constructorBuilder.build())
 }
 
-private fun TypeSpec.Builder.handleEmbeddedClass(
+private fun TypeSpec.Builder.recreateClass(
     constructorBuilder: FunSpec.Builder,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
@@ -83,7 +59,7 @@ private fun TypeSpec.Builder.handleEmbeddedClass(
             } else if (annotationNames.contains("Embedded")) {
                 logger.info("Embedded class ${prop.type}")
                 val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
-                this.handleEmbeddedClass(constructorBuilder, embeddedClass, logger)
+                this.recreateClass(constructorBuilder, embeddedClass, logger)
             } else {
                 var fieldName = name
                 if (annotationNames.contains("ColumnInfo")) {
@@ -100,5 +76,6 @@ private fun TypeSpec.Builder.handleEmbeddedClass(
             }
         }
     }
+
     return this
 }

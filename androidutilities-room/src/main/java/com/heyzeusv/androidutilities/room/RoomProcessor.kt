@@ -31,7 +31,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 // use KotlinPoet for code generation
                 val fileSpecBuilder = FileSpec.builder(packageName, fileName)
 
-                val classBuilder = recreateClass(classDeclaration, logger)
+                val classBuilder = recreateEntityClass(classDeclaration, logger)
 
                 fileSpecBuilder.addType(classBuilder.build())
 
