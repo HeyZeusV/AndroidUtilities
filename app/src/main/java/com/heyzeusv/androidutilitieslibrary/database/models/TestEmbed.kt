@@ -7,13 +7,13 @@ data class TestEmbed(
     val test1: String = "",
     val test2: Int = 0,
     val test3: Long = 0L,
-    @Embedded
+    @Embedded(prefix = "innerEmbed_")
     val embed: TestDoubleEmbed = TestDoubleEmbed()
 )
 
 data class TestDoubleEmbed(
-    @ColumnInfo(name = "Custom name")
-    val test4: String = "",
+    @ColumnInfo(name = "differentFieldName")
+    val test3: String = "",
     val test5: Int = 0,
     val test6: Long = 0L,
 )

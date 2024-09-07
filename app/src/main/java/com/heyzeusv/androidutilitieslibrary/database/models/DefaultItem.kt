@@ -29,7 +29,7 @@ data class DefaultItem(
     override val quantity: Double = 0.0,
     override val unit: String = "",
     override val memo: String = "",
-    @Embedded
+    @Embedded(prefix = "outerEmbed_")
     val testEmbed: TestEmbed = TestEmbed()
 ) : BaseItem {
 
