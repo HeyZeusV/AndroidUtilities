@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5682ac64dc3de408da378fe7ff774601",
+    "identityHash": "0bc636402dc0effdf89fbb45e2a7b2ec",
     "entities": [
       {
         "tableName": "DefaultItem",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `test1` TEXT NOT NULL, `test2` INTEGER NOT NULL, `test3` INTEGER NOT NULL, `test4` TEXT NOT NULL, `test5` INTEGER NOT NULL, `test6` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `test1` TEXT NOT NULL, `test2` INTEGER NOT NULL, `test3` INTEGER NOT NULL, `Custom name` TEXT NOT NULL, `test5` INTEGER NOT NULL, `test6` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -64,7 +64,7 @@
           },
           {
             "fieldPath": "testEmbed.embed.test4",
-            "columnName": "test4",
+            "columnName": "Custom name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -329,7 +329,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5682ac64dc3de408da378fe7ff774601')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0bc636402dc0effdf89fbb45e2a7b2ec')"
     ]
   }
 }

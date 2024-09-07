@@ -9,11 +9,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.toTypeName
 
-private val propertyNames = mutableListOf<String>()
-private val stringListClass = ClassName("kotlin.collections", "List")
-    .parameterizedBy(String::class.asTypeName())
+private val propertyToFieldName = mutableMapOf<String, String>()
+private val stringMapClass = ClassName("kotlin.collections", "Map")
+    .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
 internal fun recreateClass(
     classDeclaration: KSClassDeclaration,
@@ -34,24 +35,37 @@ internal fun recreateClass(
                 val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
                 classBuilder.handleEmbeddedClass(constructorBuilder, embeddedClass, logger)
             } else {
+                var fieldName = name
+                if (annotationNames.contains("ColumnInfo")) {
+                    val columnName =
+                        prop.annotations.find { it.shortName.getShortName() == "ColumnInfo" }
+                        ?.arguments?.find { it.name?.getShortName() == "name" }?.value.toString()
+                    if (columnName != "[field-name]") fieldName = columnName
+                }
                 constructorBuilder.addParameter(name, prop.type.toTypeName())
                 classBuilder.addProperty(
                     PropertySpec.builder(name, prop.type.toTypeName()).initializer(name).build()
                 )
-                propertyNames.add(name)
+                propertyToFieldName[name] = fieldName
             }
         }
     }
 
-    val propNamesSpec = PropertySpec.builder(::propertyNames.name, stringListClass)
-        .initializer("listOf%L", propertyNames.joinToString(
-            separator = "\", \"",
-            prefix = "(\"",
-            postfix = "\")"
-        ))
+    val propertyToFieldNameSpec = PropertySpec.builder(::propertyToFieldName.name, stringMapClass)
+        .initializer(buildCodeBlock {
+            add("mapOf(\n")
+            var count = 0
+            propertyToFieldName.forEach { (property, field) ->
+                count++
+                add("%S to %S", property, field)
+                if (count < propertyToFieldName.size) add(",\n")
+            }
+            add("\n)")
+        })
         .build()
-    classBuilder.addProperty(propNamesSpec)
-    propertyNames.clear()
+    propertyToFieldName.entries.joinToString()
+    classBuilder.addProperty(propertyToFieldNameSpec)
+    propertyToFieldName.clear()
 
     return classBuilder.primaryConstructor(constructorBuilder.build())
 }
@@ -71,11 +85,18 @@ private fun TypeSpec.Builder.handleEmbeddedClass(
                 val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
                 this.handleEmbeddedClass(constructorBuilder, embeddedClass, logger)
             } else {
+                var fieldName = name
+                if (annotationNames.contains("ColumnInfo")) {
+                    val columnName =
+                        prop.annotations.find { it.shortName.getShortName() == "ColumnInfo" }
+                            ?.arguments?.find { it.name?.getShortName() == "name" }?.value.toString()
+                    if (columnName != "[field-name]") fieldName = columnName
+                }
                 constructorBuilder.addParameter(name, prop.type.toTypeName())
                 this.addProperty(
                     PropertySpec.builder(name, prop.type.toTypeName()).initializer(name).build()
                 )
-                propertyNames.add(name)
+                propertyToFieldName[name] = fieldName
             }
         }
     }
