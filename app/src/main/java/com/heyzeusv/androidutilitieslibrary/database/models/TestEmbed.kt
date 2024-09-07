@@ -11,7 +11,7 @@ data class TestEmbed(
 )
 
 data class TestDoubleEmbed(
-    val test3: String = "",
+    val test4: String = "",
     val test5: Int = 0,
     val test6: Long = 0L,
 )
