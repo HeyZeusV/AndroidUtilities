@@ -39,8 +39,10 @@ internal fun recreateEntityClass(
         .returns(classDeclaration.toClassName())
         .addCode(buildCodeBlock {
             add("return ${classDeclaration.simpleName.getShortName()}(\n")
+            indent()
             val infoIterator = propertyInfoList.iterator()
             handlePropertyInfo(infoIterator)
+            unindent()
             add(")")
         })
     val toUtilFun = FunSpec.builder("toUtil")
@@ -102,7 +104,7 @@ private fun TypeSpec.Builder.recreateClass(
                             ?.arguments?.find { it.name?.getShortName() == "name" }?.value.toString()
                     if (columnName != "[field-name]") fieldName = "$embeddedPrefix$columnName"
                 }
-                constructorBuilder.addParameter("$embeddedPrefix$name", prop.type.toTypeName())
+                constructorBuilder.addParameter(fieldName, prop.type.toTypeName())
                 this.addProperty(PropertySpec
                     .builder(fieldName, prop.type.toTypeName())
                     .initializer(fieldName)
@@ -129,7 +131,9 @@ fun CodeBlock.Builder.handlePropertyInfo(iterator: MutableIterator<PropertyInfo>
         }
         is EmbeddedInfo -> {
             add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
+            indent()
             handlePropertyInfo(iterator)
+            unindent()
             add(")\n")
         }
     }
