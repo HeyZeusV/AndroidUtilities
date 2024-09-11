@@ -3,6 +3,7 @@ package com.heyzeusv.androidutilities.room
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -10,8 +11,10 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
+import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 
+private val propertyInfoList = mutableListOf<PropertyInfo>()
 private val fieldToPropertyName = mutableMapOf<String, String>()
 private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
@@ -24,8 +27,23 @@ internal fun recreateEntityClass(
         .classBuilder(classDeclaration.utilName())
         .addModifiers(KModifier.DATA)
     val constructorBuilder = FunSpec.constructorBuilder()
+    val companion = TypeSpec.companionObjectBuilder()
 
-    classBuilder.recreateClass(constructorBuilder, classDeclaration, logger)
+    classBuilder.recreateClass(
+        constructorBuilder = constructorBuilder,
+        classDeclaration = classDeclaration,
+        logger = logger,
+    )
+
+    val toOriginalFun = FunSpec.builder("toOriginal")
+        .returns(classDeclaration.toClassName())
+        .addCode(buildCodeBlock {
+            add("return ${classDeclaration.simpleName.getShortName()}(\n")
+            val infoIterator = propertyInfoList.iterator()
+            handlePropertyInfo(infoIterator)
+            add(")")
+        })
+    val toUtilFun = FunSpec.builder("toUtil")
 
     val propertyToFieldNameSpec = PropertySpec.builder(::fieldToPropertyName.name, stringMapClass)
         .initializer(buildCodeBlock {
@@ -39,10 +57,13 @@ internal fun recreateEntityClass(
             add("\n)")
         })
         .build()
-    fieldToPropertyName.entries.joinToString()
     classBuilder.addProperty(propertyToFieldNameSpec)
     fieldToPropertyName.clear()
+    propertyInfoList.clear()
 
+    classBuilder.addFunction(toOriginalFun.build())
+    companion.addFunction(toUtilFun.build())
+    classBuilder.addType(companion.build())
     return classBuilder.primaryConstructor(constructorBuilder.build())
 }
 
@@ -50,7 +71,7 @@ private fun TypeSpec.Builder.recreateClass(
     constructorBuilder: FunSpec.Builder,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
-    embeddedPrefix: String = ""
+    embeddedPrefix: String = "",
 ): TypeSpec.Builder {
     classDeclaration.getAllProperties().forEach { prop ->
         prop.qualifiedName?.getShortName()?.let { name ->
@@ -60,9 +81,19 @@ private fun TypeSpec.Builder.recreateClass(
             } else if (annotationNames.contains("Embedded")) {
                 logger.info("Embedded class ${prop.type}")
                 val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
-                val prefix = prop.annotations.find { it.shortName.getShortName() == "Embedded" }
+                val newPrefix = prop.annotations.find { it.shortName.getShortName() == "Embedded" }
                     ?.arguments?.find { it.name?.getShortName() == "prefix" }?.value.toString()
-                this.recreateClass(constructorBuilder, embeddedClass, logger, prefix)
+                val embeddedInfo = EmbeddedInfo(
+                    name = name,
+                    embeddedClass = embeddedClass,
+                )
+                propertyInfoList.add(embeddedInfo)
+                this.recreateClass(
+                    constructorBuilder = constructorBuilder,
+                    classDeclaration = embeddedClass,
+                    logger = logger,
+                    embeddedPrefix = "$embeddedPrefix$newPrefix",
+                )
             } else {
                 var fieldName = "$embeddedPrefix$name"
                 if (annotationNames.contains("ColumnInfo")) {
@@ -73,14 +104,34 @@ private fun TypeSpec.Builder.recreateClass(
                 }
                 constructorBuilder.addParameter("$embeddedPrefix$name", prop.type.toTypeName())
                 this.addProperty(PropertySpec
-                    .builder("$embeddedPrefix$name", prop.type.toTypeName())
-                    .initializer("$embeddedPrefix$name")
+                    .builder(fieldName, prop.type.toTypeName())
+                    .initializer(fieldName)
                     .build()
                 )
+                val fieldInfo = FieldInfo(
+                    name = name,
+                    fieldName = fieldName,
+                )
+                propertyInfoList.add(fieldInfo)
                 fieldToPropertyName[fieldName] = name
             }
         }
     }
 
     return this
+}
+
+fun CodeBlock.Builder.handlePropertyInfo(iterator: MutableIterator<PropertyInfo>) {
+    if (!iterator.hasNext()) return
+    when (val info: PropertyInfo = iterator.next()) {
+        is FieldInfo -> {
+            add("%L = %L,\n", info.name, info.fieldName)
+        }
+        is EmbeddedInfo -> {
+            add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
+            handlePropertyInfo(iterator)
+            add(")\n")
+        }
+    }
+    handlePropertyInfo(iterator)
 }

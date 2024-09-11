@@ -24,7 +24,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
-                val fileName = "${classDeclaration.simpleName.getShortName()}RoomUtil"
+                val fileName = classDeclaration.utilName()
 
                 logger.info("class name: $fileName")
 
