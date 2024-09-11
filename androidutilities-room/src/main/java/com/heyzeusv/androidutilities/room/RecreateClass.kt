@@ -41,11 +41,21 @@ internal fun recreateEntityClass(
             add("return ${classDeclaration.simpleName.getShortName()}(\n")
             indent()
             val infoIterator = propertyInfoList.iterator()
-            handlePropertyInfo(infoIterator)
+            handlePropertyInfoToOriginal(infoIterator)
             unindent()
             add(")")
         })
     val toUtilFun = FunSpec.builder("toUtil")
+        .returns(ClassName(classDeclaration.packageName.asString(), classDeclaration.utilName()))
+        .addParameter("entity", classDeclaration.toClassName())
+        .addCode(buildCodeBlock {
+            add("return ${classDeclaration.utilName()}(\n")
+            indent()
+            val infoIterator = propertyInfoList.iterator()
+            handlePropertyInfoToUtil(infoIterator)
+            unindent()
+            add(")")
+        })
 
     val propertyToFieldNameSpec = PropertySpec.builder(::fieldToPropertyName.name, stringMapClass)
         .initializer(buildCodeBlock {
@@ -123,7 +133,7 @@ private fun TypeSpec.Builder.recreateClass(
     return this
 }
 
-fun CodeBlock.Builder.handlePropertyInfo(iterator: MutableIterator<PropertyInfo>) {
+fun CodeBlock.Builder.handlePropertyInfoToOriginal(iterator: MutableIterator<PropertyInfo>) {
     if (!iterator.hasNext()) return
     when (val info: PropertyInfo = iterator.next()) {
         is FieldInfo -> {
@@ -132,10 +142,26 @@ fun CodeBlock.Builder.handlePropertyInfo(iterator: MutableIterator<PropertyInfo>
         is EmbeddedInfo -> {
             add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
             indent()
-            handlePropertyInfo(iterator)
+            handlePropertyInfoToOriginal(iterator)
             unindent()
             add(")\n")
         }
     }
-    handlePropertyInfo(iterator)
+    handlePropertyInfoToOriginal(iterator)
+}
+
+fun CodeBlock.Builder.handlePropertyInfoToUtil(
+    iterator: MutableIterator<PropertyInfo>,
+    embeddedPrefix: String = "",
+) {
+    if (!iterator.hasNext()) return
+    when (val info: PropertyInfo = iterator.next()) {
+        is FieldInfo -> {
+            add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
+        }
+        is EmbeddedInfo -> {
+            handlePropertyInfoToUtil(iterator, "$embeddedPrefix${info.name}.")
+        }
+    }
+    handlePropertyInfoToUtil(iterator, embeddedPrefix)
 }
