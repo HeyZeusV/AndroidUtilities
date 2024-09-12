@@ -19,18 +19,22 @@ import androidx.room.PrimaryKey
     indices = [Index(
         value = ["category"],
         name = "index_default_category_name"
-    )]
+    )],
+    ignoredColumns = ["testIgnore3"],
 )
 data class DefaultItem(
     @PrimaryKey(autoGenerate = true)
-    override val itemId: Long = 0L,
-    override val name: String = "",
-    override val category: String = "",
-    override val quantity: Double = 0.0,
-    override val unit: String = "",
-    override val memo: String = "",
+    override var itemId: Long = 0L,
+    override var name: String = "",
+    override var category: String = "",
+    override var quantity: Double = 0.0,
+    override var unit: String = "",
+    override var memo: String = "",
     @Embedded(prefix = "outerEmbed_")
-    val testEmbed: TestEmbed = TestEmbed()
+    var testEmbed: TestEmbed = TestEmbed(),
+    @Ignore
+    var testIgnore2: String = "",
+    var testIgnore3: String = "",
 ) : BaseItem {
 
     @Ignore

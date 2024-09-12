@@ -19,3 +19,4 @@ data class EmbeddedInfo(
     val embeddedClass: KSClassDeclaration,
 ) : PropertyInfo
 
+data class CloseClass(override val name: String = "") : PropertyInfo

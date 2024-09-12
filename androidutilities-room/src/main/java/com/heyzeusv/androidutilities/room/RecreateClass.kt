@@ -39,6 +39,7 @@ internal fun recreateEntityClass(
         logger = logger,
         tcInfoMap = tcInfoMap,
     )
+    propertyInfoList.removeLast()
 
     val toOriginalFun = FunSpec.builder("toOriginal")
         .returns(classDeclaration.toClassName())
@@ -147,6 +148,7 @@ private fun TypeSpec.Builder.recreateClass(
             }
         }
     }
+    propertyInfoList.add(CloseClass())
 
     return this
 }
@@ -173,8 +175,10 @@ private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
             add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
             indent()
             handlePropertyInfoToOriginal(iterator, tcInfoMap, logger)
+        }
+        is CloseClass -> {
             unindent()
-            add(")\n")
+            add("),\n")
         }
     }
     handlePropertyInfoToOriginal(iterator, tcInfoMap, logger)
@@ -184,11 +188,19 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
     iterator: MutableIterator<PropertyInfo>,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     logger: KSPLogger,
-    embeddedPrefix: String = "",
+    embeddedPrefixList: List<String> = emptyList(),
 ) {
     if (!iterator.hasNext()) return
+    logger.info("prefix list $embeddedPrefixList")
+    var removeLastPrefix = ""
     when (val info: PropertyInfo = iterator.next()) {
         is FieldInfo -> {
+            val embeddedPrefix = if (embeddedPrefixList.isEmpty()) {
+                ""
+            } else {
+                embeddedPrefixList.joinToString(separator = ".", postfix = ".")
+            }
+            logger.info("prefix $embeddedPrefix")
             if (info.startType == info.endType) {
                 add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
             } else {
@@ -203,13 +215,18 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
             iterator = iterator,
             tcInfoMap = tcInfoMap,
             logger = logger,
-            embeddedPrefix = "$embeddedPrefix${info.name}.",
+            embeddedPrefixList = embeddedPrefixList + info.name,
         )
+        is CloseClass -> removeLastPrefix = embeddedPrefixList.last()
     }
     handlePropertyInfoToUtil(
         iterator = iterator,
         tcInfoMap = tcInfoMap,
         logger = logger,
-        embeddedPrefix = embeddedPrefix,
+        embeddedPrefixList = if (removeLastPrefix.isNotBlank()) {
+            embeddedPrefixList - removeLastPrefix
+        } else {
+            embeddedPrefixList
+        },
     )
 }
