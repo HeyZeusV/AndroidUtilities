@@ -20,6 +20,7 @@ private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
 internal fun recreateEntityClass(
+    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
 ): TypeSpec.Builder {
