@@ -57,7 +57,7 @@ internal fun recreateEntityClass(
             add("return ${classDeclaration.utilName()}(\n")
             indent()
             val infoIterator = propertyInfoList.iterator()
-            handlePropertyInfoToUtil(infoIterator, tcInfoMap)
+            handlePropertyInfoToUtil(infoIterator, tcInfoMap, logger)
             unindent()
             add(")")
         })
@@ -183,20 +183,33 @@ private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
 private fun CodeBlock.Builder.handlePropertyInfoToUtil(
     iterator: MutableIterator<PropertyInfo>,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    logger: KSPLogger,
     embeddedPrefix: String = "",
 ) {
     if (!iterator.hasNext()) return
     when (val info: PropertyInfo = iterator.next()) {
-        is FieldInfo -> add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
+        is FieldInfo -> {
+            if (info.startType == info.endType) {
+                add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
+            } else {
+                logger.info("start ${info.startType}, end ${info.endType}")
+                val tcInfo = tcInfoMap[TO_ACCEPTED]!!
+                    .find { it.parameterType == info.startType && it.returnType == info.endType }!!
+                val tcClass = ClassName(tcInfo.packageName, tcInfo.parentClass)
+                add("%L = %T().%L(entity.$embeddedPrefix%L), \n", info.fieldName, tcClass, tcInfo.functionName, info.name)
+            }
+        }
         is EmbeddedInfo -> handlePropertyInfoToUtil(
             iterator = iterator,
             tcInfoMap = tcInfoMap,
+            logger = logger,
             embeddedPrefix = "$embeddedPrefix${info.name}.",
         )
     }
     handlePropertyInfoToUtil(
         iterator = iterator,
         tcInfoMap = tcInfoMap,
+        logger = logger,
         embeddedPrefix = embeddedPrefix,
     )
 }
