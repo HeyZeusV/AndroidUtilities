@@ -2,6 +2,7 @@ package com.heyzeusv.androidutilitieslibrary.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.heyzeusv.androidutilitieslibrary.database.dao.AllDao
 import com.heyzeusv.androidutilitieslibrary.database.dao.CategoryDao
 import com.heyzeusv.androidutilitieslibrary.database.dao.DefaultItemDao
@@ -23,10 +24,8 @@ import com.heyzeusv.androidutilitieslibrary.database.models.ItemList
     ],
     version = 1,
     exportSchema = true,
-    autoMigrations = [
-
-    ]
 )
+@TypeConverters(RoomTypeConverters::class)
 abstract class Database : RoomDatabase() {
     abstract fun allDao(): AllDao
     abstract fun itemListDao(): ItemListDao

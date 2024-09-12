@@ -2,6 +2,7 @@ package com.heyzeusv.androidutilitieslibrary.database.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
+import java.util.Date
 
 data class TestEmbed(
     val test1: String = "",
@@ -16,4 +17,5 @@ data class TestDoubleEmbed(
     val test3: String = "",
     val test5: Int = 0,
     val test6: Long = 0L,
+    val test7: Date = Date()
 )

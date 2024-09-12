@@ -136,9 +136,7 @@ private fun TypeSpec.Builder.recreateClass(
 fun CodeBlock.Builder.handlePropertyInfoToOriginal(iterator: MutableIterator<PropertyInfo>) {
     if (!iterator.hasNext()) return
     when (val info: PropertyInfo = iterator.next()) {
-        is FieldInfo -> {
-            add("%L = %L,\n", info.name, info.fieldName)
-        }
+        is FieldInfo -> add("%L = %L,\n", info.name, info.fieldName)
         is EmbeddedInfo -> {
             add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
             indent()

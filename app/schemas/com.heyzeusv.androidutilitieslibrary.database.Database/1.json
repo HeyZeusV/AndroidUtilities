@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4c01df30288d53563bad0ec82e9241a1",
+    "identityHash": "67b3703a12425720c60ab2a99636619b",
     "entities": [
       {
         "tableName": "DefaultItem",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER NOT NULL, `outerEmbed_test3` INTEGER NOT NULL, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER NOT NULL, `outerEmbed_test3` INTEGER NOT NULL, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -77,6 +77,12 @@
           {
             "fieldPath": "testEmbed.embed.test6",
             "columnName": "outerEmbed_innerEmbed_test6",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test7",
+            "columnName": "outerEmbed_innerEmbed_test7",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -329,7 +335,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4c01df30288d53563bad0ec82e9241a1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '67b3703a12425720c60ab2a99636619b')"
     ]
   }
 }
