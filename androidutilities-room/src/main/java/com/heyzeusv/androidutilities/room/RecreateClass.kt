@@ -2,6 +2,8 @@ package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.RoomTypes.TO_ACCEPTED
+import com.heyzeusv.androidutilities.room.RoomTypes.TO_COMPLEX
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
@@ -34,6 +36,7 @@ internal fun recreateEntityClass(
         constructorBuilder = constructorBuilder,
         classDeclaration = classDeclaration,
         logger = logger,
+        tcInfoMap = tcInfoMap,
     )
 
     val toOriginalFun = FunSpec.builder("toOriginal")
@@ -42,7 +45,7 @@ internal fun recreateEntityClass(
             add("return ${classDeclaration.simpleName.getShortName()}(\n")
             indent()
             val infoIterator = propertyInfoList.iterator()
-            handlePropertyInfoToOriginal(infoIterator)
+            handlePropertyInfoToOriginal(infoIterator, tcInfoMap)
             unindent()
             add(")")
         })
@@ -53,7 +56,7 @@ internal fun recreateEntityClass(
             add("return ${classDeclaration.utilName()}(\n")
             indent()
             val infoIterator = propertyInfoList.iterator()
-            handlePropertyInfoToUtil(infoIterator)
+            handlePropertyInfoToUtil(infoIterator, tcInfoMap)
             unindent()
             add(")")
         })
@@ -84,6 +87,7 @@ private fun TypeSpec.Builder.recreateClass(
     constructorBuilder: FunSpec.Builder,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
+    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     embeddedPrefix: String = "",
 ): TypeSpec.Builder {
     classDeclaration.getAllProperties().forEach { prop ->
@@ -105,9 +109,17 @@ private fun TypeSpec.Builder.recreateClass(
                     constructorBuilder = constructorBuilder,
                     classDeclaration = embeddedClass,
                     logger = logger,
+                    tcInfoMap = tcInfoMap,
                     embeddedPrefix = "$embeddedPrefix$newPrefix",
                 )
             } else {
+                val type = if (TO_ACCEPTED.types.containsNullableType(prop.type.toTypeName())) {
+                    prop.type.toTypeName()
+                } else {
+                    val tcInfo = tcInfoMap[TO_COMPLEX]!!
+                        .find { it.returnType.equalsNullableType(prop.type.toTypeName()) }!!
+                    tcInfo.parameterType
+                }
                 var fieldName = "$embeddedPrefix$name"
                 if (annotationNames.contains("ColumnInfo")) {
                     val columnName =
@@ -115,15 +127,16 @@ private fun TypeSpec.Builder.recreateClass(
                             ?.arguments?.find { it.name?.getShortName() == "name" }?.value.toString()
                     if (columnName != "[field-name]") fieldName = "$embeddedPrefix$columnName"
                 }
-                constructorBuilder.addParameter(fieldName, prop.type.toTypeName())
+                constructorBuilder.addParameter(fieldName, type)
                 this.addProperty(PropertySpec
-                    .builder(fieldName, prop.type.toTypeName())
+                    .builder(fieldName, type)
                     .initializer(fieldName)
                     .build()
                 )
                 val fieldInfo = FieldInfo(
                     name = name,
                     fieldName = fieldName,
+                    type = prop.type.toTypeName()
                 )
                 propertyInfoList.add(fieldInfo)
                 fieldToPropertyName[fieldName] = name
@@ -134,33 +147,41 @@ private fun TypeSpec.Builder.recreateClass(
     return this
 }
 
-fun CodeBlock.Builder.handlePropertyInfoToOriginal(iterator: MutableIterator<PropertyInfo>) {
+private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
+    iterator: MutableIterator<PropertyInfo>,
+    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+) {
     if (!iterator.hasNext()) return
     when (val info: PropertyInfo = iterator.next()) {
         is FieldInfo -> add("%L = %L,\n", info.name, info.fieldName)
         is EmbeddedInfo -> {
             add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
             indent()
-            handlePropertyInfoToOriginal(iterator)
+            handlePropertyInfoToOriginal(iterator, tcInfoMap)
             unindent()
             add(")\n")
         }
     }
-    handlePropertyInfoToOriginal(iterator)
+    handlePropertyInfoToOriginal(iterator, tcInfoMap)
 }
 
-fun CodeBlock.Builder.handlePropertyInfoToUtil(
+private fun CodeBlock.Builder.handlePropertyInfoToUtil(
     iterator: MutableIterator<PropertyInfo>,
+    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     embeddedPrefix: String = "",
 ) {
     if (!iterator.hasNext()) return
     when (val info: PropertyInfo = iterator.next()) {
-        is FieldInfo -> {
-            add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
-        }
-        is EmbeddedInfo -> {
-            handlePropertyInfoToUtil(iterator, "$embeddedPrefix${info.name}.")
-        }
+        is FieldInfo -> add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
+        is EmbeddedInfo -> handlePropertyInfoToUtil(
+            iterator = iterator,
+            tcInfoMap = tcInfoMap,
+            embeddedPrefix = "$embeddedPrefix${info.name}.",
+        )
     }
-    handlePropertyInfoToUtil(iterator, embeddedPrefix)
+    handlePropertyInfoToUtil(
+        iterator = iterator,
+        tcInfoMap = tcInfoMap,
+        embeddedPrefix = embeddedPrefix,
+    )
 }

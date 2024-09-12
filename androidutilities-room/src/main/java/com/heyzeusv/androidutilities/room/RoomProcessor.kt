@@ -14,8 +14,8 @@ import com.squareup.kotlinpoet.ksp.toTypeName
 class RoomProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val logger = environment.logger
     private val tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>> = mapOf(
-        RoomTypes.ACCEPTED to mutableListOf(),
-        RoomTypes.COMPLEX to mutableListOf()
+        RoomTypes.TO_ACCEPTED to mutableListOf(),
+        RoomTypes.TO_COMPLEX to mutableListOf()
     )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -31,8 +31,8 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
             val packageName = functionDeclaration.containingFile?.packageName?.asString().orEmpty()
             val parentClass = functionDeclaration.parentDeclaration?.simpleName?.getShortName().orEmpty()
             val functionName = functionDeclaration.simpleName.getShortName()
-            val parameterType = functionDeclaration.parameters.first().type.toTypeName().toString()
-            val returnType = functionDeclaration.returnType?.toTypeName().toString()
+            val parameterType = functionDeclaration.parameters.first().type.toTypeName()
+            val returnType = functionDeclaration.returnType?.toTypeName()!!
             val info = TypeConverterInfo(
                 packageName = packageName,
                 parentClass = parentClass,
@@ -40,10 +40,10 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 parameterType = parameterType,
                 returnType = returnType
             )
-            if (RoomTypes.ACCEPTED.types.containsNullableType(parameterType)) {
-                tcInfoMap[RoomTypes.ACCEPTED]!!.add(info)
+            if (RoomTypes.TO_ACCEPTED.types.containsNullableType(returnType)) {
+                tcInfoMap[RoomTypes.TO_ACCEPTED]!!.add(info)
             } else {
-                tcInfoMap[RoomTypes.COMPLEX]!!.add(info)
+                tcInfoMap[RoomTypes.TO_COMPLEX]!!.add(info)
             }
             logger.info("info $info")
             logger.info("tcInfoMap $tcInfoMap")
