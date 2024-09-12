@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
@@ -45,7 +46,7 @@ internal fun recreateEntityClass(
             add("return ${classDeclaration.simpleName.getShortName()}(\n")
             indent()
             val infoIterator = propertyInfoList.iterator()
-            handlePropertyInfoToOriginal(infoIterator, tcInfoMap)
+            handlePropertyInfoToOriginal(infoIterator, tcInfoMap, logger)
             unindent()
             add(")")
         })
@@ -113,12 +114,14 @@ private fun TypeSpec.Builder.recreateClass(
                     embeddedPrefix = "$embeddedPrefix$newPrefix",
                 )
             } else {
-                val type = if (TO_ACCEPTED.types.containsNullableType(prop.type.toTypeName())) {
-                    prop.type.toTypeName()
+                val startType: TypeName = prop.type.toTypeName()
+                val endType: TypeName
+                if (TO_ACCEPTED.types.containsNullableType(prop.type.toTypeName())) {
+                    endType = prop.type.toTypeName()
                 } else {
                     val tcInfo = tcInfoMap[TO_COMPLEX]!!
                         .find { it.returnType.equalsNullableType(prop.type.toTypeName()) }!!
-                    tcInfo.parameterType
+                    endType = tcInfo.parameterType
                 }
                 var fieldName = "$embeddedPrefix$name"
                 if (annotationNames.contains("ColumnInfo")) {
@@ -127,16 +130,17 @@ private fun TypeSpec.Builder.recreateClass(
                             ?.arguments?.find { it.name?.getShortName() == "name" }?.value.toString()
                     if (columnName != "[field-name]") fieldName = "$embeddedPrefix$columnName"
                 }
-                constructorBuilder.addParameter(fieldName, type)
+                constructorBuilder.addParameter(fieldName, endType)
                 this.addProperty(PropertySpec
-                    .builder(fieldName, type)
+                    .builder(fieldName, endType)
                     .initializer(fieldName)
                     .build()
                 )
                 val fieldInfo = FieldInfo(
                     name = name,
                     fieldName = fieldName,
-                    type = prop.type.toTypeName()
+                    startType = startType,
+                    endType = endType
                 )
                 propertyInfoList.add(fieldInfo)
                 fieldToPropertyName[fieldName] = name
@@ -150,19 +154,30 @@ private fun TypeSpec.Builder.recreateClass(
 private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
     iterator: MutableIterator<PropertyInfo>,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    logger: KSPLogger,
 ) {
     if (!iterator.hasNext()) return
     when (val info: PropertyInfo = iterator.next()) {
-        is FieldInfo -> add("%L = %L,\n", info.name, info.fieldName)
+        is FieldInfo -> {
+            if (info.startType == info.endType) {
+                add("%L = %L,\n", info.name, info.fieldName)
+            } else {
+                logger.info("start ${info.startType}, end ${info.endType}")
+                val tcInfo = tcInfoMap[TO_COMPLEX]!!
+                    .find { it.parameterType == info.endType && it.returnType == info.startType }!!
+                val tcClass = ClassName(tcInfo.packageName, tcInfo.parentClass)
+                add("%L = %T().%L(%L),\n", info.name, tcClass, tcInfo.functionName, info.fieldName)
+            }
+        }
         is EmbeddedInfo -> {
             add("%L = %L(\n", info.name, info.embeddedClass.simpleName.getShortName())
             indent()
-            handlePropertyInfoToOriginal(iterator, tcInfoMap)
+            handlePropertyInfoToOriginal(iterator, tcInfoMap, logger)
             unindent()
             add(")\n")
         }
     }
-    handlePropertyInfoToOriginal(iterator, tcInfoMap)
+    handlePropertyInfoToOriginal(iterator, tcInfoMap, logger)
 }
 
 private fun CodeBlock.Builder.handlePropertyInfoToUtil(

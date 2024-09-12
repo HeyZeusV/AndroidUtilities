@@ -10,7 +10,8 @@ interface PropertyInfo {
 data class FieldInfo(
     override val name: String,
     val fieldName: String,
-    val type: TypeName
+    val startType: TypeName,
+    val endType: TypeName,
 ) : PropertyInfo
 
 data class EmbeddedInfo(
