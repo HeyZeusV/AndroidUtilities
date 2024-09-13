@@ -2,7 +2,6 @@ package com.heyzeusv.androidutilitieslibrary
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -31,11 +30,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        exportRoomToCsv(
-//            applicationContext,
-//            parentDirectoryUri = Uri.parse(""),
-//            data = listOf(Pair(CategoryRoomUtil, listOf(CategoryRoomUtil.toUtil(Category())))),
-//        )
         val db = Room.databaseBuilder(
             applicationContext,
             Database::class.java,
@@ -51,20 +45,10 @@ class MainActivity : ComponentActivity() {
             .fallbackToDestructiveMigration()
             .build()
 
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                val categories = db.categoryDao().getAll()
-                Log.d("room", "Categories $categories")
-                categories.forEach {
-                    Log.d("room", "$it")
-                }
-            }
-        }
-
         setContent {
             AndroidUtilitiesLibraryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AppNavHost()
+                    AppNavHost(db)
                 }
             }
         }
@@ -72,7 +56,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(db: Database) {
     val navController = rememberNavController()
 
     NavHost(
@@ -100,6 +84,9 @@ fun AppNavHost() {
                 Button(onClick = { navController.navigate(Screens.ComposableResources) }) {
                     Text(text = "Composable Resources")
                 }
+                Button(onClick = { navController.navigate(Screens.RoomCsv) }) {
+                    Text(text = "Room Csv")
+                }
             }
         }
         composable<Screens.About> {
@@ -116,6 +103,9 @@ fun AppNavHost() {
         }
         composable<Screens.ComposableResources> {
             ComposableResources()
+        }
+        composable<Screens.RoomCsv> {
+            RoomCsvScreen(db)
         }
     }
 }

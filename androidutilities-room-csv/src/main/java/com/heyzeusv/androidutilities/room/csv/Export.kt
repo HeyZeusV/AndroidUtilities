@@ -13,7 +13,7 @@ import java.util.Locale
 fun exportRoomToCsv(
     context: Context,
     parentDirectoryUri: Uri,
-    data: List<Pair<CsvInfo,List<CsvData>>>,
+    data: List<Pair<CsvInfo, List<CsvData>>>,
 ) {
     val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
     if (!parentDirectory.exists()) {
@@ -59,4 +59,21 @@ private fun createNewExportDirectory(parentDirectory: DocumentFile): DocumentFil
     val formattedDate = sdf.format(Date())
     val newExportDirectory = parentDirectory.createDirectory(formattedDate)
     return newExportDirectory
+}
+
+fun findOrCreateParentDirectory(
+    context: Context,
+    parentDirectoryName: String,
+    selectedDirectoryUri: Uri,
+): Uri? {
+    try {
+        val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
+        var parentDirectory = selectedDirectory.findFile(parentDirectoryName)
+        if (parentDirectory == null) {
+            parentDirectory = selectedDirectory.createDirectory(parentDirectoryName)!!
+        }
+        return parentDirectory.uri
+    } catch (e: Exception) {
+        return null
+    }
 }

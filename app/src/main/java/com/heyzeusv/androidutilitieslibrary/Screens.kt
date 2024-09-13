@@ -20,4 +20,7 @@ sealed interface Screens {
 
     @Serializable
     data object ComposableResources: Screens
+
+    @Serializable
+    data object RoomCsv: Screens
 }
