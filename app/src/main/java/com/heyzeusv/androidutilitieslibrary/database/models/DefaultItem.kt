@@ -20,8 +20,7 @@ import androidx.room.PrimaryKey
     indices = [Index(
         value = ["category"],
         name = "index_default_category_name"
-    )],
-    ignoredColumns = ["testIgnore3"],
+    )]
 )
 data class DefaultItem(
     @PrimaryKey(autoGenerate = true)
@@ -35,7 +34,6 @@ data class DefaultItem(
     var testEmbed: TestEmbed = TestEmbed(),
     @Ignore
     var testIgnore2: String = "",
-    var testIgnore3: String = "",
 ) : BaseItem {
 
     @Ignore

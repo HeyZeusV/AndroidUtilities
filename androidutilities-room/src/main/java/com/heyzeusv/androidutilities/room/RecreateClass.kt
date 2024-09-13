@@ -30,6 +30,7 @@ internal fun recreateEntityClass(
     val classBuilder = TypeSpec
         .classBuilder(classDeclaration.utilName())
         .addModifiers(KModifier.DATA)
+        .addSuperinterface(CsvInfo::class)
     val constructorBuilder = FunSpec.constructorBuilder()
     val companion = TypeSpec.companionObjectBuilder()
     val tableName =
@@ -84,6 +85,7 @@ internal fun recreateEntityClass(
         .build()
     classBuilder.addProperty(tableNamePropertySpec)
     classBuilder.addProperty(propertyToFieldNameSpec)
+    classBuilder.addCsvProperties()
     fieldToPropertyName.clear()
     propertyInfoList.clear()
 
@@ -237,4 +239,38 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
             embeddedPrefixList
         },
     )
+}
+
+private fun TypeSpec.Builder.addCsvProperties() {
+    val fileNamePropSpec = PropertySpec.builder("csvFileName", String::class)
+        .addModifiers(KModifier.OVERRIDE)
+        .initializer("%L + %S", "tableName", ".csv")
+        .build()
+    val stringListClass = ClassName("kotlin.collections", "List")
+        .parameterizedBy(String::class.asTypeName())
+    val headerPropSpec = PropertySpec.builder("csvHeader", stringListClass)
+        .addModifiers(KModifier.OVERRIDE)
+        .initializer(buildCodeBlock {
+            add("listOf(\n")
+            fieldToPropertyName.keys.forEach {
+                add("%S, ", it)
+            }
+            add("\n)")
+        })
+        .build()
+    val anyListClass = ClassName("kotlin.collections", "List")
+        .parameterizedBy(Any::class.asTypeName().copy(nullable = true))
+    val csvRow = PropertySpec.builder("csvRow", anyListClass)
+        .addModifiers(KModifier.OVERRIDE)
+        .initializer(buildCodeBlock {
+            add("listOf(\n")
+            fieldToPropertyName.keys.forEach {
+                add("%L, ", it)
+            }
+            add("\n)")
+        })
+        .build()
+    addProperty(fileNamePropSpec)
+    addProperty(headerPropSpec)
+    addProperty(csvRow)
 }
