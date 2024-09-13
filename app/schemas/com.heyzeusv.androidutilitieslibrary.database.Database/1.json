@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "67b3703a12425720c60ab2a99636619b",
+    "identityHash": "61b804f1ee7dcc24fe6e6d701f0ef4be",
     "entities": [
       {
-        "tableName": "DefaultItem",
+        "tableName": "custom_default_item_table_name",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER NOT NULL, `outerEmbed_test3` INTEGER NOT NULL, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
@@ -123,7 +123,7 @@
         "ftsOptions": {
           "tokenizer": "simple",
           "tokenizerArgs": [],
-          "contentTable": "DefaultItem",
+          "contentTable": "custom_default_item_table_name",
           "languageIdColumnName": "",
           "matchInfo": "FTS4",
           "notIndexedColumns": [],
@@ -131,13 +131,13 @@
           "preferredOrder": "ASC"
         },
         "contentSyncTriggers": [
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_UPDATE BEFORE UPDATE ON `DefaultItem` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_DELETE BEFORE DELETE ON `DefaultItem` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_UPDATE AFTER UPDATE ON `DefaultItem` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_INSERT AFTER INSERT ON `DefaultItem` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END"
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_UPDATE BEFORE UPDATE ON `custom_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_DELETE BEFORE DELETE ON `custom_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_UPDATE AFTER UPDATE ON `custom_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_INSERT AFTER INSERT ON `custom_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END"
         ],
         "tableName": "DefaultItemFts",
-        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`name` TEXT NOT NULL, `category` TEXT NOT NULL, content=`DefaultItem`)",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`name` TEXT NOT NULL, `category` TEXT NOT NULL, content=`custom_default_item_table_name`)",
         "fields": [
           {
             "fieldPath": "name",
@@ -335,7 +335,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '67b3703a12425720c60ab2a99636619b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '61b804f1ee7dcc24fe6e6d701f0ef4be')"
     ]
   }
 }

@@ -32,6 +32,10 @@ internal fun recreateEntityClass(
         .addModifiers(KModifier.DATA)
     val constructorBuilder = FunSpec.constructorBuilder()
     val companion = TypeSpec.companionObjectBuilder()
+    val tableName =
+        classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
+            ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
+            .ifBlank { classDeclaration.simpleName.getShortName() }
 
     classBuilder.recreateClass(
         constructorBuilder = constructorBuilder,
@@ -41,6 +45,9 @@ internal fun recreateEntityClass(
     )
     propertyInfoList.removeLast()
 
+    val tableNamePropertySpec = PropertySpec.builder("tableName", String::class)
+        .initializer("%S", tableName)
+        .build()
     val toOriginalFun = FunSpec.builder("toOriginal")
         .returns(classDeclaration.toClassName())
         .addCode(buildCodeBlock {
@@ -75,6 +82,7 @@ internal fun recreateEntityClass(
             add("\n)")
         })
         .build()
+    classBuilder.addProperty(tableNamePropertySpec)
     classBuilder.addProperty(propertyToFieldNameSpec)
     fieldToPropertyName.clear()
     propertyInfoList.clear()

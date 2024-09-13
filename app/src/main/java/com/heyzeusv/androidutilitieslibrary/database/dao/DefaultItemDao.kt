@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 abstract class DefaultItemDao : BaseDao<DefaultItem>("DefaultItem") {
 
     @Query("SELECT * " +
-            "FROM DefaultItem")
+            "FROM custom_default_item_table_name")
     abstract fun getAllDefaultItems(): Flow<List<DefaultItem>>
 
     @Query("SELECT * " +
-            "FROM DefaultItem " +
-            "JOIN DefaultItemFts ON DefaultItem.name = DefaultItemFts.name " +
+            "FROM custom_default_item_table_name " +
+            "JOIN DefaultItemFts ON custom_default_item_table_name.name = DefaultItemFts.name " +
             "WHERE DefaultItemFts MATCH :query")
     abstract fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
 }
