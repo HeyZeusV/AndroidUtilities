@@ -30,9 +30,11 @@ internal fun recreateEntityClass(
     val classBuilder = TypeSpec
         .classBuilder(classDeclaration.utilName())
         .addModifiers(KModifier.DATA)
-        .addSuperinterface(CsvInfo::class)
+        .addSuperinterface(CsvData::class)
     val constructorBuilder = FunSpec.constructorBuilder()
-    val companion = TypeSpec.companionObjectBuilder()
+    val companionTypeSpec = TypeSpec
+        .companionObjectBuilder()
+        .addSuperinterface(CsvInfo::class)
     val tableName =
         classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
             ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
@@ -85,13 +87,13 @@ internal fun recreateEntityClass(
         .build()
     classBuilder.addProperty(tableNamePropertySpec)
     classBuilder.addProperty(propertyToFieldNameSpec)
-    classBuilder.addCsvProperties()
+    classBuilder.addCsvProperties(companionTypeSpec, tableName)
     fieldToPropertyName.clear()
     propertyInfoList.clear()
 
     classBuilder.addFunction(toOriginalFun.build())
-    companion.addFunction(toUtilFun.build())
-    classBuilder.addType(companion.build())
+    companionTypeSpec.addFunction(toUtilFun.build())
+    classBuilder.addType(companionTypeSpec.build())
     return classBuilder.primaryConstructor(constructorBuilder.build())
 }
 
@@ -241,10 +243,13 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
     )
 }
 
-private fun TypeSpec.Builder.addCsvProperties() {
+private fun TypeSpec.Builder.addCsvProperties(
+    companionTypeSpec: TypeSpec.Builder,
+    tableName: String,
+) {
     val fileNamePropSpec = PropertySpec.builder("csvFileName", String::class)
         .addModifiers(KModifier.OVERRIDE)
-        .initializer("%L + %S", "tableName", ".csv")
+        .initializer("%S", "$tableName.csv")
         .build()
     val stringListClass = ClassName("kotlin.collections", "List")
         .parameterizedBy(String::class.asTypeName())
@@ -270,7 +275,6 @@ private fun TypeSpec.Builder.addCsvProperties() {
             add("\n)")
         })
         .build()
-    addProperty(fileNamePropSpec)
-    addProperty(headerPropSpec)
     addProperty(csvRow)
+    companionTypeSpec.addProperty(fileNamePropSpec).addProperty(headerPropSpec)
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import com.heyzeusv.androidutilities.room.CsvData
 import com.heyzeusv.androidutilities.room.CsvInfo
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -12,7 +13,7 @@ import java.util.Locale
 fun exportRoomToCsv(
     context: Context,
     parentDirectoryUri: Uri,
-    data: List<List<CsvInfo>>,
+    data: List<Pair<CsvInfo,List<CsvData>>>,
 ) {
     val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
     if (!parentDirectory.exists()) {
@@ -26,13 +27,12 @@ fun exportRoomToCsv(
         } else {
             val newDocumentFiles = mutableListOf<DocumentFile>()
             data.forEach {
-//                val csvDocumentFile = exportRoomEntityToCsv(
-//                    context = context,
-//                    newExportDirectory = newExportDirectory,
-//                    entityInfo = it,
-//                    entityData = it
-//                )
-//                newDocumentFiles.add(csvDocumentFile)
+                val csvDocumentFile = exportRoomEntityToCsv(
+                    context = context,
+                    newExportDirectory = newExportDirectory,
+                    entityData = it
+                )
+                newDocumentFiles.add(csvDocumentFile)
             }
         }
     }
@@ -41,16 +41,15 @@ fun exportRoomToCsv(
 private fun exportRoomEntityToCsv(
     context: Context,
     newExportDirectory: DocumentFile,
-    entityInfo: CsvInfo,
-    entityData: List<CsvInfo>,
+    entityData: Pair<CsvInfo, List<CsvData>>,
 ): DocumentFile {
     // could fail and return null
-    val csvDocumentFile = newExportDirectory.createFile("text/*", entityInfo.csvFileName)!!
+    val csvDocumentFile = newExportDirectory.createFile("text/*", entityData.first.csvFileName)!!
     // could fail if file is not able to be open or if provider crashed
     val outputStream = context.contentResolver.openOutputStream(csvDocumentFile.uri)!!
     csvWriter().open(outputStream) {
-        writeRow(entityInfo.csvHeader)
-        entityData.forEach { writeRow(it.csvRow) }
+        writeRow(entityData.first.csvHeader)
+        entityData.second.forEach { writeRow(it.csvRow) }
     }
     return csvDocumentFile
 }
