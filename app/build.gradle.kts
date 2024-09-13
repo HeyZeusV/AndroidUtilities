@@ -73,6 +73,7 @@ dependencies {
     implementation(project(":androidutilities"))
     implementation(project(":androidutilities-room"))
     ksp(project(":androidutilities-room"))
+    implementation(project(":androidutilities-room-csv"))
 
     implementation(libs.aboutlibraries.core)
     implementation(libs.androidx.core.ktx)

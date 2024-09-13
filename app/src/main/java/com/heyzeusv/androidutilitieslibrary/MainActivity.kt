@@ -31,6 +31,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+//        exportRoomToCsv(
+//            applicationContext,
+//            parentDirectoryUri = Uri.parse(""),
+//            data = listOf(listOf(CategoryRoomUtil.toUtil(Category()))),
+//        )
         val db = Room.databaseBuilder(
             applicationContext,
             Database::class.java,
