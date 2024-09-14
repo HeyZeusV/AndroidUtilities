@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.room
+package com.heyzeusv.androidutilities.room.csv
 
 interface CsvInfo {
     val csvFileName: String

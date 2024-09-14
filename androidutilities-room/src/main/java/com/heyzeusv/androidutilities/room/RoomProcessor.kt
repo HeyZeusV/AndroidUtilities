@@ -8,6 +8,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
+import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.ksp.toTypeName
 
@@ -19,6 +20,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        val testList = mutableListOf<String>()
         // get all symbols
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
@@ -26,6 +28,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.Embedded"))
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter"))
             .toSet()
+         val dbSymbol = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
         symbols.filterIsInstance<KSFunctionDeclaration>().forEach { functionDeclaration ->
             val packageName = functionDeclaration.containingFile?.packageName?.asString().orEmpty()
@@ -45,8 +48,6 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
             } else {
                 tcInfoMap[RoomTypes.TO_COMPLEX]!!.add(info)
             }
-            logger.info("info $info")
-            logger.info("tcInfoMap $tcInfoMap")
         }
 
         // filter out symbols that are not classes
@@ -61,6 +62,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 val fileSpecBuilder = FileSpec.builder(packageName, fileName)
 
                 val classBuilder = recreateEntityClass(
+                    testList,
                     tcInfoMap = tcInfoMap,
                     classDeclaration = classDeclaration,
                     logger = logger,
@@ -78,6 +80,14 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     fileSpecBuilder.build().writeTo(it)
                 }
             }
+        }
+        if (testList.isNotEmpty()) {
+            buildCsvConverter(
+                codeGenerator = environment.codeGenerator,
+                dbClass = dbSymbol.first() as KSClassDeclaration,
+                logger = logger,
+            )
+
         }
 
         // filter out symbols that are not valid

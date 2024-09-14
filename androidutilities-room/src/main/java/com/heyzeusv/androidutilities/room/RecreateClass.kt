@@ -4,6 +4,8 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.RoomTypes.TO_ACCEPTED
 import com.heyzeusv.androidutilities.room.RoomTypes.TO_COMPLEX
+import com.heyzeusv.androidutilities.room.csv.CsvData
+import com.heyzeusv.androidutilities.room.csv.CsvInfo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
@@ -23,6 +25,7 @@ private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
 internal fun recreateEntityClass(
+    testList: MutableList<String>,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
@@ -39,7 +42,7 @@ internal fun recreateEntityClass(
         classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
             ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
             .ifBlank { classDeclaration.simpleName.getShortName() }
-
+    testList.add(tableName)
     classBuilder.recreateClass(
         constructorBuilder = constructorBuilder,
         classDeclaration = classDeclaration,
@@ -203,7 +206,6 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
     embeddedPrefixList: List<String> = emptyList(),
 ) {
     if (!iterator.hasNext()) return
-    logger.info("prefix list $embeddedPrefixList")
     var removeLastPrefix = ""
     when (val info: PropertyInfo = iterator.next()) {
         is FieldInfo -> {
@@ -212,7 +214,6 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
             } else {
                 embeddedPrefixList.joinToString(separator = ".", postfix = ".")
             }
-            logger.info("prefix $embeddedPrefix")
             if (info.startType == info.endType) {
                 add("%L = entity.$embeddedPrefix%L,\n", info.fieldName, info.name)
             } else {
