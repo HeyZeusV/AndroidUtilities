@@ -24,4 +24,3 @@ rootProject.name = "Android Utilities"
 include(":app")
 include(":androidutilities")
 include(":androidutilities-room")
-include(":androidutilities-room-csv")

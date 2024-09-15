@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.heyzeusv.androidutilities.room.csv.CsvData
 import com.heyzeusv.androidutilities.room.csv.CsvInfo
-import com.heyzeusv.androidutilities.room.csv.findOrCreateParentDirectory
 import com.heyzeusv.androidutilitieslibrary.database.Database
 import com.heyzeusv.androidutilitieslibrary.database.csv.CsvConverter
 import com.heyzeusv.androidutilitieslibrary.database.models.CategoryRoomUtil
@@ -59,8 +58,7 @@ private fun exportToCSV(
     db: Database,
 ) {
     scope.launch(Dispatchers.IO) {
-        val parentDirectoryUri = findOrCreateParentDirectory(
-            context = context,
+        val parentDirectoryUri = CsvConverter(context).findOrCreateParentDirectory(
             parentDirectoryName = "RoomCsvExample",
             selectedDirectoryUri = selectedDirectoryUri
         )!!.toString()
