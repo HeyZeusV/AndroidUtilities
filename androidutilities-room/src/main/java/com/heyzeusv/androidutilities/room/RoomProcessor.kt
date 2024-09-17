@@ -25,31 +25,31 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val entityDataList = mutableListOf<EntityData>()
         // get all symbols
+        val tpSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
-            .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
-            .plus(resolver.getSymbolsWithAnnotation("androidx.room.Ignore"))
-            .plus(resolver.getSymbolsWithAnnotation("androidx.room.Embedded"))
-            .plus(resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter"))
-            .toSet()
-         val dbSymbol = resolver.getSymbolsWithAnnotation("androidx.room.Database")
+        val dbSymbol = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        symbols.filterIsInstance<KSFunctionDeclaration>().forEach { functionDeclaration ->
-            val packageName = functionDeclaration.containingFile?.packageName?.asString().orEmpty()
-            val parentClass = functionDeclaration.parentDeclaration?.simpleName?.getShortName().orEmpty()
-            val functionName = functionDeclaration.simpleName.getShortName()
-            val parameterType = functionDeclaration.parameters.first().type.toTypeName()
-            val returnType = functionDeclaration.returnType?.toTypeName()!!
-            val info = TypeConverterInfo(
-                packageName = packageName,
-                parentClass = parentClass,
-                functionName = functionName,
-                parameterType = parameterType,
-                returnType = returnType
-            )
-            if (RoomTypes.TO_ACCEPTED.types.containsNullableType(returnType)) {
-                tcInfoMap[RoomTypes.TO_ACCEPTED]!!.add(info)
-            } else {
-                tcInfoMap[RoomTypes.TO_COMPLEX]!!.add(info)
+        tpSymbols.filterIsInstance<KSFunctionDeclaration>().forEach { symbol ->
+            (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
+                val packageName =
+                    functionDeclaration.containingFile?.packageName?.asString().orEmpty()
+                val parentClass =
+                    functionDeclaration.parentDeclaration?.simpleName?.getShortName().orEmpty()
+                val functionName = functionDeclaration.simpleName.getShortName()
+                val parameterType = functionDeclaration.parameters.first().type.toTypeName()
+                val returnType = functionDeclaration.returnType?.toTypeName()!!
+                val info = TypeConverterInfo(
+                    packageName = packageName,
+                    parentClass = parentClass,
+                    functionName = functionName,
+                    parameterType = parameterType,
+                    returnType = returnType
+                )
+                if (RoomTypes.TO_ACCEPTED.types.containsNullableType(returnType)) {
+                    tcInfoMap[RoomTypes.TO_ACCEPTED]!!.add(info)
+                } else {
+                    tcInfoMap[RoomTypes.TO_COMPLEX]!!.add(info)
+                }
             }
         }
 
@@ -57,6 +57,9 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         // filter out symbols that are not classes
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
+                if (classDeclaration.annotations.any { it.shortName.getShortName() == "Fts4" }) {
+                    return@forEach
+                }
                 val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
                 val fileName = classDeclaration.utilName()
                 classNameMap.addOriginalAndUtil(classDeclaration)
