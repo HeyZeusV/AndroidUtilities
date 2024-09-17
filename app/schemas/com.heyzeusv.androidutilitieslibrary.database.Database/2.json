@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "61b804f1ee7dcc24fe6e6d701f0ef4be",
+    "identityHash": "d5cb72ecf0845d6ce9e7fb05e877577d",
     "entities": [
       {
         "tableName": "custom_default_item_table_name",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER NOT NULL, `outerEmbed_test3` INTEGER NOT NULL, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER, `outerEmbed_test3` INTEGER, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -54,13 +54,13 @@
             "fieldPath": "testEmbed.test2",
             "columnName": "outerEmbed_test2",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "testEmbed.test3",
             "columnName": "outerEmbed_test3",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "testEmbed.embed.test3",
@@ -335,7 +335,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '61b804f1ee7dcc24fe6e6d701f0ef4be')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd5cb72ecf0845d6ce9e7fb05e877577d')"
     ]
   }
 }

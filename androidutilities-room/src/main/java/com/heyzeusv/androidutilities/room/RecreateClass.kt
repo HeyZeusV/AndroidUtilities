@@ -20,7 +20,7 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 
 private val propertyInfoList = mutableListOf<PropertyInfo>()
-private val fieldToPropertyName = mutableMapOf<String, String>()
+private val fieldToTypeMap = mutableMapOf<String, String>()
 private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
@@ -76,14 +76,14 @@ internal fun recreateEntityClass(
             add(")")
         })
 
-    val propertyToFieldNameSpec = PropertySpec.builder(::fieldToPropertyName.name, stringMapClass)
+    val propertyToFieldNameSpec = PropertySpec.builder(::fieldToTypeMap.name, stringMapClass)
         .initializer(buildCodeBlock {
             add("mapOf(\n")
             var count = 0
-            fieldToPropertyName.forEach { (property, field) ->
+            fieldToTypeMap.forEach { (field, type) ->
                 count++
-                add("%S to %S", property, field)
-                if (count < fieldToPropertyName.size) add(",\n")
+                add("%S to %S", field, type)
+                if (count < fieldToTypeMap.size) add(",\n")
             }
             add("\n)")
         })
@@ -91,7 +91,7 @@ internal fun recreateEntityClass(
     classBuilder.addProperty(tableNamePropertySpec)
     classBuilder.addProperty(propertyToFieldNameSpec)
     classBuilder.addCsvProperties(companionTypeSpec, tableName)
-    fieldToPropertyName.clear()
+    fieldToTypeMap.clear()
     propertyInfoList.clear()
 
     classBuilder.addFunction(toOriginalFun.build())
@@ -159,7 +159,7 @@ private fun TypeSpec.Builder.recreateClass(
                     endType = endType
                 )
                 propertyInfoList.add(fieldInfo)
-                fieldToPropertyName[fieldName] = name
+                fieldToTypeMap[fieldName] = endType.toString().removePrefix("kotlin.")
             }
         }
     }
@@ -258,7 +258,7 @@ private fun TypeSpec.Builder.addCsvProperties(
         .addModifiers(KModifier.OVERRIDE)
         .initializer(buildCodeBlock {
             add("listOf(\n")
-            fieldToPropertyName.keys.forEach {
+            fieldToTypeMap.keys.forEach {
                 add("%S, ", it)
             }
             add("\n)")
@@ -270,7 +270,7 @@ private fun TypeSpec.Builder.addCsvProperties(
         .addModifiers(KModifier.OVERRIDE)
         .initializer(buildCodeBlock {
             add("listOf(\n")
-            fieldToPropertyName.keys.forEach {
+            fieldToTypeMap.keys.forEach {
                 add("%L, ", it)
             }
             add("\n)")

@@ -6,8 +6,8 @@ import java.util.Date
 
 data class TestEmbed(
     val test1: String = "",
-    val test2: Int = 0,
-    val test3: Long = 0L,
+    val test2: Int? = 0,
+    val test3: Long? = 0L,
     @Embedded(prefix = "innerEmbed_")
     val embed: TestDoubleEmbed = TestDoubleEmbed()
 )
