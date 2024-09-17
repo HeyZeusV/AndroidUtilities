@@ -13,7 +13,7 @@ import java.util.Date
 import java.util.Locale
 
 internal val uriClassName = ClassName("android.net", "Uri")
-private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
+internal val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
 internal val csvDataListClassName = ClassName("kotlin.collections", "List")
     .parameterizedBy(CsvData::class.asTypeName())
 internal val csvMapClassName = ClassName("kotlin.collections", "Map")

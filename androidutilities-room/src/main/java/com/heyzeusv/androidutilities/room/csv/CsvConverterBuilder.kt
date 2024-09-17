@@ -45,7 +45,8 @@ internal fun TypeSpec.Builder.buildCsvConverter(
             .build()
     )
 
-    addFunction(importCsvToRoomFunSpec().build())
+    addFunction(importCsvToRoomFunSpec(roomDataClassName).build())
+    addFunction(importCsvToRoomEntityFunSpec().build())
     addFunction(exportRoomToCsvFunSpec(roomDataClassName).build())
     addFunction(exportRoomEntityToCsvFunSpec().build())
     addFunction(createNewExportDirectoryFunSpec().build())
