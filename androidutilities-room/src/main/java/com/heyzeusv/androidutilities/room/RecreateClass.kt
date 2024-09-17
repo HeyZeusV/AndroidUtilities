@@ -27,7 +27,7 @@ private val stringMapClass = ClassName("kotlin.collections", "Map")
 internal fun recreateEntityClass(
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
-    csvFileNames: MutableList<String>,
+    csvInfoMap: MutableMap<String, MutableMap<String, String>>,
     logger: KSPLogger,
 ): TypeSpec.Builder {
     val classBuilder = TypeSpec
@@ -42,12 +42,13 @@ internal fun recreateEntityClass(
         classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
             ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
             .ifBlank { classDeclaration.simpleName.getShortName() }
-    csvFileNames.add("$tableName.csv")
+    csvInfoMap["$tableName.csv"] = mutableMapOf()
     classBuilder.recreateClass(
         constructorBuilder = constructorBuilder,
         classDeclaration = classDeclaration,
         logger = logger,
         tcInfoMap = tcInfoMap,
+        csvFieldToTypeMap = csvInfoMap["$tableName.csv"]!!
     )
     propertyInfoList.removeLast()
 
@@ -92,6 +93,7 @@ private fun TypeSpec.Builder.recreateClass(
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    csvFieldToTypeMap: MutableMap<String, String>,
     embeddedPrefix: String = "",
 ): TypeSpec.Builder {
     classDeclaration.getAllProperties().forEach { prop ->
@@ -115,6 +117,7 @@ private fun TypeSpec.Builder.recreateClass(
                     logger = logger,
                     tcInfoMap = tcInfoMap,
                     embeddedPrefix = "$embeddedPrefix$newPrefix",
+                    csvFieldToTypeMap = csvFieldToTypeMap,
                 )
             } else {
                 val startType: TypeName = prop.type.toTypeName()
@@ -147,6 +150,7 @@ private fun TypeSpec.Builder.recreateClass(
                 )
                 propertyInfoList.add(fieldInfo)
                 fieldToTypeMap[fieldName] = endType.toString().removePrefix("kotlin.")
+                csvFieldToTypeMap[fieldName] = endType.toString().removePrefix("kotlin.")
             }
         }
     }

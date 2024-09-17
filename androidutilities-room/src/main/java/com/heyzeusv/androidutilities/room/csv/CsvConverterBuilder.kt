@@ -16,7 +16,7 @@ private val stringListClass = ClassName("kotlin.collections", "List")
 
 internal fun TypeSpec.Builder.buildCsvConverter(
     roomDataClassName: ClassName,
-    csvFileNames: MutableList<String>,
+    csvInfoMap: MutableMap<String, MutableMap<String, String>>,
 ): TypeSpec.Builder {
     primaryConstructor(
         FunSpec.constructorBuilder()
@@ -33,11 +33,9 @@ internal fun TypeSpec.Builder.buildCsvConverter(
         PropertySpec.builder("csvFileNames", stringListClass)
             .initializer(buildCodeBlock {
                 add("listOf(\n")
-                var count = 0
-                csvFileNames.forEach {
-                    count++
-                    add("%S", it)
-                    if (count < csvFileNames.size) add(", ")
+                csvInfoMap.keys.forEachIndexed { index, key ->
+                    add("%S", key)
+                    if (index < csvInfoMap.keys.size) add(", ")
                 }
                 add("\n)")
             })
