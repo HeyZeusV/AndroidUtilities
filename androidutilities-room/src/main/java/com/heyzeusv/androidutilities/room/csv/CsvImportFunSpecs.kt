@@ -66,31 +66,35 @@ internal fun importCsvToRoomEntityFunSpec(
                   val entityData = mutableListOf<CsvData>()
                   when (header) {
                   
-            """.trimIndent())
-                entityDataList.forEach { entityData ->
-                    add("""
+                """.trimIndent())
+                addIndented {
+                    entityDataList.forEach { entityData ->
+                        add("""
                         %T.csvHeader -> {
                           rows.forEach {
                             val entry = %T(
                             
                         """.trimIndent(), entityData.utilClassName, entityData.utilClassName)
-                    addIndented {
                         addIndented {
-                            entityData.fieldToTypeMap.entries.forEachIndexed { index, entry ->
-                                add("  %L = it[%L],\n", entry.key, index)
+                            addIndented {
+                                entityData.fieldToTypeMap.entries.forEachIndexed { index, entry ->
+                                    val cast = getTypeCast(entry.value)
+                                    add("  %L = it[%L]%L,\n", entry.key, index, cast)
+                                }
                             }
                         }
-                    }
-                    add("""
-                        )
-                      }
-                    }
+                        add("""
+                            )
+                            entityData.add(entry)
+                          }
+                        }
                   
-                """.trimIndent())
+                        """.trimIndent())
+                    }
                 }
             }
             add("""
-                }
+                  }
                   return entityData
                 } catch (e: Exception) {
                   return emptyList() // invalid data, wrong type data
@@ -99,4 +103,29 @@ internal fun importCsvToRoomEntityFunSpec(
         })
 
     return funSpec
+}
+
+private fun getTypeCast(type: String): String {
+    val cast = when (type) {
+        "Boolean" -> ".toBoolean()"
+        "Boolean?" -> ".toBoolean()"
+        "Short" -> ".toShort()"
+        "Short?" -> ".toShortOrNull()"
+        "Int" -> ".toInt()"
+        "Int?" -> ".toIntOrNull()"
+        "Long" -> ".toLong()"
+        "Long?" -> ".toLongOrNull()"
+        "Byte" -> ".toByte()"
+        "Byte?" -> ".toByteOrNull()"
+        "Char" -> ".single()"
+        "Char?" -> ".singleOrNull()"
+        "Double" -> ".toDouble()"
+        "Double?" -> ".toDoubleOrNull()"
+        "Float" -> ".toFloat()"
+        "Float?" -> ".toFloatOrNull()"
+        "ByteArray" -> ".toByteArray()"
+        "ByteArray?" -> ".toByteArray()"
+        else -> ""
+    }
+    return cast
 }
