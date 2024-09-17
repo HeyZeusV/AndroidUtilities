@@ -19,12 +19,12 @@ internal val csvDataListClassName = ClassName("kotlin.collections", "List")
 internal val csvMapClassName = ClassName("kotlin.collections", "Map")
     .parameterizedBy(CsvInfo::class.asTypeName(), csvDataListClassName)
 
-internal fun exportRoomToCsvFunSpec(): FunSpec.Builder {
+internal fun exportRoomToCsvFunSpec(roomDataClassName: ClassName): FunSpec.Builder {
     val parentDirectoryUri = "parentDirectoryUri"
-    val dataMap = "dataMap"
+    val roomData = "roomData"
     val funSpec = FunSpec.builder("exportRoomToCsv")
         .addParameter(parentDirectoryUri, uriClassName)
-        .addParameter(dataMap, csvMapClassName)
+        .addParameter(roomData, roomDataClassName)
         .addCode(buildCodeBlock {
             addStatement("val parentDirectory = %T.fromTreeUri(%L, $parentDirectoryUri)!!", documentFileClassName, CONTEXT_PROP)
             add("""
@@ -38,7 +38,7 @@ internal fun exportRoomToCsvFunSpec(): FunSpec.Builder {
                     return
                   } else {
                     val newCsvDocumentFiles = mutableListOf<DocumentFile>()
-                    $dataMap.entries.forEach {
+                    $roomData.csvDataMap.entries.forEach {
                     val csvDocumentFile = exportRoomEntityToCsv(
                       newExportDirectory = newExportDirectory,
                       csvInfo = it.key,
