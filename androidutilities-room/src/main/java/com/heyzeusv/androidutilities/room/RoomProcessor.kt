@@ -9,6 +9,8 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.ksp.toTypeName
 
@@ -50,11 +52,13 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
             }
         }
 
+        val classNameMap = mutableMapOf<ClassName, ClassName>()
         // filter out symbols that are not classes
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
                 val fileName = classDeclaration.utilName()
+                classNameMap.addOriginalAndUtil(classDeclaration)
 
                 logger.info("class name: $fileName")
 
@@ -81,13 +85,22 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 }
             }
         }
-        if (csvFileNames.isNotEmpty()) {
-            buildCsvConverter(
-                codeGenerator = environment.codeGenerator,
-                dbClass = dbSymbol.first() as KSClassDeclaration,
-                csvFileNames = csvFileNames,
-                logger = logger,
-            )
+        dbSymbol.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
+            (symbol as? KSClassDeclaration)?.let { dbClass ->
+                buildRoomData(
+                    codeGenerator = environment.codeGenerator,
+                    dbClass = dbClass,
+                    classNameMap = classNameMap,
+                    logger = logger,
+                )
+
+                buildCsvConverter(
+                    codeGenerator = environment.codeGenerator,
+                    dbClass = dbClass,
+                    csvFileNames = csvFileNames,
+                    logger = logger,
+                )
+            }
         }
 
         // filter out symbols that are not valid
@@ -96,4 +109,19 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     }
 }
 
-fun KSClassDeclaration.utilName(): String = "${simpleName.getShortName()}RoomUtil"
+
+fun KSClassDeclaration.className(): String = simpleName.getShortName()
+fun KSClassDeclaration.utilName(): String = "${className()}RoomUtil"
+fun KSClassDeclaration.packageName(): String = containingFile?.packageName?.asString().orEmpty()
+fun CodeBlock.Builder.addIndented(code: CodeBlock.Builder.() -> Unit): CodeBlock.Builder = apply {
+    indent()
+    code()
+    unindent()
+}
+
+fun MutableMap<ClassName, ClassName>.addOriginalAndUtil(classDeclaration: KSClassDeclaration) {
+    val packageName = classDeclaration.packageName()
+    val className = classDeclaration.className()
+    val utilName = classDeclaration.utilName()
+    this[ClassName(packageName, className)] = ClassName(packageName, utilName)
+}

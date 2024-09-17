@@ -4,8 +4,8 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.packageName
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -26,7 +26,7 @@ internal fun buildCsvConverter(
     csvFileNames: MutableList<String>,
     logger: KSPLogger,
 ) {
-    val packageName = dbClass.containingFile?.packageName?.asString().orEmpty()
+    val packageName = dbClass.packageName()
     val fileName = "CsvConverter"
 
     val fileSpecBuilder = FileSpec.builder("$packageName.csv", fileName)
@@ -70,10 +70,4 @@ internal fun buildCsvConverter(
         fileName = fileName,
         extensionName = "kt",
     ).bufferedWriter().use { fileSpecBuilder.build().writeTo(it) }
-}
-
-fun CodeBlock.Builder.addIndented(code: CodeBlock.Builder.() -> Unit): CodeBlock.Builder = apply {
-    indent()
-    code()
-    unindent()
 }
