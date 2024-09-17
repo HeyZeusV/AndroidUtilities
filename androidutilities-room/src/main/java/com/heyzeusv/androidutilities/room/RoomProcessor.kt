@@ -12,6 +12,7 @@ import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.toTypeName
 
 class RoomProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
@@ -87,19 +88,38 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         }
         dbSymbol.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                buildRoomData(
-                    codeGenerator = environment.codeGenerator,
-                    dbClass = dbClass,
-                    classNameMap = classNameMap,
-                    logger = logger,
-                )
+                val dbPackageName = dbClass.packageName()
 
-                buildCsvConverter(
-                    codeGenerator = environment.codeGenerator,
-                    dbClass = dbClass,
-                    csvFileNames = csvFileNames,
-                    logger = logger,
+                val roomDataFileName = "RoomData"
+                val roomDataFileSpec = FileSpec.builder(dbPackageName, roomDataFileName)
+                val roomDataTypeSpec = TypeSpec.classBuilder(roomDataFileName).buildRoomData(
+                    classNameMap = classNameMap,
                 )
+                roomDataFileSpec.addType(roomDataTypeSpec.build())
+
+                environment.codeGenerator.createNewFile(
+                    dependencies = Dependencies(false, dbClass.containingFile!!),
+                    packageName = dbPackageName,
+                    fileName = roomDataFileName,
+                    extensionName = "kt",
+                ).bufferedWriter().use { roomDataFileSpec.build().writeTo(it) }
+
+                val roomDataClassName = ClassName(dbPackageName, roomDataFileName)
+                val csvConverterFileName = "CsvConverter"
+                val csvConverterFileSpec = FileSpec.builder(dbPackageName, csvConverterFileName)
+                val csvConverterTypeSpec = TypeSpec.classBuilder(csvConverterFileName)
+                    .buildCsvConverter(
+                        roomDataClassName = roomDataClassName,
+                        csvFileNames = csvFileNames,
+                    )
+                csvConverterFileSpec.addType(csvConverterTypeSpec.build())
+
+                environment.codeGenerator.createNewFile(
+                    dependencies = Dependencies(false, dbClass.containingFile!!),
+                    packageName = dbPackageName,
+                    fileName = csvConverterFileName,
+                    extensionName = "kt",
+                ).bufferedWriter().use { csvConverterFileSpec.build().writeTo(it) }
             }
         }
 
