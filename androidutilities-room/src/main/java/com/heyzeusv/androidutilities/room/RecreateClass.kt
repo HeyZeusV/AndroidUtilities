@@ -25,9 +25,9 @@ private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
 internal fun recreateEntityClass(
-    testList: MutableList<String>,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
+    csvFileNames: MutableList<String>,
     logger: KSPLogger,
 ): TypeSpec.Builder {
     val classBuilder = TypeSpec
@@ -42,7 +42,7 @@ internal fun recreateEntityClass(
         classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
             ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
             .ifBlank { classDeclaration.simpleName.getShortName() }
-    testList.add(tableName)
+    csvFileNames.add("$tableName.csv")
     classBuilder.recreateClass(
         constructorBuilder = constructorBuilder,
         classDeclaration = classDeclaration,

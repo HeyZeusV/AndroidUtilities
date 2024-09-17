@@ -20,7 +20,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val testList = mutableListOf<String>()
+        val csvFileNames = mutableListOf<String>()
         // get all symbols
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
@@ -62,9 +62,9 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 val fileSpecBuilder = FileSpec.builder(packageName, fileName)
 
                 val classBuilder = recreateEntityClass(
-                    testList,
                     tcInfoMap = tcInfoMap,
                     classDeclaration = classDeclaration,
+                    csvFileNames = csvFileNames,
                     logger = logger,
                 )
 
@@ -81,13 +81,13 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 }
             }
         }
-        if (testList.isNotEmpty()) {
+        if (csvFileNames.isNotEmpty()) {
             buildCsvConverter(
                 codeGenerator = environment.codeGenerator,
                 dbClass = dbSymbol.first() as KSClassDeclaration,
+                csvFileNames = csvFileNames,
                 logger = logger,
             )
-
         }
 
         // filter out symbols that are not valid

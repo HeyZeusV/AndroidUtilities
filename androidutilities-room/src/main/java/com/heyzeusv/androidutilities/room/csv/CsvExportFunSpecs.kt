@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val uriClassName = ClassName("android.net", "Uri")
+internal val uriClassName = ClassName("android.net", "Uri")
 private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
 private val csvDataListClassName = ClassName("kotlin.collections", "List")
     .parameterizedBy(CsvData::class.asTypeName())

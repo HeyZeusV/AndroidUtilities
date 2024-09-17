@@ -9,15 +9,21 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.buildCodeBlock
 
 internal const val CONTEXT_PROP = "context"
 internal val contextClassName = ClassName("android.content", "Context")
+private val stringListClass = ClassName("kotlin.collections", "List")
+    .parameterizedBy(String::class.asTypeName())
 
 internal fun buildCsvConverter(
     codeGenerator: CodeGenerator,
     dbClass: KSClassDeclaration,
+    csvFileNames: MutableList<String>,
     logger: KSPLogger,
 ) {
     val packageName = dbClass.containingFile?.packageName?.asString().orEmpty()
@@ -36,7 +42,22 @@ internal fun buildCsvConverter(
             .addModifiers(KModifier.PRIVATE)
             .build()
         )
+        .addProperty(PropertySpec.builder("csvFileNames", stringListClass)
+            .initializer(buildCodeBlock {
+                add("listOf(\n")
+                var count = 0
+                csvFileNames.forEach {
+                    count++
+                    add("%S", it)
+                    if (count < csvFileNames.size) add(", ")
+                }
+                add("\n)")
+            })
+            .addModifiers(KModifier.PRIVATE)
+            .build()
+        )
 
+    classBuilder.addFunction(importCsvToRoomFunSpec().build())
     classBuilder.addFunction(exportRoomToCsvFunSpec().build())
     classBuilder.addFunction(exportRoomEntityToCsvFunSpec().build())
     classBuilder.addFunction(createNewExportDirectoryFunSpec().build())
