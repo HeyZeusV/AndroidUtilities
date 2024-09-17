@@ -4,7 +4,9 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.csv.csvMapClassName
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -28,18 +30,32 @@ internal fun buildRoomData(
 
     val classBuild = TypeSpec.classBuilder(fileName).addModifiers(KModifier.DATA)
     val constructorBuilder = FunSpec.constructorBuilder()
+    val csvDataMapCodeBlock = CodeBlock.builder().add("mapOf(")
 
-    classNameMap.keys.forEach {
-        val parameterSpec = ParameterSpec.builder(it.getDataName(), it.getListClassName())
+    classNameMap.entries.forEachIndexed { index, entry ->
+        val keyDataName = entry.key.getDataName()
+        val keyParameterSpec = ParameterSpec.builder(keyDataName, entry.key.getListClassName())
             .defaultValue("emptyList()")
-        constructorBuilder.addParameter(parameterSpec.build())
-        val propertySpec = PropertySpec
-            .builder(it.getDataName(), it.getListClassName())
-            .initializer(it.getDataName())
-        classBuild.addProperty(propertySpec.build())
+        constructorBuilder.addParameter(keyParameterSpec.build())
+        val keyPropertySpec = PropertySpec.builder(keyDataName, entry.key.getListClassName())
+            .initializer(keyDataName)
+        classBuild.addProperty(keyPropertySpec.build())
+
+        val valuePropertySpec = PropertySpec
+            .builder(entry.value.getDataName(), entry.value.getListClassName())
+            .initializer("%L.map { %L.toUtil(it) }", keyDataName, entry.value.simpleName)
+        classBuild.addProperty(valuePropertySpec.build())
+
+        csvDataMapCodeBlock.add("\n${entry.value.simpleName} to ${entry.value.getDataName()}")
+        if (index != classNameMap.size) csvDataMapCodeBlock.add(",")
     }
 
+    csvDataMapCodeBlock.add("\n)")
+    val csvDataMapPropertySpec = PropertySpec.builder("csvDataMap", csvMapClassName)
+        .initializer(csvDataMapCodeBlock.build())
+
     classBuild.primaryConstructor(constructorBuilder.build())
+        .addProperty(csvDataMapPropertySpec.build())
     fileSpecBuilder.addType(classBuild.build())
 
     codeGenerator.createNewFile(

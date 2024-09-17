@@ -14,14 +14,14 @@ import java.util.Locale
 
 internal val uriClassName = ClassName("android.net", "Uri")
 private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
-private val csvDataListClassName = ClassName("kotlin.collections", "List")
+internal val csvDataListClassName = ClassName("kotlin.collections", "List")
     .parameterizedBy(CsvData::class.asTypeName())
+internal val csvMapClassName = ClassName("kotlin.collections", "Map")
+    .parameterizedBy(CsvInfo::class.asTypeName(), csvDataListClassName)
 
 internal fun exportRoomToCsvFunSpec(): FunSpec.Builder {
     val parentDirectoryUri = "parentDirectoryUri"
     val dataMap = "dataMap"
-    val csvMapClassName = ClassName("kotlin.collections", "Map")
-        .parameterizedBy(CsvInfo::class.asTypeName(), csvDataListClassName)
     val funSpec = FunSpec.builder("exportRoomToCsv")
         .addParameter(parentDirectoryUri, uriClassName)
         .addParameter(dataMap, csvMapClassName)
