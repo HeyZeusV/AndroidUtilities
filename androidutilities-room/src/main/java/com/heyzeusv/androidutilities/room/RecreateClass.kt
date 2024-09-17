@@ -76,20 +76,7 @@ internal fun recreateEntityClass(
             add(")")
         })
 
-    val propertyToFieldNameSpec = PropertySpec.builder(::fieldToTypeMap.name, stringMapClass)
-        .initializer(buildCodeBlock {
-            add("mapOf(\n")
-            var count = 0
-            fieldToTypeMap.forEach { (field, type) ->
-                count++
-                add("%S to %S", field, type)
-                if (count < fieldToTypeMap.size) add(",\n")
-            }
-            add("\n)")
-        })
-        .build()
     classBuilder.addProperty(tableNamePropertySpec)
-    classBuilder.addProperty(propertyToFieldNameSpec)
     classBuilder.addCsvProperties(companionTypeSpec, tableName)
     fieldToTypeMap.clear()
     propertyInfoList.clear()
@@ -276,6 +263,21 @@ private fun TypeSpec.Builder.addCsvProperties(
             add("\n)")
         })
         .build()
+    val fieldToTypeMapPropSpec = PropertySpec.builder("csvFieldToTypeMap", stringMapClass)
+        .addModifiers(KModifier.OVERRIDE)
+        .initializer(buildCodeBlock {
+            add("mapOf(\n")
+            var count = 0
+            fieldToTypeMap.forEach { (field, type) ->
+                count++
+                add("%S to %S", field, type)
+                if (count < fieldToTypeMap.size) add(",\n")
+            }
+            add("\n)")
+        })
+        .build()
     addProperty(csvRow)
-    companionTypeSpec.addProperty(fileNamePropSpec).addProperty(headerPropSpec)
+    companionTypeSpec.addProperty(fileNamePropSpec)
+        .addProperty(headerPropSpec)
+        .addProperty(fieldToTypeMapPropSpec)
 }
