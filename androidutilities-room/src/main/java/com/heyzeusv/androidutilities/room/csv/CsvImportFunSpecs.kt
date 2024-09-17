@@ -1,5 +1,7 @@
 package com.heyzeusv.androidutilities.room.csv
 
+import com.heyzeusv.androidutilities.room.EntityData
+import com.heyzeusv.androidutilities.room.addIndented
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
@@ -36,7 +38,9 @@ internal fun importCsvToRoomFunSpec(roomDataClassName: ClassName): FunSpec.Build
     return funSpec
 }
 
-internal fun importCsvToRoomEntityFunSpec(): FunSpec.Builder {
+internal fun importCsvToRoomEntityFunSpec(
+    entityDataList: List<EntityData>,
+): FunSpec.Builder {
     val csvFile = "csvFile"
     val csvReaderMemberName = MemberName("com.github.doyaaaaaken.kotlincsv.dsl", "csvReader")
 
@@ -51,7 +55,8 @@ internal fun importCsvToRoomEntityFunSpec(): FunSpec.Builder {
                   
             """.trimIndent())
             addStatement("val content = %M().readAll(inputStream)", csvReaderMemberName)
-            add("""
+            addIndented {
+                add("""
                   if (content.size == 1) {
                     return emptyList()
                   }
@@ -60,8 +65,32 @@ internal fun importCsvToRoomEntityFunSpec(): FunSpec.Builder {
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
                   when (header) {
-                  }
                   
+            """.trimIndent())
+                entityDataList.forEach { entityData ->
+                    add("""
+                        %T.csvHeader -> {
+                          rows.forEach {
+                            val entry = %T(
+                            
+                        """.trimIndent(), entityData.utilClassName, entityData.utilClassName)
+                    addIndented {
+                        addIndented {
+                            entityData.fieldToTypeMap.entries.forEachIndexed { index, entry ->
+                                add("  %L = it[%L],\n", entry.key, index)
+                            }
+                        }
+                    }
+                    add("""
+                        )
+                      }
+                    }
+                  
+                """.trimIndent())
+                }
+            }
+            add("""
+                }
                   return entityData
                 } catch (e: Exception) {
                   return emptyList() // invalid data, wrong type data

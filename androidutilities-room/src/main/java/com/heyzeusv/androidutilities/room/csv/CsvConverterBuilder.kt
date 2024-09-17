@@ -1,5 +1,6 @@
 package com.heyzeusv.androidutilities.room.csv
 
+import com.heyzeusv.androidutilities.room.EntityData
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -16,7 +17,7 @@ private val stringListClass = ClassName("kotlin.collections", "List")
 
 internal fun TypeSpec.Builder.buildCsvConverter(
     roomDataClassName: ClassName,
-    csvInfoMap: MutableMap<String, MutableMap<String, String>>,
+    entityDataList: List<EntityData>,
 ): TypeSpec.Builder {
     primaryConstructor(
         FunSpec.constructorBuilder()
@@ -33,9 +34,10 @@ internal fun TypeSpec.Builder.buildCsvConverter(
         PropertySpec.builder("csvFileNames", stringListClass)
             .initializer(buildCodeBlock {
                 add("listOf(\n")
-                csvInfoMap.keys.forEachIndexed { index, key ->
-                    add("%S", key)
-                    if (index < csvInfoMap.keys.size) add(", ")
+                val tableNames = entityDataList.map { it.tableName }
+                tableNames.forEachIndexed { index, tableName ->
+                    add("%S", "$tableName.csv")
+                    if (index < tableNames.size) add(", ")
                 }
                 add("\n)")
             })
@@ -44,7 +46,7 @@ internal fun TypeSpec.Builder.buildCsvConverter(
     )
 
     addFunction(importCsvToRoomFunSpec(roomDataClassName).build())
-    addFunction(importCsvToRoomEntityFunSpec().build())
+    addFunction(importCsvToRoomEntityFunSpec(entityDataList).build())
     addFunction(exportRoomToCsvFunSpec(roomDataClassName).build())
     addFunction(exportRoomEntityToCsvFunSpec().build())
     addFunction(createNewExportDirectoryFunSpec().build())

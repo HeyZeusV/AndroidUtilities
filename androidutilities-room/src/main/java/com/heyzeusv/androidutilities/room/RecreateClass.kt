@@ -19,17 +19,18 @@ import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 
-private val propertyInfoList = mutableListOf<PropertyInfo>()
-private val fieldToTypeMap = mutableMapOf<String, String>()
 private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
 internal fun recreateEntityClass(
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
-    csvInfoMap: MutableMap<String, MutableMap<String, String>>,
+    entityDataList: MutableList<EntityData>,
     logger: KSPLogger,
 ): TypeSpec.Builder {
+    val fieldToTypeMap = mutableMapOf<String, String>()
+    val propertyInfoList = mutableListOf<PropertyInfo>()
+
     val classBuilder = TypeSpec
         .classBuilder(classDeclaration.utilName())
         .addModifiers(KModifier.DATA)
@@ -42,15 +43,22 @@ internal fun recreateEntityClass(
         classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
             ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
             .ifBlank { classDeclaration.simpleName.getShortName() }
-    csvInfoMap["$tableName.csv"] = mutableMapOf()
     classBuilder.recreateClass(
         constructorBuilder = constructorBuilder,
         classDeclaration = classDeclaration,
         logger = logger,
         tcInfoMap = tcInfoMap,
-        csvFieldToTypeMap = csvInfoMap["$tableName.csv"]!!
+        fieldToTypeMap = fieldToTypeMap,
+        propertyInfoList = propertyInfoList,
     )
     propertyInfoList.removeLast()
+
+    val entityData = EntityData(
+        utilClassName = ClassName(classDeclaration.packageName(), classDeclaration.utilName()),
+        tableName = tableName,
+        fieldToTypeMap = fieldToTypeMap,
+    )
+    entityDataList.add(entityData)
 
     val tableNamePropertySpec = PropertySpec.builder("tableName", String::class)
         .initializer("%S", tableName)
@@ -78,8 +86,7 @@ internal fun recreateEntityClass(
         })
 
     classBuilder.addProperty(tableNamePropertySpec)
-    classBuilder.addCsvProperties(companionTypeSpec, tableName)
-    fieldToTypeMap.clear()
+    classBuilder.addCsvProperties(companionTypeSpec, tableName, fieldToTypeMap)
     propertyInfoList.clear()
 
     classBuilder.addFunction(toOriginalFun.build())
@@ -93,7 +100,8 @@ private fun TypeSpec.Builder.recreateClass(
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
-    csvFieldToTypeMap: MutableMap<String, String>,
+    fieldToTypeMap: MutableMap<String, String>,
+    propertyInfoList: MutableList<PropertyInfo>,
     embeddedPrefix: String = "",
 ): TypeSpec.Builder {
     classDeclaration.getAllProperties().forEach { prop ->
@@ -117,7 +125,8 @@ private fun TypeSpec.Builder.recreateClass(
                     logger = logger,
                     tcInfoMap = tcInfoMap,
                     embeddedPrefix = "$embeddedPrefix$newPrefix",
-                    csvFieldToTypeMap = csvFieldToTypeMap,
+                    fieldToTypeMap = fieldToTypeMap,
+                    propertyInfoList = propertyInfoList
                 )
             } else {
                 val startType: TypeName = prop.type.toTypeName()
@@ -150,7 +159,6 @@ private fun TypeSpec.Builder.recreateClass(
                 )
                 propertyInfoList.add(fieldInfo)
                 fieldToTypeMap[fieldName] = endType.toString().removePrefix("kotlin.")
-                csvFieldToTypeMap[fieldName] = endType.toString().removePrefix("kotlin.")
             }
         }
     }
@@ -238,6 +246,7 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
 private fun TypeSpec.Builder.addCsvProperties(
     companionTypeSpec: TypeSpec.Builder,
     tableName: String,
+    fieldToTypeMap: MutableMap<String, String>,
 ) {
     val fileNamePropSpec = PropertySpec.builder("csvFileName", String::class)
         .addModifiers(KModifier.OVERRIDE)

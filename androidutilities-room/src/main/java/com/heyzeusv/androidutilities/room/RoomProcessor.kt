@@ -23,7 +23,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val csvInfoMap: MutableMap<String, MutableMap<String, String>> = mutableMapOf()
+        val entityDataList = mutableListOf<EntityData>()
         // get all symbols
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
             .plus(resolver.getSymbolsWithAnnotation("androidx.room.ColumnInfo"))
@@ -69,9 +69,10 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 val classBuilder = recreateEntityClass(
                     tcInfoMap = tcInfoMap,
                     classDeclaration = classDeclaration,
-                    csvInfoMap = csvInfoMap,
+                    entityDataList = entityDataList,
                     logger = logger,
                 )
+                logger.info("class data $entityDataList")
 
                 fileSpecBuilder.addType(classBuilder.build())
 
@@ -104,13 +105,14 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     extensionName = "kt",
                 ).bufferedWriter().use { roomDataFileSpec.build().writeTo(it) }
 
+                logger.info("datList $entityDataList")
                 val roomDataClassName = ClassName(dbPackageName, roomDataFileName)
                 val csvConverterFileName = "CsvConverter"
                 val csvConverterFileSpec = FileSpec.builder(dbPackageName, csvConverterFileName)
                 val csvConverterTypeSpec = TypeSpec.classBuilder(csvConverterFileName)
                     .buildCsvConverter(
                         roomDataClassName = roomDataClassName,
-                        csvInfoMap = csvInfoMap,
+                        entityDataList = entityDataList,
                     )
                 csvConverterFileSpec.addType(csvConverterTypeSpec.build())
 
