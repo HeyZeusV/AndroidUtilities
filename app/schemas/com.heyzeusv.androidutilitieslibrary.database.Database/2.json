@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "739abb9ef7c1cb998e73435f5d0bd58f",
+    "identityHash": "2b969453ecac407531794cba1a411c20",
     "entities": [
       {
-        "tableName": "custom_default_item_table_name",
+        "tableName": "a_default_item_table_name",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER, `outerEmbed_test3` INTEGER, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, `outerEmbed_innerEmbed_nullBoolean` INTEGER, `outerEmbed_innerEmbed_nullShort` INTEGER, `outerEmbed_innerEmbed_nullInt` INTEGER, `outerEmbed_innerEmbed_nullLong` INTEGER, `outerEmbed_innerEmbed_nullByte` INTEGER, `outerEmbed_innerEmbed_nullString` TEXT, `outerEmbed_innerEmbed_nullChar` INTEGER, `outerEmbed_innerEmbed_nullDouble` REAL, `outerEmbed_innerEmbed_nullFloat` REAL, `outerEmbed_innerEmbed_nullByteArray` BLOB, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
@@ -183,7 +183,7 @@
         "ftsOptions": {
           "tokenizer": "simple",
           "tokenizerArgs": [],
-          "contentTable": "custom_default_item_table_name",
+          "contentTable": "a_default_item_table_name",
           "languageIdColumnName": "",
           "matchInfo": "FTS4",
           "notIndexedColumns": [],
@@ -191,13 +191,13 @@
           "preferredOrder": "ASC"
         },
         "contentSyncTriggers": [
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_UPDATE BEFORE UPDATE ON `custom_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_DELETE BEFORE DELETE ON `custom_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_UPDATE AFTER UPDATE ON `custom_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END",
-          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_INSERT AFTER INSERT ON `custom_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END"
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_UPDATE BEFORE UPDATE ON `a_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_DELETE BEFORE DELETE ON `a_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_UPDATE AFTER UPDATE ON `a_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_INSERT AFTER INSERT ON `a_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END"
         ],
         "tableName": "DefaultItemFts",
-        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`name` TEXT NOT NULL, `category` TEXT NOT NULL, content=`custom_default_item_table_name`)",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`name` TEXT NOT NULL, `category` TEXT NOT NULL, content=`a_default_item_table_name`)",
         "fields": [
           {
             "fieldPath": "name",
@@ -395,7 +395,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '739abb9ef7c1cb998e73435f5d0bd58f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b969453ecac407531794cba1a411c20')"
     ]
   }
 }

@@ -9,7 +9,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "custom_default_item_table_name",
+    tableName = "a_default_item_table_name",
     foreignKeys = [ForeignKey(
         entity = Category::class,
         parentColumns = ["name"],

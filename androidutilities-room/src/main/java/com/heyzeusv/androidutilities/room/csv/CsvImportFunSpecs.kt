@@ -2,15 +2,24 @@ package com.heyzeusv.androidutilities.room.csv
 
 import com.heyzeusv.androidutilities.room.EntityData
 import com.heyzeusv.androidutilities.room.addIndented
+import com.heyzeusv.androidutilities.room.getDataName
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.buildCodeBlock
 
-internal fun importCsvToRoomFunSpec(roomDataClassName: ClassName): FunSpec.Builder {
+internal fun importCsvToRoomFunSpec(
+    roomDataClassName: ClassName,
+    entityDataList: List<EntityData>,
+): FunSpec.Builder {
     val selectedDirectoryUri = "selectedDirectoryUri"
 
     val funSpec = FunSpec.builder("importCsvToRoom")
+        .addAnnotation(AnnotationSpec.builder(Suppress::class)
+            .addMember("%S", "UNCHECKED_CAST")
+            .build()
+        )
         .addParameter(selectedDirectoryUri, uriClassName)
         .returns(roomDataClassName.copy(nullable = true))
         .addCode(buildCodeBlock {
@@ -30,10 +39,26 @@ internal fun importCsvToRoomFunSpec(roomDataClassName: ClassName): FunSpec.Build
                     csvDocumentFiles.add(file)
                   }
                 }
-                return null
+                
             """.trimIndent())
+            entityDataList.forEachIndexed { i, entityData ->
+                val utilName = entityData.utilClassName.getDataName()
+                addStatement("")
+                addStatement("val %L = importCsvToRoomEntity(csvDocumentFiles[%L])", utilName, i)
+                addStatement("if (%L == null) return null // error importing data", utilName)
+            }
+            addStatement("")
+            addStatement("return RoomData(")
+            entityDataList.forEach { data ->
+                val utilName = data.utilClassName.getDataName()
+                val dataName = utilName.replace("RoomUtil", "")
+                addStatement(
+                    format = "  %L = (%L as List<%L>).map { it.toOriginal() },",
+                    args = arrayOf(dataName, utilName, data.utilClassName.simpleName),
+                )
+            }
+            addStatement(")")
         })
-
 
     return funSpec
 }
@@ -46,11 +71,11 @@ internal fun importCsvToRoomEntityFunSpec(
 
     val funSpec = FunSpec.builder("importCsvToRoomEntity")
         .addParameter(csvFile, documentFileClassName)
-        .returns(csvDataListClassName)
+        .returns(csvDataListClassName.copy(nullable = true))
         .addCode(buildCodeBlock {
             add("""
                 val inputStream = context.contentResolver.openInputStream($csvFile.uri)
-                  ?: return emptyList() // corrupt file
+                  ?: return null // corrupt file
                 try {
                   
             """.trimIndent())
@@ -97,7 +122,7 @@ internal fun importCsvToRoomEntityFunSpec(
                   }
                   return entityData
                 } catch (e: Exception) {
-                  return emptyList() // invalid data, wrong type data
+                  return null // invalid data, wrong type data
                 }
             """.trimIndent())
         })
