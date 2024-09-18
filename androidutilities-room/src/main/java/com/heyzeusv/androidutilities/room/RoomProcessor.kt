@@ -69,7 +69,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 // use KotlinPoet for code generation
                 val fileSpecBuilder = FileSpec.builder(packageName, fileName)
 
-                val classBuilder = recreateEntityClass(
+                val classBuilder = buildEntityClass(
                     tcInfoMap = tcInfoMap,
                     classDeclaration = classDeclaration,
                     entityDataList = entityDataList,

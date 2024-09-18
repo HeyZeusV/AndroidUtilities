@@ -22,7 +22,7 @@ import com.squareup.kotlinpoet.ksp.toTypeName
 private val stringMapClass = ClassName("kotlin.collections", "Map")
     .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
 
-internal fun recreateEntityClass(
+internal fun buildEntityClass(
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
     entityDataList: MutableList<EntityData>,
@@ -43,7 +43,7 @@ internal fun recreateEntityClass(
         classDeclaration.annotations.find { it.shortName.getShortName() == "Entity" }
             ?.arguments?.find { it.name?.getShortName() == "tableName" }?.value.toString()
             .ifBlank { classDeclaration.simpleName.getShortName() }
-    classBuilder.recreateClass(
+    classBuilder.buildEntityClass(
         constructorBuilder = constructorBuilder,
         classDeclaration = classDeclaration,
         logger = logger,
@@ -95,7 +95,7 @@ internal fun recreateEntityClass(
     return classBuilder.primaryConstructor(constructorBuilder.build())
 }
 
-private fun TypeSpec.Builder.recreateClass(
+private fun TypeSpec.Builder.buildEntityClass(
     constructorBuilder: FunSpec.Builder,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
@@ -119,7 +119,7 @@ private fun TypeSpec.Builder.recreateClass(
                     embeddedClass = embeddedClass,
                 )
                 propertyInfoList.add(embeddedInfo)
-                this.recreateClass(
+                this.buildEntityClass(
                     constructorBuilder = constructorBuilder,
                     classDeclaration = embeddedClass,
                     logger = logger,
