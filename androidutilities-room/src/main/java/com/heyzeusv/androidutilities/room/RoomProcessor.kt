@@ -1,7 +1,6 @@
 package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.Dependencies
-import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
@@ -11,7 +10,6 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
 import com.heyzeusv.androidutilities.room.util.addOriginalAndUtil
-import com.heyzeusv.androidutilities.room.util.containsNullableType
 import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.heyzeusv.androidutilities.room.util.getUtilName
 import com.squareup.kotlinpoet.ClassName
@@ -25,12 +23,13 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         val entityDataList = mutableListOf<EntityData>()
 
         // get all symbols
-        val tpSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
+        val tcSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
         val dbSymbol = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        val tcInfoMap = createTypeConverterInfoMap(logger, tpSymbols)
-        logger.info("tcInfoMap $tcInfoMap")
+        logger.info("Creating list of TypeConverterInfo...")
+        val typeConverterInfoList = createTypeConverterInfoList(tcSymbols)
+        logger.info("List of TypeConvertInfo: $typeConverterInfoList")
 
         val classNameMap = mutableMapOf<ClassName, ClassName>()
         // filter out symbols that are not classes
@@ -49,7 +48,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 val fileSpecBuilder = FileSpec.builder(packageName, fileName)
 
                 val classBuilder = buildEntityClass(
-                    tcInfoMap = tcInfoMap,
+                    typeConverterInfoList = typeConverterInfoList,
                     classDeclaration = classDeclaration,
                     entityDataList = entityDataList,
                     logger = logger,
@@ -110,29 +109,22 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
     }
 }
 
-private fun createTypeConverterInfoMap(
-    logger: KSPLogger,
-    symbols: Sequence<KSAnnotated>,
-): Map<TypeConverterTypes, List<TypeConverterInfo>> {
-    val toAcceptedList = mutableListOf<TypeConverterInfo>()
-    val toComplexList = mutableListOf<TypeConverterInfo>()
+/**
+ *  Returns a list of [TypeConverterInfo] created from given [symbols] which have been annotated
+ *  with Room.TypeConverter.
+ *
+ *  @param symbols Sequence of functions annotated with Room.TypeConverter.
+ *  @return List of [TypeConverterInfo].
+ */
+private fun createTypeConverterInfoList(symbols: Sequence<KSAnnotated>): List<TypeConverterInfo> {
+    val typeConverterInfoList = mutableListOf<TypeConverterInfo>()
 
-    logger.info("Creating map of TypeConverters split by return types compatible with " +
-            "Room and return types that require a TypeConverter.")
     symbols.filterIsInstance<KSFunctionDeclaration>().forEach { symbol ->
         (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
             val tcInfo = TypeConverterInfo.fromFunctionDeclaration(functionDeclaration)
-
-            if (TypeConverterTypes.TO_ACCEPTED.types.containsNullableType(tcInfo.returnType)) {
-                toAcceptedList.add(tcInfo)
-            } else {
-                toComplexList.add(tcInfo)
-            }
+            typeConverterInfoList.add(tcInfo)
         }
     }
 
-    return mapOf(
-        TypeConverterTypes.TO_ACCEPTED to toAcceptedList,
-        TypeConverterTypes.TO_COMPLEX to toComplexList,
-    )
+    return typeConverterInfoList
 }
