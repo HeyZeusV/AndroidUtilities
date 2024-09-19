@@ -1,16 +1,15 @@
 package com.heyzeusv.androidutilities.room
 
 import com.heyzeusv.androidutilities.room.csv.csvMapClassName
+import com.heyzeusv.androidutilities.room.util.getDataName
+import com.heyzeusv.androidutilities.room.util.getListTypeName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import java.util.Locale
 
 internal fun TypeSpec.Builder.buildRoomData(
     classNameMap: MutableMap<ClassName, ClassName>,
@@ -22,15 +21,15 @@ internal fun TypeSpec.Builder.buildRoomData(
 
     classNameMap.entries.forEachIndexed { index, entry ->
         val keyDataName = entry.key.getDataName()
-        val keyParameterSpec = ParameterSpec.builder(keyDataName, entry.key.getListClassName())
+        val keyParameterSpec = ParameterSpec.builder(keyDataName, entry.key.getListTypeName())
             .defaultValue("emptyList()")
         constructorBuilder.addParameter(keyParameterSpec.build())
-        val keyPropertySpec = PropertySpec.builder(keyDataName, entry.key.getListClassName())
+        val keyPropertySpec = PropertySpec.builder(keyDataName, entry.key.getListTypeName())
             .initializer(keyDataName)
         addProperty(keyPropertySpec.build())
 
         val valuePropertySpec = PropertySpec
-            .builder(entry.value.getDataName(), entry.value.getListClassName())
+            .builder(entry.value.getDataName(), entry.value.getListTypeName())
             .initializer("%L.map { %L.toUtil(it) }", keyDataName, entry.value.simpleName)
         addProperty(valuePropertySpec.build())
 
@@ -47,11 +46,3 @@ internal fun TypeSpec.Builder.buildRoomData(
 
     return this
 }
-
-fun ClassName.getDataName(): String {
-    val lowercase = simpleName.replaceFirstChar { it.lowercase(Locale.getDefault()) }
-    return "${lowercase}Data"
-}
-
-fun ClassName.getListClassName(): ParameterizedTypeName = ClassName("kotlin.collections", "List")
-    .parameterizedBy(this)

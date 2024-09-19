@@ -1,6 +1,6 @@
 package com.heyzeusv.androidutilities.room.csv
 
-import com.heyzeusv.androidutilities.room.addIndented
+import com.heyzeusv.androidutilities.room.util.addIndented
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier

@@ -1,10 +1,10 @@
 package com.heyzeusv.androidutilities.room.csv
 
 import com.heyzeusv.androidutilities.room.EntityData
+import com.heyzeusv.androidutilities.room.util.getListTypeName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
@@ -12,8 +12,7 @@ import com.squareup.kotlinpoet.buildCodeBlock
 
 internal const val CONTEXT_PROP = "context"
 internal val contextClassName = ClassName("android.content", "Context")
-private val stringListClass = ClassName("kotlin.collections", "List")
-    .parameterizedBy(String::class.asTypeName())
+private val stringListClass = String::class.asTypeName().getListTypeName()
 
 internal fun TypeSpec.Builder.buildCsvConverter(
     roomDataClassName: ClassName,

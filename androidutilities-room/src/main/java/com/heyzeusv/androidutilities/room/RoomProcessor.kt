@@ -9,8 +9,11 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
+import com.heyzeusv.androidutilities.room.util.addOriginalAndUtil
+import com.heyzeusv.androidutilities.room.util.containsNullableType
+import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.heyzeusv.androidutilities.room.util.getUtilName
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.toTypeName
@@ -61,7 +64,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     return@forEach
                 }
                 val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
-                val fileName = classDeclaration.utilName()
+                val fileName = classDeclaration.getUtilName()
                 classNameMap.addOriginalAndUtil(classDeclaration)
 
                 logger.info("class name: $fileName")
@@ -75,7 +78,6 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     entityDataList = entityDataList,
                     logger = logger,
                 )
-                logger.info("class data $entityDataList")
 
                 fileSpecBuilder.addType(classBuilder.build())
 
@@ -92,13 +94,12 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         }
         dbSymbol.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                val dbPackageName = dbClass.packageName()
+                val dbPackageName = dbClass.getPackageName()
 
                 val roomDataFileName = "RoomData"
                 val roomDataFileSpec = FileSpec.builder(dbPackageName, roomDataFileName)
-                val roomDataTypeSpec = TypeSpec.classBuilder(roomDataFileName).buildRoomData(
-                    classNameMap = classNameMap,
-                )
+                val roomDataTypeSpec = TypeSpec.classBuilder(roomDataFileName)
+                    .buildRoomData(classNameMap = classNameMap)
                 roomDataFileSpec.addType(roomDataTypeSpec.build())
 
                 environment.codeGenerator.createNewFile(
@@ -108,7 +109,6 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     extensionName = "kt",
                 ).bufferedWriter().use { roomDataFileSpec.build().writeTo(it) }
 
-                logger.info("datList $entityDataList")
                 val roomDataClassName = ClassName(dbPackageName, roomDataFileName)
                 val csvConverterFileName = "CsvConverter"
                 val csvConverterFileSpec = FileSpec.builder(dbPackageName, csvConverterFileName)
@@ -132,21 +132,4 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         val ret = symbols.filterNot { it.validate() }.toList()
         return ret
     }
-}
-
-
-fun KSClassDeclaration.className(): String = simpleName.getShortName()
-fun KSClassDeclaration.utilName(): String = "${className()}RoomUtil"
-fun KSClassDeclaration.packageName(): String = containingFile?.packageName?.asString().orEmpty()
-fun CodeBlock.Builder.addIndented(code: CodeBlock.Builder.() -> Unit): CodeBlock.Builder = apply {
-    indent()
-    code()
-    unindent()
-}
-
-fun MutableMap<ClassName, ClassName>.addOriginalAndUtil(classDeclaration: KSClassDeclaration) {
-    val packageName = classDeclaration.packageName()
-    val className = classDeclaration.className()
-    val utilName = classDeclaration.utilName()
-    this[ClassName(packageName, className)] = ClassName(packageName, utilName)
 }

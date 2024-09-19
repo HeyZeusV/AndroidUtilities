@@ -6,6 +6,10 @@ import com.heyzeusv.androidutilities.room.RoomTypes.TO_ACCEPTED
 import com.heyzeusv.androidutilities.room.RoomTypes.TO_COMPLEX
 import com.heyzeusv.androidutilities.room.csv.CsvData
 import com.heyzeusv.androidutilities.room.csv.CsvInfo
+import com.heyzeusv.androidutilities.room.util.containsNullableType
+import com.heyzeusv.androidutilities.room.util.equalsNullableType
+import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.heyzeusv.androidutilities.room.util.getUtilName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
@@ -19,9 +23,6 @@ import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 
-private val stringMapClass = ClassName("kotlin.collections", "Map")
-    .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
-
 internal fun buildEntityClass(
     tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
@@ -32,7 +33,7 @@ internal fun buildEntityClass(
     val propertyInfoList = mutableListOf<PropertyInfo>()
 
     val classBuilder = TypeSpec
-        .classBuilder(classDeclaration.utilName())
+        .classBuilder(classDeclaration.getUtilName())
         .addModifiers(KModifier.DATA)
         .addSuperinterface(CsvData::class)
     val constructorBuilder = FunSpec.constructorBuilder()
@@ -54,7 +55,7 @@ internal fun buildEntityClass(
     propertyInfoList.removeLast()
 
     val entityData = EntityData(
-        utilClassName = ClassName(classDeclaration.packageName(), classDeclaration.utilName()),
+        utilClassName = ClassName(classDeclaration.getPackageName(), classDeclaration.getUtilName()),
         tableName = tableName,
         fieldToTypeMap = fieldToTypeMap,
     )
@@ -74,10 +75,10 @@ internal fun buildEntityClass(
             add(")")
         })
     val toUtilFun = FunSpec.builder("toUtil")
-        .returns(ClassName(classDeclaration.packageName.asString(), classDeclaration.utilName()))
+        .returns(ClassName(classDeclaration.packageName.asString(), classDeclaration.getUtilName()))
         .addParameter("entity", classDeclaration.toClassName())
         .addCode(buildCodeBlock {
-            add("return ${classDeclaration.utilName()}(\n")
+            add("return ${classDeclaration.getUtilName()}(\n")
             indent()
             val infoIterator = propertyInfoList.iterator()
             handlePropertyInfoToUtil(infoIterator, tcInfoMap, logger)
@@ -276,6 +277,8 @@ private fun TypeSpec.Builder.addCsvProperties(
             add("\n)")
         })
         .build()
+    val stringMapClass = ClassName("kotlin.collections", "Map")
+        .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
     val fieldToTypeMapPropSpec = PropertySpec.builder("csvFieldToTypeMap", stringMapClass)
         .addModifiers(KModifier.OVERRIDE)
         .initializer(buildCodeBlock {

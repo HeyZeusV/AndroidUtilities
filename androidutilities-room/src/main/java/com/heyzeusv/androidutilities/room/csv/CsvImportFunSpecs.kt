@@ -1,8 +1,8 @@
 package com.heyzeusv.androidutilities.room.csv
 
 import com.heyzeusv.androidutilities.room.EntityData
-import com.heyzeusv.androidutilities.room.addIndented
-import com.heyzeusv.androidutilities.room.getDataName
+import com.heyzeusv.androidutilities.room.util.addIndented
+import com.heyzeusv.androidutilities.room.util.getDataName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
