@@ -1,10 +1,10 @@
 package com.heyzeusv.androidutilities.room
 
+import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
@@ -17,8 +17,10 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 
-class RoomProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
-    private val logger = environment.logger
+class RoomProcessor(
+    private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
+) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val entityDataList = mutableListOf<EntityData>()
@@ -56,7 +58,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 fileSpecBuilder.addType(classBuilder.build())
 
                 // writing the file
-                environment.codeGenerator.createNewFile(
+                codeGenerator.createNewFile(
                     dependencies = Dependencies(false, symbol.containingFile!!),
                     packageName = packageName,
                     fileName = fileName,
@@ -76,7 +78,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     .buildRoomData(classNameMap = classNameMap)
                 roomDataFileSpec.addType(roomDataTypeSpec.build())
 
-                environment.codeGenerator.createNewFile(
+                codeGenerator.createNewFile(
                     dependencies = Dependencies(false, dbClass.containingFile!!),
                     packageName = dbPackageName,
                     fileName = roomDataFileName,
@@ -93,7 +95,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                     )
                 csvConverterFileSpec.addType(csvConverterTypeSpec.build())
 
-                environment.codeGenerator.createNewFile(
+                codeGenerator.createNewFile(
                     dependencies = Dependencies(false, dbClass.containingFile!!),
                     packageName = dbPackageName,
                     fileName = csvConverterFileName,
