@@ -2,8 +2,8 @@ package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.heyzeusv.androidutilities.room.RoomTypes.TO_ACCEPTED
-import com.heyzeusv.androidutilities.room.RoomTypes.TO_COMPLEX
+import com.heyzeusv.androidutilities.room.TypeConverterTypes.TO_ACCEPTED
+import com.heyzeusv.androidutilities.room.TypeConverterTypes.TO_COMPLEX
 import com.heyzeusv.androidutilities.room.csv.CsvData
 import com.heyzeusv.androidutilities.room.csv.CsvInfo
 import com.heyzeusv.androidutilities.room.util.containsNullableType
@@ -24,7 +24,7 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 
 internal fun buildEntityClass(
-    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    tcInfoMap: Map<TypeConverterTypes, List<TypeConverterInfo>>,
     classDeclaration: KSClassDeclaration,
     entityDataList: MutableList<EntityData>,
     logger: KSPLogger,
@@ -100,7 +100,7 @@ private fun TypeSpec.Builder.buildEntityClass(
     constructorBuilder: FunSpec.Builder,
     classDeclaration: KSClassDeclaration,
     logger: KSPLogger,
-    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    tcInfoMap: Map<TypeConverterTypes, List<TypeConverterInfo>>,
     fieldToTypeMap: MutableMap<String, String>,
     propertyInfoList: MutableList<PropertyInfo>,
     embeddedPrefix: String = "",
@@ -170,7 +170,7 @@ private fun TypeSpec.Builder.buildEntityClass(
 
 private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
     iterator: MutableIterator<PropertyInfo>,
-    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    tcInfoMap: Map<TypeConverterTypes, List<TypeConverterInfo>>,
     logger: KSPLogger,
 ) {
     if (!iterator.hasNext()) return
@@ -182,7 +182,7 @@ private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
                 logger.info("start ${info.startType}, end ${info.endType}")
                 val tcInfo = tcInfoMap[TO_COMPLEX]!!
                     .find { it.parameterType == info.endType && it.returnType == info.startType }!!
-                val tcClass = ClassName(tcInfo.packageName, tcInfo.parentClass)
+                val tcClass = ClassName(tcInfo.packageName, tcInfo.className)
                 add("%L = %T().%L(%L),\n", info.name, tcClass, tcInfo.functionName, info.fieldName)
             }
         }
@@ -201,7 +201,7 @@ private fun CodeBlock.Builder.handlePropertyInfoToOriginal(
 
 private fun CodeBlock.Builder.handlePropertyInfoToUtil(
     iterator: MutableIterator<PropertyInfo>,
-    tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>>,
+    tcInfoMap: Map<TypeConverterTypes, List<TypeConverterInfo>>,
     logger: KSPLogger,
     embeddedPrefixList: List<String> = emptyList(),
 ) {
@@ -220,7 +220,7 @@ private fun CodeBlock.Builder.handlePropertyInfoToUtil(
                 logger.info("start ${info.startType}, end ${info.endType}")
                 val tcInfo = tcInfoMap[TO_ACCEPTED]!!
                     .find { it.parameterType == info.startType && it.returnType == info.endType }!!
-                val tcClass = ClassName(tcInfo.packageName, tcInfo.parentClass)
+                val tcClass = ClassName(tcInfo.packageName, tcInfo.className)
                 add("%L = %T().%L(entity.$embeddedPrefix%L), \n", info.fieldName, tcClass, tcInfo.functionName, info.name)
             }
         }

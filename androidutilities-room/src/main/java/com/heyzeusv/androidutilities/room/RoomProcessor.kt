@@ -1,6 +1,7 @@
 package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
@@ -16,45 +17,20 @@ import com.heyzeusv.androidutilities.room.util.getUtilName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.ksp.toTypeName
 
 class RoomProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
     private val logger = environment.logger
-    private val tcInfoMap: Map<RoomTypes, MutableList<TypeConverterInfo>> = mapOf(
-        RoomTypes.TO_ACCEPTED to mutableListOf(),
-        RoomTypes.TO_COMPLEX to mutableListOf()
-    )
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val entityDataList = mutableListOf<EntityData>()
+
         // get all symbols
         val tpSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
         val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
         val dbSymbol = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        tpSymbols.filterIsInstance<KSFunctionDeclaration>().forEach { symbol ->
-            (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
-                val packageName =
-                    functionDeclaration.containingFile?.packageName?.asString().orEmpty()
-                val parentClass =
-                    functionDeclaration.parentDeclaration?.simpleName?.getShortName().orEmpty()
-                val functionName = functionDeclaration.simpleName.getShortName()
-                val parameterType = functionDeclaration.parameters.first().type.toTypeName()
-                val returnType = functionDeclaration.returnType?.toTypeName()!!
-                val info = TypeConverterInfo(
-                    packageName = packageName,
-                    parentClass = parentClass,
-                    functionName = functionName,
-                    parameterType = parameterType,
-                    returnType = returnType
-                )
-                if (RoomTypes.TO_ACCEPTED.types.containsNullableType(returnType)) {
-                    tcInfoMap[RoomTypes.TO_ACCEPTED]!!.add(info)
-                } else {
-                    tcInfoMap[RoomTypes.TO_COMPLEX]!!.add(info)
-                }
-            }
-        }
+        val tcInfoMap = createTypeConverterInfoMap(logger, tpSymbols)
+        logger.info("tcInfoMap $tcInfoMap")
 
         val classNameMap = mutableMapOf<ClassName, ClassName>()
         // filter out symbols that are not classes
@@ -132,4 +108,31 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         val ret = symbols.filterNot { it.validate() }.toList()
         return ret
     }
+}
+
+private fun createTypeConverterInfoMap(
+    logger: KSPLogger,
+    symbols: Sequence<KSAnnotated>,
+): Map<TypeConverterTypes, List<TypeConverterInfo>> {
+    val toAcceptedList = mutableListOf<TypeConverterInfo>()
+    val toComplexList = mutableListOf<TypeConverterInfo>()
+
+    logger.info("Creating map of TypeConverters split by return types compatible with " +
+            "Room and return types that require a TypeConverter.")
+    symbols.filterIsInstance<KSFunctionDeclaration>().forEach { symbol ->
+        (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
+            val tcInfo = TypeConverterInfo.fromFunctionDeclaration(functionDeclaration)
+
+            if (TypeConverterTypes.TO_ACCEPTED.types.containsNullableType(tcInfo.returnType)) {
+                toAcceptedList.add(tcInfo)
+            } else {
+                toComplexList.add(tcInfo)
+            }
+        }
+    }
+
+    return mapOf(
+        TypeConverterTypes.TO_ACCEPTED to toAcceptedList,
+        TypeConverterTypes.TO_COMPLEX to toComplexList,
+    )
 }

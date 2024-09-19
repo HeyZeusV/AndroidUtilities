@@ -1,6 +1,7 @@
 package com.heyzeusv.androidutilities.room.util
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.ParameterizedTypeName
@@ -10,15 +11,20 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import java.util.Locale
 
 /**
+ *  Returns the name of this declaration.
+ */
+internal fun KSDeclaration.getName(): String = simpleName.getShortName()
+
+/**
+ *  Returns the name of the package at which this declaration is declared at as [String].
+ */
+internal fun KSDeclaration.getPackageName(): String = packageName.asString()
+
+/**
  *  Returns the name of this class with suffix "RoomUtil" to differentiate between user created
  *  entity classes and entity classes created by this annotation processor.
  */
-internal fun KSClassDeclaration.getUtilName(): String = "${simpleName.getShortName()}RoomUtil"
-
-/**
- *  Returns the name of the package at which this class is declared as [String].
- */
-internal fun KSClassDeclaration.getPackageName(): String = packageName.asString()
+internal fun KSClassDeclaration.getUtilName(): String = "${getName()}RoomUtil"
 
 /**
  *  Adds [code] to this [CodeBlock.Builder] indented one level.
