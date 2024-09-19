@@ -1,6 +1,7 @@
 package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
@@ -24,16 +25,14 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
 
         // get all symbols
         val tcSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
-        val symbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
-        val dbSymbol = resolver.getSymbolsWithAnnotation("androidx.room.Database")
+        val eSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
+        val dbSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        logger.info("Creating list of TypeConverterInfo...")
-        val typeConverterInfoList = createTypeConverterInfoList(tcSymbols)
-        logger.info("List of TypeConvertInfo: $typeConverterInfoList")
+        val typeConverterInfoList = createTypeConverterInfoList(logger, tcSymbols)
 
         val classNameMap = mutableMapOf<ClassName, ClassName>()
         // filter out symbols that are not classes
-        symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
+        eSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 if (classDeclaration.annotations.any { it.shortName.getShortName() == "Fts4" }) {
                     return@forEach
@@ -67,7 +66,7 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
                 }
             }
         }
-        dbSymbol.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
+        dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
                 val dbPackageName = dbClass.getPackageName()
 
@@ -104,8 +103,10 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
         }
 
         // filter out symbols that are not valid
-        val ret = symbols.filterNot { it.validate() }.toList()
-        return ret
+        val tcRet = tcSymbols.filterNot { it.validate() }.toList()
+        val eRet = eSymbols.filterNot { it.validate() }.toList()
+        val dbRet = dbSymbols.filterNot { it.validate() }.toList()
+        return tcRet + eRet + dbRet
     }
 }
 
@@ -113,18 +114,24 @@ class RoomProcessor(private val environment: SymbolProcessorEnvironment) : Symbo
  *  Returns a list of [TypeConverterInfo] created from given [symbols] which have been annotated
  *  with Room.TypeConverter.
  *
+ *  @param logger Used to print out messages in log.
  *  @param symbols Sequence of functions annotated with Room.TypeConverter.
  *  @return List of [TypeConverterInfo].
  */
-private fun createTypeConverterInfoList(symbols: Sequence<KSAnnotated>): List<TypeConverterInfo> {
-    val typeConverterInfoList = mutableListOf<TypeConverterInfo>()
+private fun createTypeConverterInfoList(
+    logger: KSPLogger,
+    symbols: Sequence<KSAnnotated>
+): List<TypeConverterInfo> =
+    symbols.filterIsInstance<KSFunctionDeclaration>().run {
+        logger.info("Creating list of TypeConverterInfo...")
+        val typeConverterInfoList = mutableListOf<TypeConverterInfo>()
 
-    symbols.filterIsInstance<KSFunctionDeclaration>().forEach { symbol ->
-        (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
-            val tcInfo = TypeConverterInfo.fromFunctionDeclaration(functionDeclaration)
-            typeConverterInfoList.add(tcInfo)
+        forEach { symbol ->
+            (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
+                val tcInfo = TypeConverterInfo.fromFunctionDeclaration(functionDeclaration)
+                typeConverterInfoList.add(tcInfo)
+            }
         }
+        logger.info("List of TypeConvertInfo: $typeConverterInfoList")
+        typeConverterInfoList
     }
-
-    return typeConverterInfoList
-}
