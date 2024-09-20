@@ -3,10 +3,12 @@ package com.heyzeusv.androidutilities.room.csv
 import com.heyzeusv.androidutilities.room.EntityData
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.getDataName
+import com.heyzeusv.androidutilities.room.util.removeKotlinPrefix
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 internal fun importCsvToRoomFunSpec(
@@ -102,9 +104,9 @@ internal fun importCsvToRoomEntityFunSpec(
                         """.trimIndent(), entityData.utilClassName, entityData.utilClassName)
                         addIndented {
                             addIndented {
-                                entityData.fieldToTypeMap.entries.forEachIndexed { index, entry ->
-                                    val cast = getTypeCast(entry.value)
-                                    add("  %L = it[%L]%L,\n", entry.key, index, cast)
+                                entityData.fieldInfoList.forEachIndexed { index, info ->
+                                    val cast = getTypeCast(info.endType)
+                                    add("  %L = it[%L]%L,\n", info.fieldName, index, cast)
                                 }
                             }
                         }
@@ -130,8 +132,8 @@ internal fun importCsvToRoomEntityFunSpec(
     return funSpec
 }
 
-private fun getTypeCast(type: String): String {
-    val cast = when (type) {
+private fun getTypeCast(type: TypeName): String {
+    val cast = when (type.removeKotlinPrefix()) {
         "Boolean" -> ".toBoolean()"
         "Boolean?" -> ".toBoolean()"
         "Short" -> ".toShort()"

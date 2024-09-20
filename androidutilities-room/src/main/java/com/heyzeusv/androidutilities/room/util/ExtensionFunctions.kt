@@ -1,13 +1,15 @@
 package com.heyzeusv.androidutilities.room.util
 
+import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSValueArgument
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.ksp.toClassName
 import java.util.Locale
 
 /**
@@ -25,6 +27,16 @@ internal fun KSDeclaration.getPackageName(): String = packageName.asString()
  *  entity classes and entity classes created by this annotation processor.
  */
 internal fun KSClassDeclaration.getUtilName(): String = "${getName()}RoomUtil"
+
+/**
+ *  Returns the value of [argument] belonging to [annotation] in the form of a [String]. Assumes
+ *  that [annotation] and [argument] 100% exists.
+ */
+internal fun KSAnnotated.getAnnotationArgumentValue(
+    annotation: String,
+    argument: String,
+): String =
+    annotations.getWithName(annotation).arguments.getWithName(argument).value.toString()
 
 /**
  *  Adds [code] to this [CodeBlock.Builder] indented one level.
@@ -50,6 +62,11 @@ internal fun TypeName.getListTypeName(): ParameterizedTypeName =
     ClassName("kotlin.collections", "List").parameterizedBy(this)
 
 /**
+ *  Returns this [TypeName] as [String] with "kotlin." prefix removed.
+ */
+internal fun TypeName.removeKotlinPrefix(): String = toString().removePrefix("kotlin.")
+
+/**
  *  Checks if the specified [element], turned to non-null, is contained in this collection.
  */
 internal fun List<TypeName>.containsNullableType(element: TypeName): Boolean {
@@ -66,13 +83,23 @@ internal fun ClassName.getDataName(): String {
 }
 
 /**
- *  Adds given [classDeclaration] as [ClassName] to this map as the key, with the value being
- *  given [classDeclaration] as [ClassName] with "RoomUtil" appended to the class name.
+ *  Returns [KSAnnotation] with given [annotationName], assumes that given [annotationName] 100%
+ *  exists in this sequence.
  */
-internal fun MutableMap<ClassName, ClassName>.addOriginalAndUtil(
-    classDeclaration: KSClassDeclaration,
-) {
-    val packageName = classDeclaration.getPackageName()
-    val utilName = classDeclaration.getUtilName()
-    this[classDeclaration.toClassName()] = ClassName(packageName, utilName)
+internal fun Sequence<KSAnnotation>.getWithName(annotationName: String): KSAnnotation =
+    find { it.shortName.getShortName() == annotationName }!!
+
+/**
+ *  Returns [KSValueArgument] with given [argumentName], assumes that given [argumentName] 100%
+ *  exists in this list.
+ */
+internal fun List<KSValueArgument>.getWithName(argumentName: String): KSValueArgument =
+    find { it.name!!.getShortName() == argumentName }!!
+
+/**
+ *  If this [String] is not blank, return this [String] with [value] appended onto the end else
+ *  return blank [String].
+ */
+internal fun String.ifNotBlankAppend(value: String): String {
+    return if (isNotBlank()) this + value else this
 }

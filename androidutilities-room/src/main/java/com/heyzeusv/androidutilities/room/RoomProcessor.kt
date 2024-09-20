@@ -10,9 +10,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
-import com.heyzeusv.androidutilities.room.util.addOriginalAndUtil
 import com.heyzeusv.androidutilities.room.util.getPackageName
-import com.heyzeusv.androidutilities.room.util.getUtilName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
@@ -23,51 +21,21 @@ class RoomProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val entityDataList = mutableListOf<EntityData>()
-
         // get all symbols
         val tcSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
         val eSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
         val dbSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        val typeConverterInfoList = createTypeConverterInfoList(logger, tcSymbols)
+        val typeConverterInfoList = createTypeConverterInfoList(tcSymbols, logger)
 
-        val classNameMap = mutableMapOf<ClassName, ClassName>()
-        // filter out symbols that are not classes
-        eSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
-            (symbol as? KSClassDeclaration)?.let { classDeclaration ->
-                if (classDeclaration.annotations.any { it.shortName.getShortName() == "Fts4" }) {
-                    return@forEach
-                }
-                val packageName = classDeclaration.containingFile?.packageName?.asString().orEmpty()
-                val fileName = classDeclaration.getUtilName()
-                classNameMap.addOriginalAndUtil(classDeclaration)
+        val entityFilesCreator = EntityFilesCreator(
+            codeGenerator = codeGenerator,
+            symbols = eSymbols,
+            typeConverterInfoList = typeConverterInfoList,
+            logger = logger
+        )
+        entityFilesCreator.createEntityFiles()
 
-                logger.info("class name: $fileName")
-
-                // use KotlinPoet for code generation
-                val fileSpecBuilder = FileSpec.builder(packageName, fileName)
-
-                val classBuilder = buildEntityClass(
-                    typeConverterInfoList = typeConverterInfoList,
-                    classDeclaration = classDeclaration,
-                    entityDataList = entityDataList,
-                    logger = logger,
-                )
-
-                fileSpecBuilder.addType(classBuilder.build())
-
-                // writing the file
-                codeGenerator.createNewFile(
-                    dependencies = Dependencies(false, symbol.containingFile!!),
-                    packageName = packageName,
-                    fileName = fileName,
-                    extensionName = "kt",
-                ).bufferedWriter().use {
-                    fileSpecBuilder.build().writeTo(it)
-                }
-            }
-        }
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
                 val dbPackageName = dbClass.getPackageName()
@@ -75,7 +43,7 @@ class RoomProcessor(
                 val roomDataFileName = "RoomData"
                 val roomDataFileSpec = FileSpec.builder(dbPackageName, roomDataFileName)
                 val roomDataTypeSpec = TypeSpec.classBuilder(roomDataFileName)
-                    .buildRoomData(classNameMap = classNameMap)
+                    .buildRoomData(entityFilesCreator.entityDataList)
                 roomDataFileSpec.addType(roomDataTypeSpec.build())
 
                 codeGenerator.createNewFile(
@@ -91,7 +59,7 @@ class RoomProcessor(
                 val csvConverterTypeSpec = TypeSpec.classBuilder(csvConverterFileName)
                     .buildCsvConverter(
                         roomDataClassName = roomDataClassName,
-                        entityDataList = entityDataList,
+                        entityDataList = entityFilesCreator.entityDataList,
                     )
                 csvConverterFileSpec.addType(csvConverterTypeSpec.build())
 
@@ -121,8 +89,8 @@ class RoomProcessor(
  *  @return List of [TypeConverterInfo].
  */
 private fun createTypeConverterInfoList(
-    logger: KSPLogger,
-    symbols: Sequence<KSAnnotated>
+    symbols: Sequence<KSAnnotated>,
+    logger: KSPLogger
 ): List<TypeConverterInfo> =
     symbols.filterIsInstance<KSFunctionDeclaration>().run {
         logger.info("Creating list of TypeConverterInfo...")
@@ -134,6 +102,6 @@ private fun createTypeConverterInfoList(
                 typeConverterInfoList.add(tcInfo)
             }
         }
-        logger.info("List of TypeConvertInfo: $typeConverterInfoList")
+        logger.info("List of TypeConverterInfo: $typeConverterInfoList")
         typeConverterInfoList
     }

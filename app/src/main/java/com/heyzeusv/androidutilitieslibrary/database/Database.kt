@@ -22,7 +22,7 @@ import com.heyzeusv.androidutilitieslibrary.database.models.ItemList
         ItemList::class,
         Category::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(RoomTypeConverters::class)
