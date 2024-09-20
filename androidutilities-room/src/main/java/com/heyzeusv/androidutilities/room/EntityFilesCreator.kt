@@ -296,17 +296,6 @@ internal class EntityFilesCreator(
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer("%S", "$tableName.csv")
 
-            val stringListClass = String::class.asTypeName().getListTypeName()
-            val headerPropBuilder = PropertySpec.builder(CsvInfo::csvHeader.name, stringListClass)
-                .addModifiers(KModifier.OVERRIDE)
-                .initializer(buildCodeBlock {
-                    addStatement("listOf(")
-                    addIndented {
-                        fieldInfoList.forEach { addStatement("%S,", it.fieldName) }
-                    }
-                    add(")")
-                })
-
             val stringMapClass = Map::class.asTypeName()
                 .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
             val fieldToTypeMapPropBuilder = PropertySpec
@@ -326,7 +315,6 @@ internal class EntityFilesCreator(
                 })
 
             companionObjectBuilder.addProperty(fileNamePropBuilder.build())
-                .addProperty(headerPropBuilder.build())
                 .addProperty(fieldToTypeMapPropBuilder.build())
 
             val anyListClass = Any::class.asTypeName().copy(nullable = true).getListTypeName()

@@ -97,7 +97,7 @@ internal fun importCsvToRoomEntityFunSpec(
                 addIndented {
                     entityDataList.forEach { entityData ->
                         add("""
-                        %T.csvHeader -> {
+                        %T.csvFieldToTypeMap.keys.toList() -> {
                           rows.forEach {
                             val entry = %T(
                             

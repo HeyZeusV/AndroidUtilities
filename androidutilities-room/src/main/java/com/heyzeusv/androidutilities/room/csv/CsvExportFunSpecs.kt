@@ -67,7 +67,7 @@ internal fun exportRoomEntityToCsvFunSpec(): FunSpec.Builder {
             addStatement("val outputStream = %L.contentResolver.openOutputStream(csvDocumentFile.uri)!!", CONTEXT_PROP)
             addStatement("%M().open(outputStream) {", csvWriterMemberName)
             add("""
-                  writeRow(csvInfo.csvHeader)
+                  writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
                 return csvDocumentFile
