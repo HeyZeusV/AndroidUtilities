@@ -93,15 +93,20 @@ private fun createTypeConverterInfoList(
     logger: KSPLogger
 ): List<TypeConverterInfo> =
     symbols.filterIsInstance<KSFunctionDeclaration>().run {
-        logger.info("Creating list of TypeConverterInfo...")
-        val typeConverterInfoList = mutableListOf<TypeConverterInfo>()
+        if (count() > 0) {
+            logger.info("Creating list of TypeConverterInfo...")
+            val typeConverterInfoList = mutableListOf<TypeConverterInfo>()
 
-        forEach { symbol ->
-            (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
-                val tcInfo = TypeConverterInfo.fromFunctionDeclaration(functionDeclaration)
-                typeConverterInfoList.add(tcInfo)
+            forEach { symbol ->
+                (symbol as? KSFunctionDeclaration)?.let { functionDeclaration ->
+                    val tcInfo = TypeConverterInfo.fromFunctionDeclaration(functionDeclaration)
+                    typeConverterInfoList.add(tcInfo)
+                }
             }
+            logger.info("List of TypeConverterInfo: $typeConverterInfoList")
+            typeConverterInfoList
+        } else {
+            logger.info("No TypeConverters found...")
+            emptyList()
         }
-        logger.info("List of TypeConverterInfo: $typeConverterInfoList")
-        typeConverterInfoList
     }

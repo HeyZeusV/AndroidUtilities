@@ -1,0 +1,401 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "2b969453ecac407531794cba1a411c20",
+    "entities": [
+      {
+        "tableName": "a_default_item_table_name",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER, `outerEmbed_test3` INTEGER, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, `outerEmbed_innerEmbed_nullBoolean` INTEGER, `outerEmbed_innerEmbed_nullShort` INTEGER, `outerEmbed_innerEmbed_nullInt` INTEGER, `outerEmbed_innerEmbed_nullLong` INTEGER, `outerEmbed_innerEmbed_nullByte` INTEGER, `outerEmbed_innerEmbed_nullString` TEXT, `outerEmbed_innerEmbed_nullChar` INTEGER, `outerEmbed_innerEmbed_nullDouble` REAL, `outerEmbed_innerEmbed_nullFloat` REAL, `outerEmbed_innerEmbed_nullByteArray` BLOB, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memo",
+            "columnName": "memo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.test1",
+            "columnName": "outerEmbed_test1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.test2",
+            "columnName": "outerEmbed_test2",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.test3",
+            "columnName": "outerEmbed_test3",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.test3",
+            "columnName": "outerEmbed_innerEmbed_differentFieldName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test5",
+            "columnName": "outerEmbed_innerEmbed_test5",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test6",
+            "columnName": "outerEmbed_innerEmbed_test6",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.test7",
+            "columnName": "outerEmbed_innerEmbed_test7",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullBoolean",
+            "columnName": "outerEmbed_innerEmbed_nullBoolean",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullShort",
+            "columnName": "outerEmbed_innerEmbed_nullShort",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullInt",
+            "columnName": "outerEmbed_innerEmbed_nullInt",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullLong",
+            "columnName": "outerEmbed_innerEmbed_nullLong",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullByte",
+            "columnName": "outerEmbed_innerEmbed_nullByte",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullString",
+            "columnName": "outerEmbed_innerEmbed_nullString",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullChar",
+            "columnName": "outerEmbed_innerEmbed_nullChar",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullDouble",
+            "columnName": "outerEmbed_innerEmbed_nullDouble",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullFloat",
+            "columnName": "outerEmbed_innerEmbed_nullFloat",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testEmbed.embed.nullByteArray",
+            "columnName": "outerEmbed_innerEmbed_nullByteArray",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "itemId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_default_category_name",
+            "unique": false,
+            "columnNames": [
+              "category"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_default_category_name` ON `${TABLE_NAME}` (`category`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Category",
+            "onDelete": "RESTRICT",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "category"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          }
+        ]
+      },
+      {
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "simple",
+          "tokenizerArgs": [],
+          "contentTable": "a_default_item_table_name",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_UPDATE BEFORE UPDATE ON `a_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_BEFORE_DELETE BEFORE DELETE ON `a_default_item_table_name` BEGIN DELETE FROM `DefaultItemFts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_UPDATE AFTER UPDATE ON `a_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_DefaultItemFts_AFTER_INSERT AFTER INSERT ON `a_default_item_table_name` BEGIN INSERT INTO `DefaultItemFts`(`docid`, `name`, `category`) VALUES (NEW.`rowid`, NEW.`name`, NEW.`category`); END"
+        ],
+        "tableName": "DefaultItemFts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`name` TEXT NOT NULL, `category` TEXT NOT NULL, content=`a_default_item_table_name`)",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Item",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `isChecked` INTEGER NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `parentItemListId` INTEGER NOT NULL, `originItemListId` INTEGER, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT , FOREIGN KEY(`parentItemListId`) REFERENCES `ItemList`(`itemListId`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isChecked",
+            "columnName": "isChecked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memo",
+            "columnName": "memo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentItemListId",
+            "columnName": "parentItemListId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originItemListId",
+            "columnName": "originItemListId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "itemId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_item_category_name",
+            "unique": false,
+            "columnNames": [
+              "category"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_category_name` ON `${TABLE_NAME}` (`category`)"
+          },
+          {
+            "name": "index_parent_id",
+            "unique": false,
+            "columnNames": [
+              "parentItemListId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_parent_id` ON `${TABLE_NAME}` (`parentItemListId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Category",
+            "onDelete": "RESTRICT",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "category"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          },
+          {
+            "table": "ItemList",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "parentItemListId"
+            ],
+            "referencedColumns": [
+              "itemListId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ItemList",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemListId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "itemListId",
+            "columnName": "itemListId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "itemListId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Category",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_category_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_category_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b969453ecac407531794cba1a411c20')"
+    ]
+  }
+}

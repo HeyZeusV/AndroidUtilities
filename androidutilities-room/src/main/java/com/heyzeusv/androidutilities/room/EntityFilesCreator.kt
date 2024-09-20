@@ -32,6 +32,14 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import kotlin.Exception
 
+/**
+ *  Creates *RoomUtil files from classes annotated with Room.Entity.
+ *
+ *  @param codeGenerator Creates the files.
+ *  @param symbols Classes annotated with Room.Entity.
+ *  @param typeConverterInfoList Information on classes annotated with Room.TypeConverter.
+ *  @param logger Used to print info to output.
+ */
 internal class EntityFilesCreator(
     private val codeGenerator: CodeGenerator,
     private val symbols: Sequence<KSAnnotated>,
@@ -53,6 +61,10 @@ internal class EntityFilesCreator(
     private val _entityDataList = mutableListOf<EntityData>()
     val entityDataList: List<EntityData> get() = _entityDataList
 
+    /**
+     *  Go through all [symbols] and create a *RoomUtil file from each using inner class
+     *  [EntityBuilder].
+     */
     fun createEntityFiles() {
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
@@ -73,6 +85,9 @@ internal class EntityFilesCreator(
         }
     }
 
+    /**
+     *  Builds *RoomUtil from given [classDeclaration] using KotlinPoet's *Spec.Builders.
+     */
     private inner class EntityBuilder(private val classDeclaration: KSClassDeclaration) {
         val packageName = classDeclaration.getPackageName()
         val fileName = classDeclaration.getUtilName()
@@ -80,7 +95,7 @@ internal class EntityFilesCreator(
 
         /**
          *  Get table name by first searching for tableName parameter of Room.Entity annotation.
-         *  If it is blank, then use the name of the class annotated with Entity.
+         *  If it is blank, then use the name of the class annotated with Room.Entity.
          */
         private val tableName = classDeclaration.getAnnotationArgumentValue("Entity", "tableName")
             .ifBlank { classDeclaration.simpleName.getShortName() }
@@ -93,12 +108,20 @@ internal class EntityFilesCreator(
                 .build()
             )
         private val constructorBuilder = FunSpec.constructorBuilder()
-        private val companionBuilder = TypeSpec.companionObjectBuilder()
+        private val companionObjectBuilder = TypeSpec.companionObjectBuilder()
             .addSuperinterface(CsvInfo::class)
 
         private val propertyInfoList = mutableListOf<PropertyInfo>()
 
-        private fun TypeSpec.Builder.buildProperties(
+        /**
+         *  Goes through all properties of [classDeclaration] and builds *RoomUtil's
+         *  properties/parameters by adding parameters to [constructorBuilder] and adding
+         *  properties to [classBuilder]. Recursively called when property is annotated with
+         *  Room.Embedded in order to flatten out embedded class. Also checks if property type is
+         *  accepted by Room natively, else it searches [typeConverterInfoList] to get correct
+         *  type when saved to Room.
+         */
+        private fun buildProperties(
             classDeclaration: KSClassDeclaration,
             embeddedPrefix: String = "",
         ) {
@@ -109,6 +132,7 @@ internal class EntityFilesCreator(
                 // print log message and continue
                 if (annotations.contains("Ignore")) {
                     logger.info("Ignoring field $name of type ${prop.type}")
+                // flatten embedded class by recursively calling this function and passing prefix (if any)
                 } else if (annotations.contains("Embedded")) {
                     logger.info("Flattening embedded class ${prop.type}")
 
@@ -124,6 +148,7 @@ internal class EntityFilesCreator(
                     )
                 } else {
                     val startType: TypeName = prop.type.toTypeName()
+                    // search for TypeConverter if prop.type is not accepted by Room
                     val endType: TypeName =
                         if (validRoomTypes.containsNullableType(prop.type.toTypeName())) {
                             prop.type.toTypeName()
@@ -143,7 +168,7 @@ internal class EntityFilesCreator(
                     }
 
                     constructorBuilder.addParameter(fieldName, endType)
-                    addProperty(PropertySpec.builder(fieldName, endType)
+                    classBuilder.addProperty(PropertySpec.builder(fieldName, endType)
                         .initializer(fieldName)
                         .build()
                     )
@@ -159,6 +184,9 @@ internal class EntityFilesCreator(
             propertyInfoList.add(CloseClass())
         }
 
+        /**
+         *  Builds functions that convert from original entity type to RoomUtil type and vice versa.
+         */
         private fun buildToFunctions() {
             val toOriginalFunBuilder = FunSpec.builder("toOriginal")
                 .returns(classDeclaration.toClassName())
@@ -185,30 +213,39 @@ internal class EntityFilesCreator(
                 })
 
             classBuilder.addFunction(toOriginalFunBuilder.build())
-            companionBuilder.addFunction(toUtilFunBuilder.build())
+            companionObjectBuilder.addFunction(toUtilFunBuilder.build())
         }
 
+        /**
+         *  Adds one line to [CodeBlock] for toOriginal(), which depends on given [info] type.
+         */
         private fun CodeBlock.Builder.buildToOriginalProperties(info: PropertyInfo) {
             when (info) {
                 is FieldInfo -> {
+                    // no TypeConverter needed if start type = end type
                     if (info.startType == info.endType) {
                         add("%L = %L,\n", info.name, info.fieldName)
                     } else {
+                        // search for TypeConverter depending on info startType and endType
                         val tcInfo = typeConverterInfoList.find {
                             it.parameterType == info.endType && it.returnType == info.startType
                         } ?: throw Exception("No TypeConverter found with ${info.endType} " +
                                 "parameter and ${info.startType} return type!!")
                         val tcClass = ClassName(tcInfo.packageName, tcInfo.className)
+                        // use KotlinPoet format specifier to automatically import TypeConverter
+                        // and call it.
                         add(
                             "%L = %T().%L(%L),\n",
                             info.name, tcClass , tcInfo.functionName, info.fieldName
                         )
                     }
                 }
+                // calls embedded class
                 is EmbeddedInfo -> {
                     add("%L = %L(\n", info.name, info.embeddedClass.getName())
                     indent()
                 }
+                // closes embedded classes
                 is CloseClass -> {
                     unindent()
                     add("),\n")
@@ -216,6 +253,10 @@ internal class EntityFilesCreator(
             }
         }
 
+        /**
+         *  Adds one line to [CodeBlock] for toUtil(), which depends on given [info] type. Adds
+         *  all strings of [embeddedPrefixList] as prefix to parameter if [info] is [FieldInfo].
+         */
         private fun CodeBlock.Builder.buildToUtilProperties(
             info: PropertyInfo,
             embeddedPrefixList: MutableList<String>,
@@ -224,14 +265,18 @@ internal class EntityFilesCreator(
                 is FieldInfo -> {
                     val prefix = embeddedPrefixList.joinToString(separator = ".")
                         .ifNotBlankAppend(".")
+                    // no TypeConverter needed if start type = end type
                     if (info.startType == info.endType) {
                         add("%L = entity.%L%L,\n", info.fieldName, prefix, info.name)
                     } else {
+                        // search for TypeConverter depending on info startType and endType
                         val tcInfo = typeConverterInfoList.find {
                             it.parameterType == info.startType && it.returnType == info.endType
                         } ?: throw Exception("No TypeConverter found with ${info.startType} " +
                                 "parameter and ${info.endType} return type!!")
                         val tcClass = ClassName(tcInfo.packageName, tcInfo.className)
+                        // use KotlinPoet format specifier to automatically import TypeConverter
+                        // and call it.
                         add(
                             "%L = %T().%L(entity.%L%L), \n",
                             info.fieldName, tcClass, tcInfo.functionName, prefix, info.name
@@ -243,6 +288,9 @@ internal class EntityFilesCreator(
             }
         }
 
+        /**
+         *  Builds the implementations of [CsvInfo] and [CsvData] using given [fieldInfoList].
+         */
         private fun buildCsvInterfaceImplementations(fieldInfoList: List<FieldInfo>) {
             val fileNamePropBuilder = PropertySpec.builder(CsvInfo::csvFileName.name, String::class)
                 .addModifiers(KModifier.OVERRIDE)
@@ -271,7 +319,7 @@ internal class EntityFilesCreator(
                     add("\n)")
                 })
 
-            companionBuilder.addProperty(fileNamePropBuilder.build())
+            companionObjectBuilder.addProperty(fileNamePropBuilder.build())
                 .addProperty(headerPropBuilder.build())
                 .addProperty(fieldToTypeMapPropBuilder.build())
 
@@ -290,7 +338,8 @@ internal class EntityFilesCreator(
         init {
             logger.info("Creating file $fileName...")
 
-            classBuilder.buildProperties(classDeclaration)
+            // build parameters/properties
+            buildProperties(classDeclaration)
             val entityData = EntityData(
                 originalClassName = classDeclaration.toClassName(),
                 utilClassName = ClassName(classDeclaration.getPackageName(), classDeclaration.getUtilName()),
@@ -298,13 +347,20 @@ internal class EntityFilesCreator(
                 fieldInfoList = propertyInfoList.filterIsInstance<FieldInfo>()
             )
             _entityDataList.add(entityData)
+            // removes extra CloseClass that is added
             propertyInfoList.removeLast()
-            buildCsvInterfaceImplementations(entityData.fieldInfoList)
+
+            // build toOriginal/toUtil functions
             buildToFunctions()
+            // build CsvInfo/CsvData implementations
+            buildCsvInterfaceImplementations(entityData.fieldInfoList)
 
+            // add constructor to class
             classBuilder.primaryConstructor(constructorBuilder.build())
-            classBuilder.addType(companionBuilder.build())
+            // add companion object to class
+            classBuilder.addType(companionObjectBuilder.build())
 
+            // add class to file
             fileBuilder.addType(classBuilder.build())
         }
     }
