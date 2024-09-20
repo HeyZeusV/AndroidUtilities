@@ -300,9 +300,11 @@ internal class EntityFilesCreator(
             val headerPropBuilder = PropertySpec.builder(CsvInfo::csvHeader.name, stringListClass)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer(buildCodeBlock {
-                    add("listOf(\n")
-                    fieldInfoList.forEach { add("%S, ", it.fieldName) }
-                    add("\n)")
+                    addStatement("listOf(")
+                    addIndented {
+                        fieldInfoList.forEach { addStatement("%S,", it.fieldName) }
+                    }
+                    add(")")
                 })
 
             val stringMapClass = Map::class.asTypeName()
@@ -311,12 +313,16 @@ internal class EntityFilesCreator(
                 .builder(CsvInfo::csvFieldToTypeMap.name, stringMapClass)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer(buildCodeBlock {
-                    add("mapOf(\n")
-                    fieldInfoList.forEachIndexed { index, fieldInfo ->
-                        add("%S to %S", fieldInfo.fieldName, fieldInfo.endType.removeKotlinPrefix())
-                        if (index < fieldInfoList.size) add(",\n")
+                    addStatement("mapOf(")
+                    addIndented {
+                        fieldInfoList.forEach { fieldInfo ->
+                            addStatement(
+                                "%S to %S,",
+                                fieldInfo.fieldName, fieldInfo.endType.removeKotlinPrefix()
+                            )
+                        }
                     }
-                    add("\n)")
+                    add(")")
                 })
 
             companionObjectBuilder.addProperty(fileNamePropBuilder.build())
@@ -327,9 +333,11 @@ internal class EntityFilesCreator(
             val rowPropBuilder = PropertySpec.builder(CsvData::csvRow.name, anyListClass)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer(buildCodeBlock {
-                    add("listOf(\n")
-                    fieldInfoList.forEach { add("%L, ", it.fieldName) }
-                    add("\n)")
+                    addStatement("listOf(")
+                    addIndented {
+                        fieldInfoList.forEach { addStatement("%L, ", it.fieldName) }
+                    }
+                    add(")")
                 })
 
             classBuilder.addProperty(rowPropBuilder.build())
