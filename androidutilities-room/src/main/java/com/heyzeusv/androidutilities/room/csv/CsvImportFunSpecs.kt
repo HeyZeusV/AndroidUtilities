@@ -105,7 +105,7 @@ internal fun importCsvToRoomEntityFunSpec(
                         addIndented {
                             addIndented {
                                 entityData.fieldInfoList.forEachIndexed { index, info ->
-                                    val cast = getTypeCast(info.endType)
+                                    val cast = getTypeCast(info.roomType)
                                     add("  %L = it[%L]%L,\n", info.fieldName, index, cast)
                                 }
                             }

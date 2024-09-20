@@ -147,15 +147,15 @@ internal class EntityFilesCreator(
                         embeddedPrefix = "$embeddedPrefix$newPrefix",
                     )
                 } else {
-                    val startType: TypeName = prop.type.toTypeName()
+                    val androidType: TypeName = prop.type.toTypeName()
                     // search for TypeConverter if prop.type is not accepted by Room
-                    val endType: TypeName =
+                    val roomType: TypeName =
                         if (validRoomTypes.containsNullableType(prop.type.toTypeName())) {
                             prop.type.toTypeName()
                         } else {
                             val tcInfo = typeConverterInfoList.find {
                                 it.returnType.equalsNullableType(prop.type.toTypeName())
-                            } ?: throw Exception("No TypeConverter found with $startType return type!!")
+                            } ?: throw Exception("No TypeConverter found with $androidType return type!!")
                             tcInfo.parameterType
                         }
 
@@ -167,16 +167,16 @@ internal class EntityFilesCreator(
                         if (columnName != "[field-name]") fieldName = "$embeddedPrefix$columnName"
                     }
 
-                    constructorBuilder.addParameter(fieldName, endType)
-                    classBuilder.addProperty(PropertySpec.builder(fieldName, endType)
+                    constructorBuilder.addParameter(fieldName, roomType)
+                    classBuilder.addProperty(PropertySpec.builder(fieldName, roomType)
                         .initializer(fieldName)
                         .build()
                     )
                     val fieldInfo = FieldInfo(
                         name = name,
                         fieldName = fieldName,
-                        startType = startType,
-                        endType = endType
+                        androidType = androidType,
+                        roomType = roomType
                     )
                     propertyInfoList.add(fieldInfo)
                 }
@@ -222,15 +222,15 @@ internal class EntityFilesCreator(
         private fun CodeBlock.Builder.buildToOriginalProperties(info: PropertyInfo) {
             when (info) {
                 is FieldInfo -> {
-                    // no TypeConverter needed if start type = end type
-                    if (info.startType == info.endType) {
+                    // no TypeConverter needed if androidType = roomType
+                    if (info.androidType == info.roomType) {
                         add("%L = %L,\n", info.name, info.fieldName)
                     } else {
-                        // search for TypeConverter depending on info startType and endType
+                        // search for TypeConverter depending on info androidType and roomTyp
                         val tcInfo = typeConverterInfoList.find {
-                            it.parameterType == info.endType && it.returnType == info.startType
-                        } ?: throw Exception("No TypeConverter found with ${info.endType} " +
-                                "parameter and ${info.startType} return type!!")
+                            it.parameterType == info.roomType && it.returnType == info.androidType
+                        } ?: throw Exception("No TypeConverter found with ${info.roomType} " +
+                                "parameter and ${info.androidType} return type!!")
                         val tcClass = ClassName(tcInfo.packageName, tcInfo.className)
                         // use KotlinPoet format specifier to automatically import TypeConverter
                         // and call it.
@@ -265,15 +265,15 @@ internal class EntityFilesCreator(
                 is FieldInfo -> {
                     val prefix = embeddedPrefixList.joinToString(separator = ".")
                         .ifNotBlankAppend(".")
-                    // no TypeConverter needed if start type = end type
-                    if (info.startType == info.endType) {
+                    // no TypeConverter needed if androidType = roomType
+                    if (info.androidType == info.roomType) {
                         add("%L = entity.%L%L,\n", info.fieldName, prefix, info.name)
                     } else {
-                        // search for TypeConverter depending on info startType and endType
+                        // search for TypeConverter depending on info androidType and roomType
                         val tcInfo = typeConverterInfoList.find {
-                            it.parameterType == info.startType && it.returnType == info.endType
-                        } ?: throw Exception("No TypeConverter found with ${info.startType} " +
-                                "parameter and ${info.endType} return type!!")
+                            it.parameterType == info.androidType && it.returnType == info.roomType
+                        } ?: throw Exception("No TypeConverter found with ${info.androidType} " +
+                                "parameter and ${info.roomType} return type!!")
                         val tcClass = ClassName(tcInfo.packageName, tcInfo.className)
                         // use KotlinPoet format specifier to automatically import TypeConverter
                         // and call it.
@@ -318,7 +318,7 @@ internal class EntityFilesCreator(
                         fieldInfoList.forEach { fieldInfo ->
                             addStatement(
                                 "%S to %S,",
-                                fieldInfo.fieldName, fieldInfo.endType.removeKotlinPrefix()
+                                fieldInfo.fieldName, fieldInfo.roomType.removeKotlinPrefix()
                             )
                         }
                     }
