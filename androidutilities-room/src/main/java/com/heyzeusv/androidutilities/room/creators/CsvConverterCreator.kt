@@ -323,7 +323,7 @@ internal class CsvConverterCreator(
             .addCode(buildCodeBlock {
                 addStatement(
                     "val sdf = %T(%S, %T.getDefault())",
-                    SimpleDateFormat::class, "MMMM_dd_yyyy__hh_mm_aa", Locale::class,
+                    SimpleDateFormat::class, "MMM_dd_yyyy__hh_mm_aa", Locale::class,
                 )
                 addStatement("val formattedDate = sdf.format(%T())", Date::class)
                 add("""
