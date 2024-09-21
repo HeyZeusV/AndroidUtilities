@@ -10,7 +10,9 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asTypeName
 import java.util.Locale
+import kotlin.reflect.KClass
 
 /**
  *  Returns the name of this declaration.
@@ -55,6 +57,7 @@ internal fun TypeName.equalsNullableType(type: TypeName): Boolean {
     return this.copy(nullable = false) == type.copy(nullable = false)
 }
 
+// TODO: check if all usages can be replaced with asListTypeName() below
 /**
  *  Returns [TypeName] of this if it was contained within a [List], i.e. List<this>
  */
@@ -103,3 +106,9 @@ internal fun List<KSValueArgument>.getWithName(argumentName: String): KSValueArg
 internal fun String.ifNotBlankAppend(value: String): String {
     return if (isNotBlank()) this + value else this
 }
+
+/**
+ *  Returns [TypeName] of this if it was contained within a [List], i.e. List<*>
+ */
+internal fun KClass<*>.asListTypeName(): ParameterizedTypeName =
+    ClassName("kotlin.collections", "List").parameterizedBy(this.asTypeName())

@@ -2,19 +2,25 @@ package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.heyzeusv.androidutilities.room.csv.csvMapClassName
+import com.heyzeusv.androidutilities.room.csv.CsvData
+import com.heyzeusv.androidutilities.room.csv.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
+import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
 import com.heyzeusv.androidutilities.room.util.getListTypeName
 import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 /**
@@ -30,13 +36,15 @@ internal class RoomDataFileCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
     private val entityDataList: List<EntityData>,
+    private val logger: KSPLogger,
 ) {
-    val fileName = "RoomData"
+    private val fileName = "RoomData"
 
     /**
      *  Creates RoomData.kt file.
      */
     private fun createRoomDataFile() {
+        logger.info("Creating RoomData...")
         val packageName = dbClassDeclaration.getPackageName()
         val fileBuilder = FileSpec.builder(packageName, fileName)
         val classBuilder = TypeSpec.classBuilder(fileName)
@@ -97,6 +105,8 @@ internal class RoomDataFileCreator(
         }
         
         csvDataMapCodeBlockBuilder.unindent().add(")")
+        val csvMapClassName = ClassName("kotlin.collections", "Map")
+            .parameterizedBy(CsvInfo::class.asTypeName(), CsvData::class.asListTypeName())
         val csvDataMapPropertyBuilder = PropertySpec.builder("csvDataMap", csvMapClassName)
             .initializer(csvDataMapCodeBlockBuilder.build())
         

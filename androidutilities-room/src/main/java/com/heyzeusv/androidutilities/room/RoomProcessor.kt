@@ -1,7 +1,6 @@
 package com.heyzeusv.androidutilities.room
 
 import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -9,11 +8,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
-import com.heyzeusv.androidutilities.room.csv.buildCsvConverter
-import com.heyzeusv.androidutilities.room.util.getPackageName
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.TypeSpec
+import com.heyzeusv.androidutilities.room.csv.CsvConverterCreator
 
 class RoomProcessor(
     private val codeGenerator: CodeGenerator,
@@ -38,30 +33,19 @@ class RoomProcessor(
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                val dbPackageName = dbClass.getPackageName()
-
-                val roomDataFileCreator = RoomDataFileCreator(
+                RoomDataFileCreator(
                     codeGenerator = codeGenerator,
                     dbClassDeclaration = dbClass,
-                    entityDataList = entityFilesCreator.entityDataList
+                    entityDataList = entityFilesCreator.entityDataList,
+                    logger = logger,
                 )
 
-                val roomDataClassName = ClassName(dbPackageName, roomDataFileCreator.fileName)
-                val csvConverterFileName = "CsvConverter"
-                val csvConverterFileSpec = FileSpec.builder(dbPackageName, csvConverterFileName)
-                val csvConverterTypeSpec = TypeSpec.classBuilder(csvConverterFileName)
-                    .buildCsvConverter(
-                        roomDataClassName = roomDataClassName,
-                        entityDataList = entityFilesCreator.entityDataList,
-                    )
-                csvConverterFileSpec.addType(csvConverterTypeSpec.build())
-
-                codeGenerator.createNewFile(
-                    dependencies = Dependencies(false, dbClass.containingFile!!),
-                    packageName = dbPackageName,
-                    fileName = csvConverterFileName,
-                    extensionName = "kt",
-                ).bufferedWriter().use { csvConverterFileSpec.build().writeTo(it) }
+                CsvConverterCreator(
+                    codeGenerator = codeGenerator,
+                    dbClassDeclaration = dbClass,
+                    entityDataList = entityFilesCreator.entityDataList,
+                    logger = logger
+                )
             }
         }
 

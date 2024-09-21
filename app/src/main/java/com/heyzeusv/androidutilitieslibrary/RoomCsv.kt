@@ -53,13 +53,13 @@ private fun exportToCSV(
     db: Database,
 ) {
     scope.launch(Dispatchers.IO) {
-        val parentDirectoryUri = CsvConverter(context).findOrCreateParentDirectory(
-            parentDirectoryName = "RoomCsvExample",
+        val parentDirectoryUri = CsvConverter(context).findOrCreateSaveDirectory(
+            saveDirectoryName = "RoomCsvExample",
             selectedDirectoryUri = selectedDirectoryUri
         )!!.toString()
         val roomData = getData(db)
         CsvConverter(context).exportRoomToCsv(
-            parentDirectoryUri = Uri.parse(parentDirectoryUri),
+            saveDirectoryUri = Uri.parse(parentDirectoryUri),
             roomData = roomData,
         )
     }
