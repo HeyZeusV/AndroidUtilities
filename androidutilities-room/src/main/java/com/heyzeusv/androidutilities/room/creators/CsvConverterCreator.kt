@@ -1,10 +1,12 @@
-package com.heyzeusv.androidutilities.room.csv
+package com.heyzeusv.androidutilities.room.creators
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.EntityData
+import com.heyzeusv.androidutilities.room.util.CsvData
+import com.heyzeusv.androidutilities.room.util.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
