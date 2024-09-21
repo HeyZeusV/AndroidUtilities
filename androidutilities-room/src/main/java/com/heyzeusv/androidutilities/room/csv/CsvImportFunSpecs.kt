@@ -55,7 +55,7 @@ internal fun importCsvToRoomFunSpec(
                 val utilName = data.utilClassName.getDataName()
                 val dataName = utilName.replace("RoomUtil", "")
                 addStatement(
-                    format = "  %L = (%L as List<%L>).map { it.toOriginal() },",
+                    format = "  %L = (%L·as·List<%L>).map·{·it.toOriginal()·},",
                     args = arrayOf(dataName, utilName, data.utilClassName.simpleName),
                 )
             }

@@ -40,20 +40,13 @@ class RoomProcessor(
             (symbol as? KSClassDeclaration)?.let { dbClass ->
                 val dbPackageName = dbClass.getPackageName()
 
-                val roomDataFileName = "RoomData"
-                val roomDataFileSpec = FileSpec.builder(dbPackageName, roomDataFileName)
-                val roomDataTypeSpec = TypeSpec.classBuilder(roomDataFileName)
-                    .buildRoomData(entityFilesCreator.entityDataList)
-                roomDataFileSpec.addType(roomDataTypeSpec.build())
+                val roomDataFileCreator = RoomDataFileCreator(
+                    codeGenerator = codeGenerator,
+                    dbClassDeclaration = dbClass,
+                    entityDataList = entityFilesCreator.entityDataList
+                )
 
-                codeGenerator.createNewFile(
-                    dependencies = Dependencies(false, dbClass.containingFile!!),
-                    packageName = dbPackageName,
-                    fileName = roomDataFileName,
-                    extensionName = "kt",
-                ).bufferedWriter().use { roomDataFileSpec.build().writeTo(it) }
-
-                val roomDataClassName = ClassName(dbPackageName, roomDataFileName)
+                val roomDataClassName = ClassName(dbPackageName, roomDataFileCreator.fileName)
                 val csvConverterFileName = "CsvConverter"
                 val csvConverterFileSpec = FileSpec.builder(dbPackageName, csvConverterFileName)
                 val csvConverterTypeSpec = TypeSpec.classBuilder(csvConverterFileName)
