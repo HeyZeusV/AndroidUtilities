@@ -4,7 +4,7 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.heyzeusv.androidutilities.room.util.EntityData
+import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.CsvData
 import com.heyzeusv.androidutilities.room.util.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
@@ -32,7 +32,7 @@ private const val CONTEXT_PROP = "context"
 internal class CsvConverterCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
-    private val entityDataList: List<EntityData>,
+    private val entityInfoList: List<EntityInfo>,
     private val logger: KSPLogger,
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
@@ -81,7 +81,7 @@ internal class CsvConverterCreator(
                 .initializer(buildCodeBlock {
                     addStatement("listOf(")
                     addIndented {
-                        val tableNames = entityDataList.map { it.tableName }
+                        val tableNames = entityInfoList.map { it.tableName }
                         tableNames.forEachIndexed { index, tableName ->
                             add("%S", "$tableName.csv")
                             if (index < tableNames.size) add(", ")
@@ -134,15 +134,15 @@ internal class CsvConverterCreator(
                 }
                 
                 """.trimIndent())
-                entityDataList.forEachIndexed { i, entityData ->
-                    val utilName = entityData.utilClassName.getDataName()
+                entityInfoList.forEachIndexed { i, entityInfo ->
+                    val utilName = entityInfo.utilClassName.getDataName()
                     addStatement("")
                     addStatement("val %L = importCsvToRoomEntity(csvDocumentFiles[%L])", utilName, i)
                     addStatement("if (%L == null) return null // error importing data", utilName)
                 }
                 addStatement("")
                 addStatement("return RoomData(")
-                entityDataList.forEach { data ->
+                entityInfoList.forEach { data ->
                     val utilName = data.utilClassName.getDataName()
                     val dataName = utilName.replace("RoomUtil", "")
                     addStatement(
@@ -184,16 +184,16 @@ internal class CsvConverterCreator(
                   
                     """.trimIndent())
                     addIndented {
-                        entityDataList.forEach { entityData ->
+                        entityInfoList.forEach { entityInfo ->
                             add("""
                             %T.csvFieldToTypeMap.keys.toList() -> {
                               rows.forEach {
                                 val entry = %T(
                             
-                            """.trimIndent(), entityData.utilClassName, entityData.utilClassName)
+                            """.trimIndent(), entityInfo.utilClassName, entityInfo.utilClassName)
                             addIndented {
                                 addIndented {
-                                    entityData.fieldInfoList.forEachIndexed { index, info ->
+                                    entityInfo.fieldInfoList.forEachIndexed { index, info ->
                                         val cast = getTypeCast(info.roomType)
                                         add("  %L = it[%L]%L,\n", info.fieldName, index, cast)
                                     }

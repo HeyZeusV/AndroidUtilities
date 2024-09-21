@@ -4,7 +4,7 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.heyzeusv.androidutilities.room.util.EntityData
+import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.CsvData
 import com.heyzeusv.androidutilities.room.util.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
@@ -30,12 +30,12 @@ import com.squareup.kotlinpoet.buildCodeBlock
  *
  *  @param codeGenerator Creates file.
  *  @param dbClassDeclaration Class declaration annotated with Room.Database
- *  @param entityDataList List of info on each Room.Entity annotated class.
+ *  @param entityInfoList List of info on each Room.Entity annotated class.
  */
 internal class RoomDataFileCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
-    private val entityDataList: List<EntityData>,
+    private val entityInfoList: List<EntityInfo>,
     private val logger: KSPLogger,
 ) {
     private val fileName = "RoomData"
@@ -63,34 +63,34 @@ internal class RoomDataFileCreator(
 
     /**
      *  RoomData is pretty simple, just constructor and a few additional properties, so entire class
-     *  is built here using [entityDataList].
+     *  is built here using [entityInfoList].
      */
     private fun TypeSpec.Builder.buildRoomData(): TypeSpec.Builder {
         val constructorBuilder = FunSpec.constructorBuilder()
         val csvDataMapCodeBlockBuilder = CodeBlock.builder().addStatement("mapOf(").indent()
 
-        entityDataList.forEach { entityData ->
+        entityInfoList.forEach { entityInfo ->
             // parameter/property list of user created entity
-            val originalDataName = entityData.originalClassName.getDataName()
+            val originalDataName = entityInfo.originalClassName.getDataName()
             val originalParameterBuilder = ParameterSpec
-                .builder(originalDataName, entityData.originalClassName.asListTypeName())
+                .builder(originalDataName, entityInfo.originalClassName.asListTypeName())
                 .defaultValue("emptyList()")
             val originalPropertyBuilder = PropertySpec
-                .builder(originalDataName, entityData.originalClassName.asListTypeName())
+                .builder(originalDataName, entityInfo.originalClassName.asListTypeName())
                 .initializer(originalDataName)
             constructorBuilder.addParameter(originalParameterBuilder.build())
             addProperty(originalPropertyBuilder.build())
 
             // property list of RoomUtil created by EntityFilesCreator
-            val utilDataName = entityData.utilClassName.getDataName()
+            val utilDataName = entityInfo.utilClassName.getDataName()
             val utilPropertyBuilder = PropertySpec
-                .builder(utilDataName, entityData.utilClassName.asListTypeName())
+                .builder(utilDataName, entityInfo.utilClassName.asListTypeName())
                 .addModifiers(KModifier.PRIVATE)
                 .initializer(
                     buildCodeBlock {
                         addStatement("%L.map {", originalDataName)
                         addIndented {
-                            addStatement("%L.toUtil(it)", entityData.utilClassName.simpleName)
+                            addStatement("%L.toUtil(it)", entityInfo.utilClassName.simpleName)
                         }
                         add("}")
                     }
@@ -100,7 +100,7 @@ internal class RoomDataFileCreator(
             // property map of *RoomUtil class to list of *RoomUtil created above.
             csvDataMapCodeBlockBuilder.addStatement(
                 "%L to %L,",
-                entityData.utilClassName.simpleName, entityData.utilClassName.getDataName(),
+                entityInfo.utilClassName.simpleName, entityInfo.utilClassName.getDataName(),
             )
         }
         

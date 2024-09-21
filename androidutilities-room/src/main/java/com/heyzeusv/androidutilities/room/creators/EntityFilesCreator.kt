@@ -7,7 +7,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.util.CloseClass
 import com.heyzeusv.androidutilities.room.util.EmbeddedInfo
-import com.heyzeusv.androidutilities.room.util.EntityData
+import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.FieldInfo
 import com.heyzeusv.androidutilities.room.util.PropertyInfo
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
@@ -64,8 +64,8 @@ internal class EntityFilesCreator(
         ClassName("kotlin", "Float"), ClassName("kotlin", "ByteArray"),
     )
 
-    private val _entityDataList = mutableListOf<EntityData>()
-    val entityDataList: List<EntityData> get() = _entityDataList
+    private val _entityInfoList = mutableListOf<EntityInfo>()
+    val entityInfoList: List<EntityInfo> get() = _entityInfoList
 
     /**
      *  Go through all [symbols] and create a *RoomUtil file from each using inner class
@@ -342,20 +342,20 @@ internal class EntityFilesCreator(
 
             // build parameters/properties
             buildProperties(classDeclaration)
-            val entityData = EntityData(
+            val entityInfo = EntityInfo(
                 originalClassName = classDeclaration.toClassName(),
                 utilClassName = ClassName(classDeclaration.getPackageName(), classDeclaration.getUtilName()),
                 tableName = tableName,
                 fieldInfoList = propertyInfoList.filterIsInstance<FieldInfo>()
             )
-            _entityDataList.add(entityData)
+            _entityInfoList.add(entityInfo)
             // removes extra CloseClass that is added
             propertyInfoList.removeLast()
 
             // build toOriginal/toUtil functions
             buildToFunctions()
             // build CsvInfo/CsvData implementations
-            buildCsvInterfaceImplementations(entityData.fieldInfoList)
+            buildCsvInterfaceImplementations(entityInfo.fieldInfoList)
 
             // add constructor to class
             classBuilder.primaryConstructor(constructorBuilder.build())

@@ -39,14 +39,14 @@ class RoomProcessor(
                 RoomDataFileCreator(
                     codeGenerator = codeGenerator,
                     dbClassDeclaration = dbClass,
-                    entityDataList = entityFilesCreator.entityDataList,
+                    entityInfoList = entityFilesCreator.entityInfoList,
                     logger = logger,
                 )
 
                 CsvConverterCreator(
                     codeGenerator = codeGenerator,
                     dbClassDeclaration = dbClass,
-                    entityDataList = entityFilesCreator.entityDataList,
+                    entityInfoList = entityFilesCreator.entityInfoList,
                     logger = logger
                 )
             }

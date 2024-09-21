@@ -12,7 +12,7 @@ import com.squareup.kotlinpoet.ClassName
  *  @param tableName Name of table when saved by Room
  *  @param fieldInfoList Information on each property belonging to entity
  */
-data class EntityData(
+data class EntityInfo(
     val originalClassName: ClassName,
     val utilClassName: ClassName,
     val tableName: String,
