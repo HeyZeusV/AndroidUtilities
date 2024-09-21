@@ -15,18 +15,18 @@ import java.util.Locale
 import kotlin.reflect.KClass
 
 /**
- *  Returns the name of this declaration.
+ *  Returns the name of [this] declaration.
  */
 internal fun KSDeclaration.getName(): String = simpleName.getShortName()
 
 /**
- *  Returns the name of the package at which this declaration is declared at as [String].
+ *  Returns the name of the package at which [this] declaration is declared at as [String].
  */
 internal fun KSDeclaration.getPackageName(): String = packageName.asString()
 
 /**
- *  Returns the name of this class with suffix "RoomUtil" to differentiate between user created
- *  entity classes and entity classes created by this annotation processor.
+ *  Returns the name of [this] class with suffix "RoomUtil" to differentiate between user created
+ *  entity classes and entity classes created by [this] annotation processor.
  */
 internal fun KSClassDeclaration.getUtilName(): String = "${getName()}RoomUtil"
 
@@ -41,7 +41,7 @@ internal fun KSAnnotated.getAnnotationArgumentValue(
     annotations.getWithName(annotation).arguments.getWithName(argument).value.toString()
 
 /**
- *  Adds [code] to this [CodeBlock.Builder] indented one level.
+ *  Adds [code] to [this] [CodeBlock.Builder] indented one level.
  */
 internal fun CodeBlock.Builder.addIndented(code: CodeBlock.Builder.() -> Unit): CodeBlock.Builder =
     apply {
@@ -51,33 +51,32 @@ internal fun CodeBlock.Builder.addIndented(code: CodeBlock.Builder.() -> Unit): 
     }
 
 /**
- *  Indicates whether some other [TypeName] is "equal to" this if both were non-nullable.
+ *  Indicates whether some other [TypeName] is "equal to" [this] if both were non-nullable.
  */
 internal fun TypeName.equalsNullableType(type: TypeName): Boolean {
     return this.copy(nullable = false) == type.copy(nullable = false)
 }
 
-// TODO: check if all usages can be replaced with asListTypeName() below
 /**
- *  Returns [TypeName] of this if it was contained within a [List], i.e. List<this>
+ *  Returns [TypeName] of [this] if it was contained within a [List], i.e. List<[this]>
  */
-internal fun TypeName.getListTypeName(): ParameterizedTypeName =
+internal fun TypeName.asListTypeName(): ParameterizedTypeName =
     ClassName("kotlin.collections", "List").parameterizedBy(this)
 
 /**
- *  Returns this [TypeName] as [String] with "kotlin." prefix removed.
+ *  Returns [this] [TypeName] as [String] with "kotlin." prefix removed.
  */
 internal fun TypeName.removeKotlinPrefix(): String = toString().removePrefix("kotlin.")
 
 /**
- *  Checks if the specified [element], turned to non-null, is contained in this collection.
+ *  Checks if the specified [element], turned to non-null, is contained in [this] collection.
  */
 internal fun List<TypeName>.containsNullableType(element: TypeName): Boolean {
     return contains(element.copy(false))
 }
 
 /**
- *  Returns the name of this class with lowercase first letter and suffix "Data" in order to be
+ *  Returns the name of [this] class with lowercase first letter and suffix "Data" in order to be
  *  used as a parameter/property.
  */
 internal fun ClassName.getDataName(): String {
@@ -87,20 +86,20 @@ internal fun ClassName.getDataName(): String {
 
 /**
  *  Returns [KSAnnotation] with given [annotationName], assumes that given [annotationName] 100%
- *  exists in this sequence.
+ *  exists in [this] sequence.
  */
 internal fun Sequence<KSAnnotation>.getWithName(annotationName: String): KSAnnotation =
     find { it.shortName.getShortName() == annotationName }!!
 
 /**
  *  Returns [KSValueArgument] with given [argumentName], assumes that given [argumentName] 100%
- *  exists in this list.
+ *  exists in [this] list.
  */
 internal fun List<KSValueArgument>.getWithName(argumentName: String): KSValueArgument =
     find { it.name!!.getShortName() == argumentName }!!
 
 /**
- *  If this [String] is not blank, return this [String] with [value] appended onto the end else
+ *  If [this] [String] is not blank, return [this] [String] with [value] appended onto the end else
  *  return blank [String].
  */
 internal fun String.ifNotBlankAppend(value: String): String {
@@ -108,7 +107,9 @@ internal fun String.ifNotBlankAppend(value: String): String {
 }
 
 /**
- *  Returns [TypeName] of this if it was contained within a [List], i.e. List<*>
+ *  Returns [TypeName] of [this] if it was contained within a [List], i.e. List<*>.
+ *  
+ *  @param nullable Determines if [this] is nullable.
  */
-internal fun KClass<*>.asListTypeName(): ParameterizedTypeName =
-    ClassName("kotlin.collections", "List").parameterizedBy(this.asTypeName())
+internal fun KClass<*>.asListTypeName(nullable: Boolean = false): ParameterizedTypeName =
+    this.asTypeName().copy(nullable = nullable).asListTypeName()

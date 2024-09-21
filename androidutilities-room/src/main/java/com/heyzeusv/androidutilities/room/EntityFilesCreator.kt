@@ -8,10 +8,10 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.csv.CsvData
 import com.heyzeusv.androidutilities.room.csv.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
+import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.containsNullableType
 import com.heyzeusv.androidutilities.room.util.equalsNullableType
 import com.heyzeusv.androidutilities.room.util.getAnnotationArgumentValue
-import com.heyzeusv.androidutilities.room.util.getListTypeName
 import com.heyzeusv.androidutilities.room.util.getName
 import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.heyzeusv.androidutilities.room.util.getUtilName
@@ -317,7 +317,7 @@ internal class EntityFilesCreator(
             companionObjectBuilder.addProperty(fileNamePropBuilder.build())
                 .addProperty(fieldToTypeMapPropBuilder.build())
 
-            val anyListClass = Any::class.asTypeName().copy(nullable = true).getListTypeName()
+            val anyListClass = Any::class.asListTypeName(nullable = true)
             val rowPropBuilder = PropertySpec.builder(CsvData::csvRow.name, anyListClass)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer(buildCodeBlock {

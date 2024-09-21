@@ -9,7 +9,6 @@ import com.heyzeusv.androidutilities.room.csv.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
-import com.heyzeusv.androidutilities.room.util.getListTypeName
 import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
@@ -73,10 +72,10 @@ internal class RoomDataFileCreator(
             // parameter/property list of user created entity
             val originalDataName = entityData.originalClassName.getDataName()
             val originalParameterBuilder = ParameterSpec
-                .builder(originalDataName, entityData.originalClassName.getListTypeName())
+                .builder(originalDataName, entityData.originalClassName.asListTypeName())
                 .defaultValue("emptyList()")
             val originalPropertyBuilder = PropertySpec
-                .builder(originalDataName, entityData.originalClassName.getListTypeName())
+                .builder(originalDataName, entityData.originalClassName.asListTypeName())
                 .initializer(originalDataName)
             constructorBuilder.addParameter(originalParameterBuilder.build())
             addProperty(originalPropertyBuilder.build())
@@ -84,7 +83,7 @@ internal class RoomDataFileCreator(
             // property list of RoomUtil created by EntityFilesCreator
             val utilDataName = entityData.utilClassName.getDataName()
             val utilPropertyBuilder = PropertySpec
-                .builder(utilDataName, entityData.utilClassName.getListTypeName())
+                .builder(utilDataName, entityData.utilClassName.asListTypeName())
                 .addModifiers(KModifier.PRIVATE)
                 .initializer(
                     buildCodeBlock {

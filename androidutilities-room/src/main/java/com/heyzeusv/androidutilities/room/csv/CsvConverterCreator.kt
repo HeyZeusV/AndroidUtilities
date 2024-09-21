@@ -8,7 +8,6 @@ import com.heyzeusv.androidutilities.room.EntityData
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
-import com.heyzeusv.androidutilities.room.util.getListTypeName
 import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.heyzeusv.androidutilities.room.util.removeKotlinPrefix
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -20,7 +19,6 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -77,7 +75,7 @@ internal class CsvConverterCreator(
                 .build()
         )
         addProperty(
-            PropertySpec.builder("csvFileNames", String::class.asTypeName().getListTypeName())
+            PropertySpec.builder("csvFileNames", String::class.asListTypeName())
                 .initializer(buildCodeBlock {
                     addStatement("listOf(")
                     addIndented {
