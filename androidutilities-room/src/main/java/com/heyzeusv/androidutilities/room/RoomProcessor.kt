@@ -11,6 +11,7 @@ import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.creators.CsvConverterCreator
 import com.heyzeusv.androidutilities.room.creators.EntityFilesCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataFileCreator
+import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
 
 class RoomProcessor(
     private val codeGenerator: CodeGenerator,

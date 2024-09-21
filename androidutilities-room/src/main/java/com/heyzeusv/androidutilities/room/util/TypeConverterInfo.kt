@@ -1,8 +1,6 @@
-package com.heyzeusv.androidutilities.room
+package com.heyzeusv.androidutilities.room.util
 
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
-import com.heyzeusv.androidutilities.room.util.getName
-import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ksp.toTypeName

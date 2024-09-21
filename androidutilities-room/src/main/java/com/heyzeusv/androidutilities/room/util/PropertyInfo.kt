@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilities.room
+package com.heyzeusv.androidutilities.room.util
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.TypeName
