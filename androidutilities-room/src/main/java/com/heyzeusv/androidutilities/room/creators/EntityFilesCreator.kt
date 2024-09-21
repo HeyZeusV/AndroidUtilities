@@ -76,6 +76,10 @@ internal class EntityFilesCreator(
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 // skip any classes that are annotated with Room.Fts4
                 if (classDeclaration.annotations.any { it.shortName.getShortName() == "Fts4"}) {
+                    logger.warn("Entity annotated with Fts4 detected...\n" +
+                            "Make sure to rebuild Fts4 table after import using: " +
+                            "INSERT INTO table_name(table_name) VALUES('rebuild');\n" +
+                            "Will not be part of import/export...")
                     return@forEach
                 }
                 val entityBuilder = EntityBuilder(classDeclaration)
