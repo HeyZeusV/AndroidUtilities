@@ -112,22 +112,17 @@ internal class CsvConverterCreator(
             .returns(roomDataClassName.copy(nullable = true))
             .addCode(buildCodeBlock {
                 add("""
-                val selectedDirectory = DocumentFile.fromTreeUri(context, $selectedDirectoryUri)!!
-                if (!selectedDirectory.exists()) {
-                  // selected directory does no exist
-                  return null
-                }
-                val csvDocumentFiles = mutableListOf<DocumentFile>()
-                csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it)
-                  if (file == null) {
-                    // file was not found
-                    return null
-                  } else {
-                    csvDocumentFiles.add(file)
-                  }
-                }
-                
+                    val selectedDirectory = DocumentFile.fromTreeUri(context, $selectedDirectoryUri)!!
+                    if (!selectedDirectory.exists()) {
+                      // selected directory does not exist
+                      return null
+                    }
+                    val csvDocumentFiles = mutableListOf<DocumentFile>()
+                    csvFileNames.forEach {
+                      val file = selectedDirectory.findFile(it) ?: return null // file was not found
+                      csvDocumentFiles.add(file)
+                    }
+                    
                 """.trimIndent())
                 entityInfoList.forEachIndexed { i, entityInfo ->
                     val utilName = entityInfo.utilClassName.getDataName()
@@ -141,8 +136,8 @@ internal class CsvConverterCreator(
                     val utilName = data.utilClassName.getDataName()
                     val dataName = utilName.replace("RoomUtil", "")
                     addStatement(
-                        format = "  %L = (%L·as·List<%L>).map·{·it.toOriginal()·},",
-                        args = arrayOf(dataName, utilName, data.utilClassName.simpleName),
+                        "  %L = (%L·as·List<%L>).map·{·it.toOriginal()·},",
+                        dataName, utilName, data.utilClassName.simpleName,
                     )
                 }
                 addStatement(")")
@@ -252,28 +247,30 @@ internal class CsvConverterCreator(
                     "val appExportDirectory = %T.fromTreeUri(%L, $appExportDirectoryUri)!!",
                     documentFileClassName, CONTEXT_PROP,
                 )
-                // TODO: REMOVE THE ELSE STATEMENT
                 add("""
-                if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
-                  return
-                } else {
-                  val newExportDirectory = createNewExportDirectory(appExportDirectory)
-                  if (newExportDirectory == null) {
-                    // failed to create directory
-                    return
-                  } else {
-                    val newCsvDocumentFiles = mutableListOf<DocumentFile>()
-                    $roomData.csvDataMap.entries.forEach {
-                    val csvDocumentFile = exportRoomEntityToCsv(
-                      newExportDirectory = newExportDirectory,
-                      csvInfo = it.key,
-                      csvDataList = it.value,
-                      )
-                      newCsvDocumentFiles.add(csvDocumentFile)
+                    if (!appExportDirectory.exists()) {
+                      // given directory doesn't exist
+                      return
+                    } else {
+                      // returns if fails to create directory
+                      val newExportDirectory = createNewExportDirectory(appExportDirectory) ?: return
+                      val newCsvFiles = mutableListOf<DocumentFile>()
+                      $roomData.csvDataMap.entries.forEach {
+                        val csvFile = exportRoomEntityToCsv(
+                          newExportDirectory = newExportDirectory,
+                          csvInfo = it.key,
+                          csvDataList = it.value,
+                        )
+                        if (csvFile == null) {
+                          // delete previously created csv files
+                          newCsvFiles.forEach { file -> file.delete() }
+                          // delete directory created for this export
+                          newExportDirectory.delete()
+                          return // failed to create csv file
+                        }
+                        newCsvFiles.add(csvFile)
+                      }
                     }
-                  }
-                }
                 """.trimIndent())
             })
 
@@ -285,25 +282,25 @@ internal class CsvConverterCreator(
         val csvWriterMemberName = MemberName("com.github.doyaaaaaken.kotlincsv.dsl", "csvWriter")
         val funSpec = FunSpec.builder("exportRoomEntityToCsv")
             .addModifiers(KModifier.PRIVATE)
-            .returns(documentFileClassName)
+            .returns(documentFileClassName.copy(nullable = true))
             .addParameter(newExportDirectory, documentFileClassName)
             .addParameter("csvInfo", CsvInfo::class)
             .addParameter("csvDataList", csvDataListClassName)
             .addCode(buildCodeBlock {
-                addStatement(
-                    "val csvDocumentFile = %L.createFile(%S, csvInfo.csvFileName)!!",
-                    newExportDirectory, "text/*",
-                )
-                addStatement(
-                    "val outputStream = %L.contentResolver.openOutputStream(csvDocumentFile.uri)!!",
-                    CONTEXT_PROP,
-                )
+                add("""
+                    val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
+                      return null // failed to create file
+                    val outputStream = $CONTEXT_PROP.contentResolver.openOutputStream(csvFile.uri) ?:
+                      return null // failed to open output stream
+                    
+                    
+                """.trimIndent())
                 addStatement("%M().open(outputStream) {", csvWriterMemberName)
                 add("""
-                  writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
-                  csvDataList.forEach { writeRow(it.csvRow) }
-                }
-                return csvDocumentFile
+                      writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
+                      csvDataList.forEach { writeRow(it.csvRow) }
+                    }
+                    return csvFile
                 """.trimIndent())
             })
 
