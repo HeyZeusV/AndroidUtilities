@@ -10,7 +10,8 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.creators.CsvConverterCreator
 import com.heyzeusv.androidutilities.room.creators.EntityFilesCreator
-import com.heyzeusv.androidutilities.room.creators.RoomDataFileCreator
+import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
+import com.heyzeusv.androidutilities.room.creators.RoomUtilFunctionsCreator
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
 
 class RoomProcessor(
@@ -36,18 +37,22 @@ class RoomProcessor(
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                RoomDataFileCreator(
+                RoomUtilFunctionsCreator(
+                    codeGenerator = codeGenerator,
+                    dbClassDeclaration = dbClass,
+                    logger = logger,
+                )
+                RoomDataCreator(
                     codeGenerator = codeGenerator,
                     dbClassDeclaration = dbClass,
                     entityInfoList = entityFilesCreator.entityInfoList,
                     logger = logger,
                 )
-
                 CsvConverterCreator(
                     codeGenerator = codeGenerator,
                     dbClassDeclaration = dbClass,
                     entityInfoList = entityFilesCreator.entityInfoList,
-                    logger = logger
+                    logger = logger,
                 )
             }
         }

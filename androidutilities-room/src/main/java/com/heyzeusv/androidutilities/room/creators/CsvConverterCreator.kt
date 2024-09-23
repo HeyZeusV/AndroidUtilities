@@ -22,9 +22,6 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 private const val FILE_NAME = "CsvConverter"
 private const val CONTEXT_PROP = "context"
@@ -98,8 +95,6 @@ internal class CsvConverterCreator(
         addFunction(buildImportCsvToRoomEntityFunction().build())
         addFunction(buildExportRoomToCsvFunction().build())
         addFunction(buildExportRoomEntityToCsv().build())
-        addFunction(buildCreateNewExportDirectoryFunction().build())
-        addFunction(buildFindOrCreateSaveDirectoryFunction().build())
 
         return this
     }
@@ -247,22 +242,23 @@ internal class CsvConverterCreator(
     }
 
     private fun buildExportRoomToCsvFunction(): FunSpec.Builder {
-        val saveDirectoryUri = "saveDirectoryUri"
+        val appExportDirectoryUri = "appExportDirectoryUri"
         val roomData = "roomData"
         val funSpec = FunSpec.builder("exportRoomToCsv")
-            .addParameter(saveDirectoryUri, uriClassName)
+            .addParameter(appExportDirectoryUri, uriClassName)
             .addParameter(roomData, roomDataClassName)
             .addCode(buildCodeBlock {
                 addStatement(
-                    "val saveDirectory = %T.fromTreeUri(%L, $saveDirectoryUri)!!",
+                    "val appExportDirectory = %T.fromTreeUri(%L, $appExportDirectoryUri)!!",
                     documentFileClassName, CONTEXT_PROP,
                 )
+                // TODO: REMOVE THE ELSE STATEMENT
                 add("""
-                if (!saveDirectory.exists()) {
+                if (!appExportDirectory.exists()) {
                   // given directory doesn't exist
                   return
                 } else {
-                  val newExportDirectory = createNewExportDirectory(saveDirectory)
+                  val newExportDirectory = createNewExportDirectory(appExportDirectory)
                   if (newExportDirectory == null) {
                     // failed to create directory
                     return
@@ -309,58 +305,6 @@ internal class CsvConverterCreator(
                 }
                 return csvDocumentFile
                 """.trimIndent())
-            })
-
-        return funSpec
-    }
-
-    private fun buildCreateNewExportDirectoryFunction(): FunSpec.Builder {
-        val saveDirectory = "saveDirectory"
-        val funSpec = FunSpec.builder("createNewExportDirectory")
-            .addModifiers(KModifier.PRIVATE)
-            .returns(documentFileClassName.copy(nullable = true))
-            .addParameter(saveDirectory, documentFileClassName)
-            .addCode(buildCodeBlock {
-                addStatement(
-                    "val sdf = %T(%S, %T.getDefault())",
-                    SimpleDateFormat::class, "MMM_dd_yyyy__hh_mm_aa", Locale::class,
-                )
-                addStatement("val formattedDate = sdf.format(%T())", Date::class)
-                add("""
-                val newExportDirectory = $saveDirectory.createDirectory(formattedDate)
-                return newExportDirectory
-                """.trimIndent())
-            })
-
-        return funSpec
-    }
-
-    private fun buildFindOrCreateSaveDirectoryFunction(): FunSpec.Builder {
-        val saveDirectoryName = "saveDirectoryName"
-        val selectedDirectoryUri = "selectedDirectoryUri"
-        val funSpec = FunSpec.builder("findOrCreateSaveDirectory")
-            .returns(uriClassName.copy(nullable = true))
-            .addParameter(saveDirectoryName, String::class)
-            .addParameter(selectedDirectoryUri, uriClassName)
-            .addCode(buildCodeBlock {
-                addStatement("try {")
-                addIndented {
-                    addStatement(
-                        "val selectedDirectory = %T.fromTreeUri(%L, %L)!!",
-                        documentFileClassName, CONTEXT_PROP, selectedDirectoryUri,
-                    )
-                    add("""
-                    var saveDirectory = selectedDirectory.findFile($saveDirectoryName)
-                    if (saveDirectory == null) {
-                      saveDirectory = selectedDirectory.createDirectory($saveDirectoryName)!!
-                    }
-                    return saveDirectory.uri
-                    
-                    """.trimIndent())
-                }
-                addStatement("} catch (e: %T) {", Exception::class)
-                addIndented { addStatement("return null") }
-                addStatement("}")
             })
 
         return funSpec

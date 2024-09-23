@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.heyzeusv.androidutilitieslibrary.database.Database
 import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
 import com.heyzeusv.androidutilitieslibrary.database.RoomData
+import com.heyzeusv.androidutilitieslibrary.database.findOrCreateAppExportDirectory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,13 +54,14 @@ private fun exportToCSV(
     db: Database,
 ) {
     scope.launch(Dispatchers.IO) {
-        val parentDirectoryUri = CsvConverter(context).findOrCreateSaveDirectory(
-            saveDirectoryName = "RoomCsvExample",
-            selectedDirectoryUri = selectedDirectoryUri
-        )!!.toString()
+        val appExportDirectoryUri = findOrCreateAppExportDirectory(
+            context = context,
+            selectedDirectoryUri = selectedDirectoryUri,
+            appExportDirectoryName = "RoomCsvExample",
+        )!!
         val roomData = getData(db)
         CsvConverter(context).exportRoomToCsv(
-            saveDirectoryUri = Uri.parse(parentDirectoryUri),
+            appExportDirectoryUri = appExportDirectoryUri,
             roomData = roomData,
         )
     }

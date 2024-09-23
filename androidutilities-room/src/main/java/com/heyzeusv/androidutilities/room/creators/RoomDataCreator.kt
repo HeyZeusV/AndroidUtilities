@@ -32,7 +32,7 @@ import com.squareup.kotlinpoet.buildCodeBlock
  *  @param dbClassDeclaration Class declaration annotated with Room.Database
  *  @param entityInfoList List of info on each Room.Entity annotated class.
  */
-internal class RoomDataFileCreator(
+internal class RoomDataCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
     private val entityInfoList: List<EntityInfo>,
@@ -57,7 +57,7 @@ internal class RoomDataFileCreator(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
             packageName = packageName,
             fileName = fileName,
-            extensionName = "kt"
+            extensionName = "kt",
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
 
