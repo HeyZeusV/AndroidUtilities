@@ -23,7 +23,6 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 
-private const val FILE_NAME = "CsvConverter"
 private const val CONTEXT_PROP = "context"
 
 internal class CsvConverterCreator(
@@ -41,9 +40,10 @@ internal class CsvConverterCreator(
 
     private fun createCsvConverterFile() {
         logger.info("Creating CsvConverter...")
-        val fileBuilder = FileSpec.builder(packageName, FILE_NAME)
+        val fileName = "CsvConverter"
+        val fileBuilder = FileSpec.builder(packageName, fileName)
 
-        val classBuilder = TypeSpec.classBuilder(FILE_NAME)
+        val classBuilder = TypeSpec.classBuilder(fileName)
             .buildCsvConverter()
 
         fileBuilder.addType(classBuilder.build())
@@ -51,7 +51,7 @@ internal class CsvConverterCreator(
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
             packageName = packageName,
-            fileName = FILE_NAME,
+            fileName = fileName,
             extensionName = "kt"
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
@@ -105,8 +105,8 @@ internal class CsvConverterCreator(
         val funSpec = FunSpec.builder("importCsvToRoom")
             .addAnnotation(
                 AnnotationSpec.builder(Suppress::class)
-                .addMember("%S", "UNCHECKED_CAST")
-                .build()
+                    .addMember("%S", "UNCHECKED_CAST")
+                    .build()
             )
             .addParameter(selectedDirectoryUri, uriClassName)
             .returns(roomDataClassName.copy(nullable = true))
@@ -253,7 +253,7 @@ internal class CsvConverterCreator(
                       return
                     } else {
                       // returns if fails to create directory
-                      val newExportDirectory = createNewExportDirectory(appExportDirectory) ?: return
+                      val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
                       val newCsvFiles = mutableListOf<DocumentFile>()
                       $roomData.csvDataMap.entries.forEach {
                         val csvFile = exportRoomEntityToCsv(

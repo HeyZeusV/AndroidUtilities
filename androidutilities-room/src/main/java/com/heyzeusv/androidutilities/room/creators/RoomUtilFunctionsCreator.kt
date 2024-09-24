@@ -36,8 +36,8 @@ internal class RoomUtilFunctionsCreator(
         val fileName = "RoomUtilFunctions"
         val fileBuilder = FileSpec.builder(packageName, fileName)
 
-        fileBuilder.addFunction(buildCreateNewExportDirectoryFunction().build())
-        fileBuilder.addFunction(buildFindOrCreateAppExportDirectoryFunction().build())
+        fileBuilder.addFunction(buildCreateNewDirectoryFunction().build())
+        fileBuilder.addFunction(buildFindOrCreateAppDirectoryFunction().build())
 
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
@@ -51,11 +51,11 @@ internal class RoomUtilFunctionsCreator(
      *  Builds function that creates directory to place exported data using the date as a naming
      *  scheme.
      */
-    private fun buildCreateNewExportDirectoryFunction(): FunSpec.Builder {
-        val saveDirectory = "saveDirectory"
-        val funSpec = FunSpec.builder("createNewExportDirectory")
+    private fun buildCreateNewDirectoryFunction(): FunSpec.Builder {
+        val appDirectory = "appDirectory"
+        val funSpec = FunSpec.builder("createNewDirectory")
             .returns(documentFileClassName.copy(nullable = true))
-            .addParameter(saveDirectory, documentFileClassName)
+            .addParameter(appDirectory, documentFileClassName)
             .addCode(buildCodeBlock {
                 addStatement(
                     "val sdf = %T(%S, %T.getDefault())",
@@ -63,8 +63,8 @@ internal class RoomUtilFunctionsCreator(
                 )
                 addStatement("val formattedDate = sdf.format(%T())", Date::class)
                 add("""
-                    val newExportDirectory = $saveDirectory.createDirectory(formattedDate)
-                    return newExportDirectory
+                    val newDirectory = $appDirectory.createDirectory(formattedDate)
+                    return newDirectory
                 """.trimIndent())
             })
 
@@ -75,18 +75,18 @@ internal class RoomUtilFunctionsCreator(
      *  Builds function that searches for appExportDirectoryName in selectedDirectoryUri and
      *  returns its Uri if found, else it creates appExportDirectoryName in selectedDirectoryUri.
      */
-    private fun buildFindOrCreateAppExportDirectoryFunction(): FunSpec.Builder {
+    private fun buildFindOrCreateAppDirectoryFunction(): FunSpec.Builder {
         val context = "context"
         val contextClassName = ClassName("android.content", "Context")
 
         val selectedDirectoryUri = "selectedDirectoryUri"
-        val appExportDirectoryName = "appExportDirectoryName"
+        val appDirectoryName = "appDirectoryName"
 
-        val funSpec = FunSpec.builder("findOrCreateAppExportDirectory")
+        val funSpec = FunSpec.builder("findOrCreateAppDirectory")
             .returns(uriClassName.copy(nullable = true))
             .addParameter(context, contextClassName)
             .addParameter(selectedDirectoryUri, uriClassName)
-            .addParameter(appExportDirectoryName, String::class)
+            .addParameter(appDirectoryName, String::class)
             .addCode(buildCodeBlock {
                 addStatement("try {")
                 addIndented {
@@ -95,10 +95,10 @@ internal class RoomUtilFunctionsCreator(
                         documentFileClassName, context, selectedDirectoryUri,
                     )
                     add("""
-                        val appExportDirectory = selectedDirectory.findFile($appExportDirectoryName) ?:
-                          selectedDirectory.createDirectory($appExportDirectoryName)!!
+                        val appDirectory = selectedDirectory.findFile($appDirectoryName) ?:
+                          selectedDirectory.createDirectory($appDirectoryName)!!
       
-                        return appExportDirectory.uri
+                        return appDirectory.uri
                     
                     """.trimIndent())
                 }

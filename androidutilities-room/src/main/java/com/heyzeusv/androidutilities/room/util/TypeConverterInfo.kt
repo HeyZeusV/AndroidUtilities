@@ -12,8 +12,7 @@ import com.squareup.kotlinpoet.ksp.toTypeName
  *  [packageName] and [className] are used as parameters to create a [ClassName]. This [ClassName]
  *  is used to automatically import [className] using KotlinPoet's %T format specifier. The
  *  function can then be called using [functionName]. [parameterType] and [returnType] are used
- *  to determine which TypeConverter function to use. This can be seen at [handlePropertyInfoToUtil]
- *  under is FieldInfo condition.
+ *  to determine which TypeConverter function to use.
  *
  *  @param packageName Name of package where TypeConverter is declared at.
  *  @param className Name of class that TypeConverter belongs to.
