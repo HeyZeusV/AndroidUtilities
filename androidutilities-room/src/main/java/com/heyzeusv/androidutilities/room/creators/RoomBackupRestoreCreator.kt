@@ -21,6 +21,7 @@ import java.io.PrintWriter
 
 private const val CONTEXT = "context"
 private const val DB_FILE_NAME = "dbFileName"
+private const val TEXT_MIME = "text/*"
 
 internal class RoomBackupRestoreCreator(
     private val codeGenerator: CodeGenerator,
@@ -84,27 +85,31 @@ internal class RoomBackupRestoreCreator(
         val funSpec = FunSpec.builder("backup")
             .addParameter(appBackupDirectoryUri, uriClassName)
             .addCode(buildCodeBlock {
-                addStatement(
-                    "val appBackupDirectory = %T.fromTreeUri(%L, %L)!!",
-                    documentFileClassName, CONTEXT, appBackupDirectoryUri
-                )
                 add("""
+                    val appBackupDirectory = %T.fromTreeUri(%L, %L)!!
                     if (!appBackupDirectory.exists()) {
                       return // directory not found
                     }
+                    
+                """.trimIndent(), documentFileClassName, CONTEXT, appBackupDirectoryUri)
+                add("""
+                    
                     val newBackupDirectory = createNewDirectory(appBackupDirectory) ?:
                       return // new directory could not be created
-                    val dbPath = $CONTEXT.getDatabasePath("$DB_FILE_NAME").path
+                    val dbPath = %L.getDatabasePath(%L).path
                     
-                """.trimIndent())
-                addStatement("val dbFile = DocumentFile.fromFile(%T(dbPath))", File::class)
-                addStatement("val dbWalFile = DocumentFile.fromFile(File(%P))", "$" + "dbPath-wal")
-                addStatement("val dbShmFile = DocumentFile.fromFile(File(%P))", "$" + "dbPath-shm")
+                """.trimIndent(), CONTEXT, DB_FILE_NAME)
                 add("""
+                    val dbFile = DocumentFile.fromFile(%T(dbPath))
+                    val dbWalFile = DocumentFile.fromFile(File(%P))
+                    val dbShmFile = DocumentFile.fromFile(File(%P))
                     if (!dbFile.exists()) return // main db file not found
                     
+                """.trimIndent(), File::class, "$" + "dbPath-wal", "$" + "dbPath-shm")
+                add("""
+                    
                     val newFiles = mutableListOf(newBackupDirectory)
-                    val bkpDbFile = newBackupDirectory.createFile("text/*", $DB_FILE_NAME) ?:
+                    val bkpDbFile = newBackupDirectory.createFile(%S, %L) ?:
                       return // error creating backup file
                     var dbFileCopyStatus = dbFile.copyTo(bkpDbFile)
                     if (!dbFileCopyStatus) {
@@ -114,14 +119,11 @@ internal class RoomBackupRestoreCreator(
                     }
                     newFiles.add(bkpDbFile)
                     
-                    if (dbWalFile.exists()) {
-                    
-                """.trimIndent())
-                addStatement(
-                    "  val bkpDbWalFile = newBackupDirectory.createFile(%S, %P) ?:",
-                    "text/*", "$" + "dbFileName-wal"
-                )
+                """.trimIndent(), TEXT_MIME, DB_FILE_NAME)
                 add("""
+                    
+                    if (dbWalFile.exists()) {
+                      val bkpDbWalFile = newBackupDirectory.createFile(%S, %P) ?:
                         return // error creating backup file
                       dbFileCopyStatus = dbWalFile.copyTo(bkpDbWalFile)
                       if (!dbFileCopyStatus) {
@@ -132,14 +134,11 @@ internal class RoomBackupRestoreCreator(
                       newFiles.add(bkpDbWalFile)
                     }
                         
-                    if (dbShmFile.exists()) {
-                    
-                """.trimIndent())
-                addStatement(
-                    "  val bkpDbShmFile = newBackupDirectory.createFile(%S, %P) ?:",
-                    "text/*", "$" + "dbFileName-shm"
-                )
+                """.trimIndent(), TEXT_MIME, "$" + "dbFileName-wal")
                 add("""
+                    
+                    if (dbShmFile.exists()) {
+                      val bkpDbShmFile = newBackupDirectory.createFile(%S, %P) ?:
                         return // error creating backup file
                       dbFileCopyStatus = dbShmFile.copyTo(bkpDbShmFile)
                       if (!dbFileCopyStatus) {
@@ -148,7 +147,7 @@ internal class RoomBackupRestoreCreator(
                         return // failed to copy shm file
                       }
                     }
-                """.trimIndent())
+                """.trimIndent(), TEXT_MIME, "$" + "dbFileName-shm")
             })
 
         return funSpec
@@ -168,22 +167,28 @@ internal class RoomBackupRestoreCreator(
                     if (!selectedDirectory.exists()) {
                       return // directory doesn't exist
                     }
-                    val bkpDbFile = selectedDirectory.findFile($DB_FILE_NAME) ?: return // main db file not found
                     
                 """.trimIndent())
-                addStatement("val bkpDbWalFile = selectedDirectory.findFile(%P)", "$" + "dbFileName-wal")
-                addStatement("val bkpDbShmFile = selectedDirectory.findFile(%P)", "$" + "dbFileName-shm")
-                addStatement("")
-                add("""val dbPath = context.getDatabasePath("$DB_FILE_NAME").path""")
-                addStatement("")
-                addStatement("val dbFile = DocumentFile.fromFile(File(dbPath))")
-                addStatement("val dbWalFile = DocumentFile.fromFile(File(%P))", "$" + "dbPath-wal")
-                addStatement("val dbShmFile = DocumentFile.fromFile(File(%P))", "$" + "dbPath-shm")
-                addStatement("if (!dbFile.exists()) return // main db file not found")
-                addStatement("")
-                addStatement("// delete any existing content before restoring")
-                addStatement("%T(File(dbPath)).close()", PrintWriter::class)
                 add("""
+                    
+                    val bkpDbFile = selectedDirectory.findFile(%L) ?: return // main db file not found
+                    val bkpDbWalFile = selectedDirectory.findFile(%P)
+                    val bkpDbShmFile = selectedDirectory.findFile(%P)
+                    
+                """.trimIndent(), DB_FILE_NAME, "$" + "dbFileName-wal", "$" + "dbFileName-shm")
+                add("""
+                    
+                    val dbPath = context.getDatabasePath(%L).path
+                    val dbFile = DocumentFile.fromFile(File(dbPath))
+                    val dbWalFile = DocumentFile.fromFile(File(%P))
+                    val dbShmFile = DocumentFile.fromFile(File(%P))
+                    if (!dbFile.exists()) return // main db file not found
+                    
+                """.trimIndent(), DB_FILE_NAME, "$" + "dbPath-wal", "$" + "dbPath-shm")
+                add("""
+                    
+                    // delete any existing content before restoring
+                    %T(File(dbPath)).close()
                     bkpDbFile.copyTo(dbFile)
                     // file doesn't exist in backup so delete current
                     if (bkpDbWalFile == null) {
@@ -203,7 +208,7 @@ internal class RoomBackupRestoreCreator(
                     }
                     
                     restartApp()
-                """.trimIndent(),  "$" + "dbPath-wal", "$" + "dbPath-shm")
+                """.trimIndent(),  PrintWriter::class, "$" + "dbPath-wal", "$" + "dbPath-shm")
             })
 
         return funSpec
@@ -220,10 +225,7 @@ internal class RoomBackupRestoreCreator(
                     val input = try {
                       // returns false if fails to open stream
                       context.contentResolver.openInputStream(this.uri) ?: return false
-                    
-                """.trimIndent())
-                addStatement("} catch (e: %T) {", FileNotFoundException::class)
-                add("""
+                    } catch (e: %T) {
                       return false
                     }
                     val output = try {
@@ -232,6 +234,9 @@ internal class RoomBackupRestoreCreator(
                     } catch (e: FileNotFoundException) {
                       return false
                     }
+                    
+                """.trimIndent(), FileNotFoundException::class)
+                add("""
                     
                     try {
                       val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
