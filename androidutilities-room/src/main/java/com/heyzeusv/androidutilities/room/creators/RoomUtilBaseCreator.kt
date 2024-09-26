@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 import java.lang.UnsupportedOperationException
@@ -26,6 +27,7 @@ internal class RoomUtilBaseCreator(
     private val dbClassDeclaration: KSClassDeclaration,
     private val logger: KSPLogger,
 ) {
+    private val contextClassName = ClassName("android.content", "Context")
     private val uriClassName = ClassName("android.net", "Uri")
     private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
 
@@ -38,9 +40,7 @@ internal class RoomUtilBaseCreator(
         val fileName = "RoomUtilBase"
         val fileBuilder = FileSpec.builder(packageName, fileName)
         val classBuilder = TypeSpec.classBuilder(fileName)
-            .addModifiers(KModifier.ABSTRACT)
-            .addFunction(buildCreateNewDirectoryFunction().build())
-            .addFunction(buildFindOrCreateAppDirectoryFunction().build())
+            .buildRoomUtilBase()
 
         fileBuilder.addType(classBuilder.build())
 
@@ -50,6 +50,37 @@ internal class RoomUtilBaseCreator(
             fileName = fileName,
             extensionName = "kt",
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
+    }
+
+    /**
+     *  Builds RoomUtilBase TypeSpec by adding parameters/properties and functions.
+     */
+    private fun TypeSpec.Builder.buildRoomUtilBase(): TypeSpec.Builder {
+        addModifiers(KModifier.ABSTRACT)
+
+        primaryConstructor(
+            FunSpec.constructorBuilder()
+                .addParameter("context", contextClassName)
+                .addParameter("appDirectoryName", String::class)
+                .build()
+        )
+        addProperty(
+            PropertySpec.builder("context", contextClassName)
+                .initializer("context")
+                .addModifiers(KModifier.PRIVATE)
+                .build()
+        )
+        addProperty(
+            PropertySpec.builder("appDirectoryName", String::class)
+                .initializer("appDirectoryName")
+                .addModifiers(KModifier.PRIVATE)
+                .build()
+        )
+
+        addFunction(buildCreateNewDirectoryFunction().build())
+        addFunction(buildFindOrCreateAppDirectoryFunction().build())
+
+        return this
     }
 
     /**
@@ -83,16 +114,13 @@ internal class RoomUtilBaseCreator(
      */
     private fun buildFindOrCreateAppDirectoryFunction(): FunSpec.Builder {
         val context = "context"
-        val contextClassName = ClassName("android.content", "Context")
 
         val selectedDirectoryUri = "selectedDirectoryUri"
         val appDirectoryName = "appDirectoryName"
 
         val funSpec = FunSpec.builder("findOrCreateAppDirectory")
             .returns(uriClassName.copy(nullable = true))
-            .addParameter(context, contextClassName)
             .addParameter(selectedDirectoryUri, uriClassName)
-            .addParameter(appDirectoryName, String::class)
             .addCode(buildCodeBlock {
                 addStatement("try {")
                 addIndented {

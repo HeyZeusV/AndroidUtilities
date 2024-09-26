@@ -28,17 +28,16 @@ internal class RoomBackupRestoreCreator(
     private val dbClassDeclaration: KSClassDeclaration,
     private val logger: KSPLogger,
 ) {
+    private val packageName = dbClassDeclaration.getPackageName()
     private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
     private val uriClassName = ClassName("android.net", "Uri")
 
     private fun createRoomBackupRestoreFile() {
         logger.info("Creating RoomBackupRestore...")
-        val packageName = dbClassDeclaration.getPackageName()
         val fileName = "RoomBackupRestore"
         val fileBuilder = FileSpec.builder(packageName, fileName)
 
         val classBuilder = TypeSpec.classBuilder(fileName)
-            .superclass(ClassName(packageName, "RoomUtilBase"))
             .buildRoomBackupRestore()
 
         fileBuilder.addType(classBuilder.build())
@@ -53,12 +52,18 @@ internal class RoomBackupRestoreCreator(
 
     private fun TypeSpec.Builder.buildRoomBackupRestore(): TypeSpec.Builder {
         val contextClassName = ClassName("android.content", "Context")
+
+        superclass(ClassName(packageName, "RoomUtilBase"))
+        addSuperclassConstructorParameter(CONTEXT)
+        addSuperclassConstructorParameter("appDirectoryName")
+
         // context parameter/property in order to read/write files
         primaryConstructor(
             FunSpec.constructorBuilder()
                 .addComment("include file extension to dbFileName!!")
                 .addParameter(CONTEXT, contextClassName)
                 .addParameter(DB_FILE_NAME, String::class)
+                .addParameter("appDirectoryName", String::class)
                 .build()
         )
         addProperty(
@@ -73,6 +78,13 @@ internal class RoomBackupRestoreCreator(
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
+        addProperty(
+            PropertySpec.builder("appDirectoryName", String::class)
+                .initializer("appDirectoryName")
+                .addModifiers(KModifier.PRIVATE)
+                .build()
+        )
+
         addFunction(buildBackupFunction().build())
         addFunction(buildRestoreFunction().build())
         addFunction(buildCopyToFunction().build())

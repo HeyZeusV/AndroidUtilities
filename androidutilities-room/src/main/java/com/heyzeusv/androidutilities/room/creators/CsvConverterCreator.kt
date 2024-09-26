@@ -23,7 +23,7 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 
-private const val CONTEXT_PROP = "context"
+private const val CONTEXT = "context"
 
 internal class CsvConverterCreator(
     private val codeGenerator: CodeGenerator,
@@ -44,7 +44,6 @@ internal class CsvConverterCreator(
         val fileBuilder = FileSpec.builder(packageName, fileName)
 
         val classBuilder = TypeSpec.classBuilder(fileName)
-            .superclass(ClassName(packageName, "RoomUtilBase"))
             .buildCsvConverter()
 
         fileBuilder.addType(classBuilder.build())
@@ -62,17 +61,29 @@ internal class CsvConverterCreator(
      */
     private fun TypeSpec.Builder.buildCsvConverter(): TypeSpec.Builder {
         val contextClassName = ClassName("android.content", "Context")
+
+        superclass(ClassName(packageName, "RoomUtilBase"))
+        addSuperclassConstructorParameter(CONTEXT)
+        addSuperclassConstructorParameter("appDirectoryName")
+
         // context parameter/property in order to read/write files
         primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter(CONTEXT_PROP, contextClassName)
+                .addParameter(CONTEXT, contextClassName)
+                .addParameter("appDirectoryName", String::class)
                 // TODO: Make this option through gradle options
                 .addAnnotation(ClassName("javax.inject", "Inject"))
                 .build()
         )
         addProperty(
-            PropertySpec.builder(CONTEXT_PROP, contextClassName)
-                .initializer(CONTEXT_PROP)
+            PropertySpec.builder(CONTEXT, contextClassName)
+                .initializer(CONTEXT)
+                .addModifiers(KModifier.PRIVATE)
+                .build()
+        )
+        addProperty(
+            PropertySpec.builder("appDirectoryName", String::class)
+                .initializer("appDirectoryName")
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
@@ -249,7 +260,7 @@ internal class CsvConverterCreator(
             .addCode(buildCodeBlock {
                 addStatement(
                     "val appExportDirectory = %T.fromTreeUri(%L, $appExportDirectoryUri)!!",
-                    documentFileClassName, CONTEXT_PROP,
+                    documentFileClassName, CONTEXT,
                 )
                 add("""
                     if (!appExportDirectory.exists()) {
@@ -294,7 +305,7 @@ internal class CsvConverterCreator(
                 add("""
                     val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
                       return null // failed to create file
-                    val outputStream = $CONTEXT_PROP.contentResolver.openOutputStream(csvFile.uri) ?:
+                    val outputStream = $CONTEXT.contentResolver.openOutputStream(csvFile.uri) ?:
                       return null // failed to open output stream
                     
                     

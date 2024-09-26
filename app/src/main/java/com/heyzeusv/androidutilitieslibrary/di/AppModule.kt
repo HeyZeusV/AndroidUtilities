@@ -15,5 +15,5 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCsvConverter(@ApplicationContext context: Context): CsvConverter =
-        CsvConverter(context)
+        CsvConverter(context, "RoomUtilSample")
 }

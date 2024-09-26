@@ -16,12 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.heyzeusv.androidutilitieslibrary.database.Database
-import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
 import com.heyzeusv.androidutilitieslibrary.database.RoomData
-import com.heyzeusv.androidutilitieslibrary.database.findOrCreateAppDirectory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun RoomUtilScreen(
@@ -55,18 +51,18 @@ private fun exportToCSV(
     selectedDirectoryUri: Uri,
     db: Database,
 ) {
-    scope.launch(Dispatchers.IO) {
-        val appExportDirectoryUri = findOrCreateAppDirectory(
-            context = context,
-            selectedDirectoryUri = selectedDirectoryUri,
-            appDirectoryName = "RoomCsvExample",
-        )!!
-        val roomData = getData(db)
-        CsvConverter(context).exportRoomToCsv(
-            appExportDirectoryUri = appExportDirectoryUri,
-            roomData = roomData,
-        )
-    }
+//    scope.launch(Dispatchers.IO) {
+//        val appExportDirectoryUri = findOrCreateAppDirectory(
+//            context = context,
+//            selectedDirectoryUri = selectedDirectoryUri,
+//            appDirectoryName = "RoomCsvExample",
+//        )!!
+//        val roomData = getData(db)
+//        CsvConverter(context).exportRoomToCsv(
+//            appExportDirectoryUri = appExportDirectoryUri,
+//            roomData = roomData,
+//        )
+//    }
 }
 
 private suspend fun getData(db: Database): RoomData{
