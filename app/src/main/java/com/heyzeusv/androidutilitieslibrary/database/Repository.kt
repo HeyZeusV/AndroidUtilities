@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class Repository @Inject constructor(
-    private val transactionProvider: TransactionProvider,
+    val transactionProvider: TransactionProvider,
     private val allDao: AllDao,
     private val itemListDao: ItemListDao,
     private val itemDao: ItemDao,

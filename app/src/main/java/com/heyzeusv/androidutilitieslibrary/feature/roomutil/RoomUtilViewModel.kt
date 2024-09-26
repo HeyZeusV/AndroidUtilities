@@ -1,7 +1,6 @@
 package com.heyzeusv.androidutilitieslibrary.feature.roomutil
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
@@ -26,8 +25,8 @@ class RoomUtilViewModel @Inject constructor(
 
     fun restoreDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
+            repository.callCheckpoint()
             roomBackupRestore.restore(selectedDirectoryUri)
-            // TODO: Call checkpoint here
         }
     }
 
@@ -37,8 +36,8 @@ class RoomUtilViewModel @Inject constructor(
             _appDirectoryUri?.let {
                 val directoryUri = _appDirectoryUri ?: return@launch
 
+                repository.callCheckpoint()
                 roomBackupRestore.backup(directoryUri)
-                // TODO: call checkpoint here
             }
         }
     }
@@ -47,8 +46,8 @@ class RoomUtilViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val directoryUri = _appDirectoryUri ?: return@launch
 
-            roomBackupRestore.restore(directoryUri)
-            // TODO: call checkpoint here
+            repository.callCheckpoint()
+            roomBackupRestore.backup(directoryUri)
         }
     }
 
@@ -56,8 +55,15 @@ class RoomUtilViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val data = csvConverter.importCsvToRoom(selectedDirectoryUri)
 
-            // TODO: Call fts rebuild here
-            Log.d("SampleApp", "Data: $data")
+            data?.let {
+                repository.transactionProvider.runAsTransaction {
+                    repository.run {
+                        deleteAll()
+                        insertRoomData(it)
+                        rebuildDefaultItemFts()
+                    }
+                }
+            }
         }
     }
 
