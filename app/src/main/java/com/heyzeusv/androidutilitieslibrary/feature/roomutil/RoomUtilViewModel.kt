@@ -20,6 +20,7 @@ class RoomUtilViewModel @Inject constructor(
 
     private var _appDirectoryUri: Uri? = null
     val appDirectoryUri: Uri? get() = _appDirectoryUri
+    fun updateAppDirectoryUriToNull() { _appDirectoryUri = null }
 
     fun importCsvToRoom(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -29,13 +30,24 @@ class RoomUtilViewModel @Inject constructor(
         }
     }
 
-    fun exportRoomToCsv() {
-        val data = RoomData()
-        val uri = _appDirectoryUri!!
+    fun setupAppDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _appDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
+            _appDirectoryUri?.let {
+                val roomData = RoomData()
+                val directoryUri = _appDirectoryUri ?: return@launch
 
-        csvConverter.exportRoomToCsv(
-            appExportDirectoryUri = uri,
-            roomData = data,
-        )
+                csvConverter.exportRoomToCsv(directoryUri, roomData)
+            }
+        }
+    }
+
+    fun exportToCsv() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val roomData = RoomData()
+            val directoryUri = _appDirectoryUri ?: return@launch
+
+            csvConverter.exportRoomToCsv(directoryUri, roomData)
+        }
     }
 }

@@ -1,8 +1,6 @@
 package com.heyzeusv.androidutilitieslibrary.feature.roomutil
 
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.heyzeusv.androidutilitieslibrary.database.Database
-import com.heyzeusv.androidutilitieslibrary.database.RoomData
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun RoomUtilScreen(
@@ -30,50 +25,28 @@ fun RoomUtilScreen(
         it?.let { uri ->
             val flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flags)
-//            exportToCSV(context, coroutineScope, uri, db)
+            roomUtilVM.setupAppDirectoryAndExportToCsv(uri)
         }
     }
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(onClick = { exportLauncher.launch(null) }) {
+        Button(
+            onClick = {
+                if (roomUtilVM.appDirectoryUri == null) {
+                    exportLauncher.launch(null)
+                } else {
+                    roomUtilVM.exportToCsv()
+                }
+            }
+        ) {
             Text(text = "Export Sample Database")
         }
+        Button(onClick = { roomUtilVM.updateAppDirectoryUriToNull()}) {
+            Text(text = "Clear selected app directory")
+        }
     }
-}
-
-private fun exportToCSV(
-    context: Context,
-    scope: CoroutineScope,
-    selectedDirectoryUri: Uri,
-    db: Database,
-) {
-//    scope.launch(Dispatchers.IO) {
-//        val appExportDirectoryUri = findOrCreateAppDirectory(
-//            context = context,
-//            selectedDirectoryUri = selectedDirectoryUri,
-//            appDirectoryName = "RoomCsvExample",
-//        )!!
-//        val roomData = getData(db)
-//        CsvConverter(context).exportRoomToCsv(
-//            appExportDirectoryUri = appExportDirectoryUri,
-//            roomData = roomData,
-//        )
-//    }
-}
-
-private suspend fun getData(db: Database): RoomData{
-    val categories = db.categoryDao().getAll()
-    val defaultItems = db.defaultItemDao().getAll()
-    val items = db.itemDao().getAll()
-    val itemLists = db.itemListDao().getAll()
-    return RoomData(
-        categoryData = categories,
-        defaultItemData = defaultItems,
-        itemData = items,
-        itemListData = itemLists
-    )
 }
