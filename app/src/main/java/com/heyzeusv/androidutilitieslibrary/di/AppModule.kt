@@ -2,6 +2,7 @@ package com.heyzeusv.androidutilitieslibrary.di
 
 import android.content.Context
 import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
+import com.heyzeusv.androidutilitieslibrary.database.RoomBackupRestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,5 +16,14 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCsvConverter(@ApplicationContext context: Context): CsvConverter =
-        CsvConverter(context, "RoomUtilSample")
+        CsvConverter(context, "RoomUtilCsvSample")
+
+    @Provides
+    @Singleton
+    fun provideRoomBackupRestore(@ApplicationContext context: Context): RoomBackupRestore =
+        RoomBackupRestore(
+            context = context,
+            dbFileName = "Database.db",
+            appDirectoryName = "RoomUtilDbSample"
+        )
 }

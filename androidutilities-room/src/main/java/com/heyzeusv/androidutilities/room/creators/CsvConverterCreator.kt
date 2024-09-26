@@ -69,10 +69,10 @@ internal class CsvConverterCreator(
         // context parameter/property in order to read/write files
         primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter(CONTEXT, contextClassName)
-                .addParameter("appDirectoryName", String::class)
                 // TODO: Make this option through gradle options
                 .addAnnotation(ClassName("javax.inject", "Inject"))
+                .addParameter(CONTEXT, contextClassName)
+                .addParameter("appDirectoryName", String::class)
                 .build()
         )
         addProperty(

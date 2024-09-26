@@ -20,14 +20,28 @@ fun RoomUtilScreen(
 ) {
     val context = LocalContext.current
 
-    val importLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+    val dbRestoreLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+        it?.let { uri ->
+            val flags = FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
+            roomUtilVM.restoreDatabase(uri)
+        }
+    }
+    val dbBackupLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+        it?.let { uri ->
+            val flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
+            roomUtilVM.setupAppDirectoryAndBackupDatabase(uri)
+        }
+    }
+    val csvImportLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
             val flags = FLAG_GRANT_READ_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flags)
             roomUtilVM.importCsvToRoom(uri)
         }
     }
-    val exportLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+    val csvExportLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
             val flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flags)
@@ -40,13 +54,27 @@ fun RoomUtilScreen(
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(onClick = { importLauncher.launch(null) }) {
+        Button(onClick = { dbRestoreLauncher.launch(null) }) {
+            Text(text = "DB Restore Sample Database")
+        }
+        Button(
+            onClick = {
+                if (roomUtilVM.appDirectoryUri == null) {
+                    dbBackupLauncher.launch(null)
+                } else {
+                    roomUtilVM.backupDatabase()
+                }
+            }
+        ) {
+            Text(text = "Db Backup Sample Database")
+        }
+        Button(onClick = { csvImportLauncher.launch(null) }) {
             Text(text = "CSV Import Sample Database")
         }
         Button(
             onClick = {
                 if (roomUtilVM.appDirectoryUri == null) {
-                    exportLauncher.launch(null)
+                    csvExportLauncher.launch(null)
                 } else {
                     roomUtilVM.exportToCsv()
                 }

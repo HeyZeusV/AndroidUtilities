@@ -61,6 +61,8 @@ internal class RoomBackupRestoreCreator(
         primaryConstructor(
             FunSpec.constructorBuilder()
                 .addComment("include file extension to dbFileName!!")
+                // TODO: Make this option through gradle options
+                .addAnnotation(ClassName("javax.inject", "Inject"))
                 .addParameter(CONTEXT, contextClassName)
                 .addParameter(DB_FILE_NAME, String::class)
                 .addParameter("appDirectoryName", String::class)
