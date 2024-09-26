@@ -13,19 +13,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.heyzeusv.androidutilitieslibrary.database.Database
 import com.heyzeusv.androidutilitieslibrary.feature.AnnotatedStringScreen
 import com.heyzeusv.androidutilitieslibrary.feature.AppAboutScreen
 import com.heyzeusv.androidutilitieslibrary.feature.AppAboutScreenNoBackOrIcon
 import com.heyzeusv.androidutilitieslibrary.feature.AppAboutScreenNoIcon
 import com.heyzeusv.androidutilitieslibrary.feature.ComposableResources
-import com.heyzeusv.androidutilitieslibrary.feature.RoomCsvScreen
+import com.heyzeusv.androidutilitieslibrary.feature.roomutil.RoomUtilScreen
+import com.heyzeusv.androidutilitieslibrary.feature.roomutil.RoomUtilViewModel
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,25 +33,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val db = Room.databaseBuilder(
-            applicationContext,
-            Database::class.java,
-            "Database.db"
-        )
-//            .createFromAsset("InitDatabase.db")
-            .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    super.onCreate(db)
-                    db.execSQL("INSERT INTO DefaultItemFts(DefaultItemFts) VALUES ('rebuild')")
-                }
-            })
-            .fallbackToDestructiveMigration()
-            .build()
-
         setContent {
             AndroidUtilitiesLibraryTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AppNavHost(db)
+                    AppNavHost()
                 }
             }
         }
@@ -61,7 +44,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavHost(db: Database) {
+fun AppNavHost() {
     val navController = rememberNavController()
 
     NavHost(
@@ -89,8 +72,8 @@ fun AppNavHost(db: Database) {
                 Button(onClick = { navController.navigate(Screens.ComposableResources) }) {
                     Text(text = "Composable Resources")
                 }
-                Button(onClick = { navController.navigate(Screens.RoomCsv) }) {
-                    Text(text = "Room Csv")
+                Button(onClick = { navController.navigate(Screens.RoomUtil) }) {
+                    Text(text = "Room Util")
                 }
             }
         }
@@ -109,8 +92,9 @@ fun AppNavHost(db: Database) {
         composable<Screens.ComposableResources> {
             ComposableResources()
         }
-        composable<Screens.RoomCsv> {
-            RoomCsvScreen(db)
+        composable<Screens.RoomUtil> {
+            val roomUtilVM: RoomUtilViewModel = hiltViewModel()
+            RoomUtilScreen(roomUtilVM)
         }
     }
 }
