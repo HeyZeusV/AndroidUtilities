@@ -81,7 +81,7 @@ class RoomUtilViewModel @Inject constructor(
 
     fun exportToCsv() {
         viewModelScope.launch(Dispatchers.IO) {
-            val roomData = RoomData()
+            val roomData = repository.getAllRoomData()
             val directoryUri = _appDirectoryUri ?: return@launch
 
             csvConverter.exportRoomToCsv(directoryUri, roomData)

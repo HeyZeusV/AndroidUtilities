@@ -8,8 +8,6 @@ import com.heyzeusv.androidutilitieslibrary.database.Database
 import com.heyzeusv.androidutilitieslibrary.database.dao.AllDao
 import com.heyzeusv.androidutilitieslibrary.database.dao.CategoryDao
 import com.heyzeusv.androidutilitieslibrary.database.dao.DefaultItemDao
-import com.heyzeusv.androidutilitieslibrary.database.dao.ItemDao
-import com.heyzeusv.androidutilitieslibrary.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,12 +20,6 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     fun provideAllDao(database: Database): AllDao = database.allDao()
-
-    @Provides
-    fun provideItemListDao(database: Database): ItemListDao = database.itemListDao()
-
-    @Provides
-    fun provideItemDao(database: Database): ItemDao = database.itemDao()
 
     @Provides
     fun provideDefaultItemDao(database: Database): DefaultItemDao = database.defaultItemDao()

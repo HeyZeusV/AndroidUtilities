@@ -6,13 +6,17 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun RoomUtilScreen(
@@ -50,40 +54,60 @@ fun RoomUtilScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(onClick = { dbRestoreLauncher.launch(null) }) {
-            Text(text = "DB Restore Sample Database")
-        }
-        Button(
-            onClick = {
-                if (roomUtilVM.appDirectoryUri == null) {
-                    dbBackupLauncher.launch(null)
-                } else {
-                    roomUtilVM.backupDatabase()
-                }
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(text = "Db Backup Sample Database")
-        }
-        Button(onClick = { csvImportLauncher.launch(null) }) {
-            Text(text = "CSV Import Sample Database")
-        }
-        Button(
-            onClick = {
-                if (roomUtilVM.appDirectoryUri == null) {
-                    csvExportLauncher.launch(null)
-                } else {
-                    roomUtilVM.exportToCsv()
-                }
+            Button(
+                onClick = { dbRestoreLauncher.launch(null) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "DB Restore")
             }
+            Button(
+                onClick = {
+                    if (roomUtilVM.appDirectoryUri == null) {
+                        dbBackupLauncher.launch(null)
+                    } else {
+                        roomUtilVM.backupDatabase()
+                    }
+                },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "Db Backup")
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Text(text = "CSV Export Sample Database")
+            Button(
+                onClick = { csvImportLauncher.launch(null) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "CSV Import")
+            }
+            Button(
+                onClick = {
+                    if (roomUtilVM.appDirectoryUri == null) {
+                        csvExportLauncher.launch(null)
+                    } else {
+                        roomUtilVM.exportToCsv()
+                    }
+                },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "CSV Export")
+            }
         }
         Button(onClick = { roomUtilVM.updateAppDirectoryUriToNull()}) {
-            Text(text = "Clear selected app directory")
+            Text(text = "Clear sample app directory")
         }
     }
 }

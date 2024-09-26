@@ -24,52 +24,17 @@ import androidx.room.PrimaryKey
 )
 data class DefaultItem(
     @PrimaryKey(autoGenerate = true)
-    override var itemId: Long = 0L,
-    override var name: String = "",
-    override var category: String = "",
-    override var quantity: Double = 0.0,
-    override var unit: String = "",
-    override var memo: String = "",
+    var itemId: Long = 0L,
+    var name: String = "",
+    var category: String = "",
+    var quantity: Double = 0.0,
+    var unit: String = "",
+    var memo: String = "",
     @Embedded(prefix = "outerEmbed_")
     var testEmbed: TestEmbed = TestEmbed(),
     @Ignore
     var testIgnore2: String = "",
-) : BaseItem {
-
-    @Ignore
-    val testIgnore: String = ""
-
-    override fun editCopy(
-        itemId: Long,
-        name: String,
-        category: String,
-        quantity: Double,
-        unit: String,
-        memo: String
-    ): DefaultItem {
-        return DefaultItem(
-            itemId = itemId,
-            name = name,
-            category = category,
-            quantity = quantity,
-            unit = unit,
-            memo = memo,
-        )
-    }
-
-    fun toItem(parentItemListId: Long): Item {
-        return Item(
-            itemId = 0L,
-            name = name,
-            isChecked = false,
-            category = category,
-            quantity = quantity,
-            unit = unit,
-            memo = memo,
-            parentItemListId = parentItemListId
-        )
-    }
-}
+)
 
 @Fts4(contentEntity = DefaultItem::class)
 @Entity
