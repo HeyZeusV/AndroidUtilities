@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
-import com.heyzeusv.androidutilitieslibrary.database.Database
+import com.heyzeusv.androidutilitieslibrary.database.Repository
 import com.heyzeusv.androidutilitieslibrary.database.RoomBackupRestore
 import com.heyzeusv.androidutilitieslibrary.database.RoomData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RoomUtilViewModel @Inject constructor(
-    private val database: Database,
+    private val repository: Repository,
     private val roomBackupRestore: RoomBackupRestore,
     private val csvConverter: CsvConverter,
 ) : ViewModel() {
