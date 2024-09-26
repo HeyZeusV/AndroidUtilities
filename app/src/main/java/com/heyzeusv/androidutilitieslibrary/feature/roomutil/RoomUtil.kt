@@ -24,7 +24,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun RoomUtilScreen(roomUtilVM: RoomUtilViewModel) {
+fun RoomUtilScreen(
+    roomUtilVM: RoomUtilViewModel,
+) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 

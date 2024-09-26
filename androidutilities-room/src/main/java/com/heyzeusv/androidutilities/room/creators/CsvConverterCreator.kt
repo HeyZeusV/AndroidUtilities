@@ -65,6 +65,8 @@ internal class CsvConverterCreator(
         primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter(CONTEXT_PROP, contextClassName)
+                // TODO: Make this option through gradle options
+                .addAnnotation(ClassName("javax.inject", "Inject"))
                 .build()
         )
         addProperty(
