@@ -12,7 +12,7 @@ import com.heyzeusv.androidutilities.room.creators.CsvConverterCreator
 import com.heyzeusv.androidutilities.room.creators.EntityFilesCreator
 import com.heyzeusv.androidutilities.room.creators.RoomBackupRestoreCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
-import com.heyzeusv.androidutilities.room.creators.RoomUtilFunctionsCreator
+import com.heyzeusv.androidutilities.room.creators.RoomUtilBaseCreator
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
 
 class RoomProcessor(
@@ -38,7 +38,7 @@ class RoomProcessor(
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                RoomUtilFunctionsCreator(
+                RoomUtilBaseCreator(
                     codeGenerator = codeGenerator,
                     dbClassDeclaration = dbClass,
                     logger = logger,

@@ -9,6 +9,8 @@ import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 import java.lang.UnsupportedOperationException
 import java.text.SimpleDateFormat
@@ -16,10 +18,10 @@ import java.util.Date
 import java.util.Locale
 
 /**
- *  Creates RoomUtilFunctions file, which contains functions that are used by multiple methods of
+ *  Creates RoomUtilBase file, which contains functions that are used by multiple methods of
  *  export/import/backup/restore of Room database.
  */
-internal class RoomUtilFunctionsCreator(
+internal class RoomUtilBaseCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
     private val logger: KSPLogger,
@@ -28,16 +30,19 @@ internal class RoomUtilFunctionsCreator(
     private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
 
     /**
-     *  Creates RoomUtilFunctions.kt file.
+     *  Creates RoomUtilBase.kt file.
      */
-    private fun createRoomUtilFunctionsFile() {
-        logger.info("Creating RoomUtilFunctions...")
+    private fun createRoomUtilBaseFile() {
+        logger.info("Creating RoomUtilBase...")
         val packageName = dbClassDeclaration.getPackageName()
-        val fileName = "RoomUtilFunctions"
+        val fileName = "RoomUtilBase"
         val fileBuilder = FileSpec.builder(packageName, fileName)
+        val classBuilder = TypeSpec.classBuilder(fileName)
+            .addModifiers(KModifier.ABSTRACT)
+            .addFunction(buildCreateNewDirectoryFunction().build())
+            .addFunction(buildFindOrCreateAppDirectoryFunction().build())
 
-        fileBuilder.addFunction(buildCreateNewDirectoryFunction().build())
-        fileBuilder.addFunction(buildFindOrCreateAppDirectoryFunction().build())
+        fileBuilder.addType(classBuilder.build())
 
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
@@ -54,6 +59,7 @@ internal class RoomUtilFunctionsCreator(
     private fun buildCreateNewDirectoryFunction(): FunSpec.Builder {
         val appDirectory = "appDirectory"
         val funSpec = FunSpec.builder("createNewDirectory")
+            .addModifiers(KModifier.PROTECTED)
             .returns(documentFileClassName.copy(nullable = true))
             .addParameter(appDirectory, documentFileClassName)
             .addCode(buildCodeBlock {
@@ -114,6 +120,6 @@ internal class RoomUtilFunctionsCreator(
     }
 
     init {
-        createRoomUtilFunctionsFile()
+        createRoomUtilBaseFile()
     }
 }

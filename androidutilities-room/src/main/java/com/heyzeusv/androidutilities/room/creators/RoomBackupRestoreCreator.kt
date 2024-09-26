@@ -37,7 +37,9 @@ internal class RoomBackupRestoreCreator(
         val fileName = "RoomBackupRestore"
         val fileBuilder = FileSpec.builder(packageName, fileName)
 
-        val classBuilder = TypeSpec.classBuilder(fileName).buildRoomBackupRestore()
+        val classBuilder = TypeSpec.classBuilder(fileName)
+            .superclass(ClassName(packageName, "RoomUtilBase"))
+            .buildRoomBackupRestore()
 
         fileBuilder.addType(classBuilder.build())
 

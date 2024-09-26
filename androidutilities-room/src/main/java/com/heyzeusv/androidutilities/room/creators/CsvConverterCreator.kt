@@ -44,6 +44,7 @@ internal class CsvConverterCreator(
         val fileBuilder = FileSpec.builder(packageName, fileName)
 
         val classBuilder = TypeSpec.classBuilder(fileName)
+            .superclass(ClassName(packageName, "RoomUtilBase"))
             .buildCsvConverter()
 
         fileBuilder.addType(classBuilder.build())
