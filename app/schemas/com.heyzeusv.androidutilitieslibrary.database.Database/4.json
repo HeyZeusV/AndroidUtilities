@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "53d8b1d14efd04ee65aaf1c03c588f56",
+    "identityHash": "d2252ad365a48066ed90161e4fb26ee1",
     "entities": [
       {
         "tableName": "a_default_item_table_name",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_test1` TEXT NOT NULL, `outerEmbed_test2` INTEGER, `outerEmbed_test3` INTEGER, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_test5` INTEGER NOT NULL, `outerEmbed_innerEmbed_test6` INTEGER NOT NULL, `outerEmbed_innerEmbed_test7` INTEGER NOT NULL, `outerEmbed_innerEmbed_nullBoolean` INTEGER, `outerEmbed_innerEmbed_nullShort` INTEGER, `outerEmbed_innerEmbed_nullInt` INTEGER, `outerEmbed_innerEmbed_nullLong` INTEGER, `outerEmbed_innerEmbed_nullByte` INTEGER, `outerEmbed_innerEmbed_nullString` TEXT, `outerEmbed_innerEmbed_nullChar` INTEGER, `outerEmbed_innerEmbed_nullDouble` REAL, `outerEmbed_innerEmbed_nullFloat` REAL, `outerEmbed_innerEmbed_nullByteArray` BLOB, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `category` TEXT NOT NULL, `quantity` REAL NOT NULL, `unit` TEXT NOT NULL, `memo` TEXT NOT NULL, `outerEmbed_sameName` TEXT NOT NULL, `outerEmbed_someField` INTEGER, `outerEmbed_uselessField` INTEGER, `outerEmbed_innerEmbed_differentFieldName` TEXT NOT NULL, `outerEmbed_innerEmbed_typeConverterField` INTEGER NOT NULL, `outerEmbed_innerEmbed_nullableBoolean` INTEGER, `outerEmbed_innerEmbed_nullableShort` INTEGER, `outerEmbed_innerEmbed_nullableInt` INTEGER, `outerEmbed_innerEmbed_nullableLong` INTEGER, `outerEmbed_innerEmbed_nullableByte` INTEGER, `outerEmbed_innerEmbed_nullableString` TEXT, `outerEmbed_innerEmbed_nullableChar` INTEGER, `outerEmbed_innerEmbed_nullableDouble` REAL, `outerEmbed_innerEmbed_nullableFloat` REAL, `outerEmbed_innerEmbed_nullableByteArray` BLOB, FOREIGN KEY(`category`) REFERENCES `Category`(`name`) ON UPDATE CASCADE ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "itemId",
@@ -45,104 +45,92 @@
             "notNull": true
           },
           {
-            "fieldPath": "testEmbed.test1",
-            "columnName": "outerEmbed_test1",
+            "fieldPath": "outerEmbed.sameName",
+            "columnName": "outerEmbed_sameName",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "testEmbed.test2",
-            "columnName": "outerEmbed_test2",
+            "fieldPath": "outerEmbed.someField",
+            "columnName": "outerEmbed_someField",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.test3",
-            "columnName": "outerEmbed_test3",
+            "fieldPath": "outerEmbed.uselessField",
+            "columnName": "outerEmbed_uselessField",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.test3",
+            "fieldPath": "outerEmbed.embed.sameName",
             "columnName": "outerEmbed_innerEmbed_differentFieldName",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "testEmbed.embed.test5",
-            "columnName": "outerEmbed_innerEmbed_test5",
+            "fieldPath": "outerEmbed.embed.typeConverterField",
+            "columnName": "outerEmbed_innerEmbed_typeConverterField",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "testEmbed.embed.test6",
-            "columnName": "outerEmbed_innerEmbed_test6",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "testEmbed.embed.test7",
-            "columnName": "outerEmbed_innerEmbed_test7",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "testEmbed.embed.nullBoolean",
-            "columnName": "outerEmbed_innerEmbed_nullBoolean",
+            "fieldPath": "outerEmbed.embed.nullableBoolean",
+            "columnName": "outerEmbed_innerEmbed_nullableBoolean",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullShort",
-            "columnName": "outerEmbed_innerEmbed_nullShort",
+            "fieldPath": "outerEmbed.embed.nullableShort",
+            "columnName": "outerEmbed_innerEmbed_nullableShort",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullInt",
-            "columnName": "outerEmbed_innerEmbed_nullInt",
+            "fieldPath": "outerEmbed.embed.nullableInt",
+            "columnName": "outerEmbed_innerEmbed_nullableInt",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullLong",
-            "columnName": "outerEmbed_innerEmbed_nullLong",
+            "fieldPath": "outerEmbed.embed.nullableLong",
+            "columnName": "outerEmbed_innerEmbed_nullableLong",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullByte",
-            "columnName": "outerEmbed_innerEmbed_nullByte",
+            "fieldPath": "outerEmbed.embed.nullableByte",
+            "columnName": "outerEmbed_innerEmbed_nullableByte",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullString",
-            "columnName": "outerEmbed_innerEmbed_nullString",
+            "fieldPath": "outerEmbed.embed.nullableString",
+            "columnName": "outerEmbed_innerEmbed_nullableString",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullChar",
-            "columnName": "outerEmbed_innerEmbed_nullChar",
+            "fieldPath": "outerEmbed.embed.nullableChar",
+            "columnName": "outerEmbed_innerEmbed_nullableChar",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullDouble",
-            "columnName": "outerEmbed_innerEmbed_nullDouble",
+            "fieldPath": "outerEmbed.embed.nullableDouble",
+            "columnName": "outerEmbed_innerEmbed_nullableDouble",
             "affinity": "REAL",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullFloat",
-            "columnName": "outerEmbed_innerEmbed_nullFloat",
+            "fieldPath": "outerEmbed.embed.nullableFloat",
+            "columnName": "outerEmbed_innerEmbed_nullableFloat",
             "affinity": "REAL",
             "notNull": false
           },
           {
-            "fieldPath": "testEmbed.embed.nullByteArray",
-            "columnName": "outerEmbed_innerEmbed_nullByteArray",
+            "fieldPath": "outerEmbed.embed.nullableByteArray",
+            "columnName": "outerEmbed_innerEmbed_nullableByteArray",
             "affinity": "BLOB",
             "notNull": false
           }
@@ -259,7 +247,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '53d8b1d14efd04ee65aaf1c03c588f56')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2252ad365a48066ed90161e4fb26ee1')"
     ]
   }
 }

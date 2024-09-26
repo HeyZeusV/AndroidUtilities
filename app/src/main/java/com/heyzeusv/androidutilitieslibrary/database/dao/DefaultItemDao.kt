@@ -6,7 +6,7 @@ import com.heyzeusv.androidutilitieslibrary.database.models.DefaultItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class DefaultItemDao : BaseDao<DefaultItem>("DefaultItem") {
+abstract class DefaultItemDao : BaseDao<DefaultItem>("a_default_item_table_name") {
 
     @Query("SELECT * " +
             "FROM a_default_item_table_name")

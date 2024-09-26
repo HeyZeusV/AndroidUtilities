@@ -72,7 +72,7 @@ fun RoomUtilScreen(
             }
             Button(
                 onClick = {
-                    if (roomUtilVM.appDirectoryUri == null) {
+                    if (roomUtilVM.appDbDirectoryUri == null) {
                         dbBackupLauncher.launch(null)
                     } else {
                         roomUtilVM.backupDatabase()
@@ -95,7 +95,7 @@ fun RoomUtilScreen(
             }
             Button(
                 onClick = {
-                    if (roomUtilVM.appDirectoryUri == null) {
+                    if (roomUtilVM.appCsvDirectoryUri == null) {
                         csvExportLauncher.launch(null)
                     } else {
                         roomUtilVM.exportToCsv()

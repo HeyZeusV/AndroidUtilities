@@ -31,9 +31,9 @@ data class DefaultItem(
     var unit: String = "",
     var memo: String = "",
     @Embedded(prefix = "outerEmbed_")
-    var testEmbed: TestEmbed = TestEmbed(),
+    var outerEmbed: SampleOuterEmbed = SampleOuterEmbed(),
     @Ignore
-    var testIgnore2: String = "",
+    var ignoreField: String = "",
 )
 
 @Fts4(contentEntity = DefaultItem::class)

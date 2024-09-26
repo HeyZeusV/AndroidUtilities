@@ -19,9 +19,17 @@ class RoomUtilViewModel @Inject constructor(
     private val csvConverter: CsvConverter,
 ) : ViewModel() {
 
-    private var _appDirectoryUri: Uri? = null
-    val appDirectoryUri: Uri? get() = _appDirectoryUri
-    fun updateAppDirectoryUriToNull() { _appDirectoryUri = null }
+    private var _appDbDirectoryUri: Uri? = null
+    val appDbDirectoryUri: Uri? get() = _appDbDirectoryUri
+
+    private var _appCsvDirectoryUri: Uri? = null
+    val appCsvDirectoryUri: Uri? get() = _appCsvDirectoryUri
+
+    fun updateAppDirectoryUriToNull() {
+        _appDbDirectoryUri = null
+        _appCsvDirectoryUri = null
+
+    }
 
     fun restoreDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -32,9 +40,9 @@ class RoomUtilViewModel @Inject constructor(
 
     fun setupAppDirectoryAndBackupDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            _appDirectoryUri = roomBackupRestore.findOrCreateAppDirectory(selectedDirectoryUri)
-            _appDirectoryUri?.let {
-                val directoryUri = _appDirectoryUri ?: return@launch
+            _appDbDirectoryUri = roomBackupRestore.findOrCreateAppDirectory(selectedDirectoryUri)
+            _appDbDirectoryUri?.let {
+                val directoryUri = _appDbDirectoryUri ?: return@launch
 
                 repository.callCheckpoint()
                 roomBackupRestore.backup(directoryUri)
@@ -44,7 +52,7 @@ class RoomUtilViewModel @Inject constructor(
 
     fun backupDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
-            val directoryUri = _appDirectoryUri ?: return@launch
+            val directoryUri = _appDbDirectoryUri ?: return@launch
 
             repository.callCheckpoint()
             roomBackupRestore.backup(directoryUri)
@@ -69,10 +77,10 @@ class RoomUtilViewModel @Inject constructor(
 
     fun setupAppDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            _appDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
-            _appDirectoryUri?.let {
+            _appCsvDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
+            _appCsvDirectoryUri?.let {
                 val roomData = RoomData()
-                val directoryUri = _appDirectoryUri ?: return@launch
+                val directoryUri = _appCsvDirectoryUri ?: return@launch
 
                 csvConverter.exportRoomToCsv(directoryUri, roomData)
             }
@@ -82,7 +90,7 @@ class RoomUtilViewModel @Inject constructor(
     fun exportToCsv() {
         viewModelScope.launch(Dispatchers.IO) {
             val roomData = repository.getAllRoomData()
-            val directoryUri = _appDirectoryUri ?: return@launch
+            val directoryUri = _appCsvDirectoryUri ?: return@launch
 
             csvConverter.exportRoomToCsv(directoryUri, roomData)
         }
