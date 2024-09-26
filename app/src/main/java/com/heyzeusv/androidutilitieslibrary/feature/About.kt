@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilitieslibrary
+package com.heyzeusv.androidutilitieslibrary.feature
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.heyzeusv.androidutilities.compose.about.AboutScreen
 import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.sRes
+import com.heyzeusv.androidutilitieslibrary.R
 import com.heyzeusv.androidutilitieslibrary.util.hyperlinkCustomStringResourceEntry
 import com.heyzeusv.androidutilitieslibrary.util.hyperlinkStringResource
 import com.heyzeusv.androidutilitieslibrary.util.lorenEntry

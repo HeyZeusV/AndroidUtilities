@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilitieslibrary
+package com.heyzeusv.androidutilitieslibrary.feature
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.heyzeusv.androidutilities.compose.annotatedstring.HyperlinkText
+import com.heyzeusv.androidutilitieslibrary.R
 import kotlinx.collections.immutable.persistentMapOf
 
 @Composable

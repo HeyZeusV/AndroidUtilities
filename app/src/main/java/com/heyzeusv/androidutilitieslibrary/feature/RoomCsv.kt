@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilitieslibrary
+package com.heyzeusv.androidutilitieslibrary.feature
 
 import android.content.Context
 import android.content.Intent

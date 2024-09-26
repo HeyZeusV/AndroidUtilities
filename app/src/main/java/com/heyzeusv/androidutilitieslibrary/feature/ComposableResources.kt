@@ -1,4 +1,4 @@
-package com.heyzeusv.androidutilitieslibrary
+package com.heyzeusv.androidutilitieslibrary.feature
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -34,6 +34,7 @@ import com.heyzeusv.androidutilities.compose.util.pRes
 import com.heyzeusv.androidutilities.compose.util.psRes
 import com.heyzeusv.androidutilities.compose.util.sRes
 import com.heyzeusv.androidutilities.compose.util.saRes
+import com.heyzeusv.androidutilitieslibrary.R
 import com.heyzeusv.androidutilitieslibrary.ui.theme.AndroidUtilitiesLibraryTheme
 
 @OptIn(ExperimentalAnimationGraphicsApi::class)
