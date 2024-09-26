@@ -153,6 +153,7 @@ internal class CsvConverterCreator(
         val csvReaderMemberName = MemberName("com.github.doyaaaaaken.kotlincsv.dsl", "csvReader")
 
         val funSpec = FunSpec.builder("importCsvToRoomEntity")
+            .addModifiers(KModifier.PRIVATE)
             .addParameter(csvFile, documentFileClassName)
             .returns(csvDataListClassName.copy(nullable = true))
             .addCode(buildCodeBlock {
