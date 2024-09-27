@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 abstract class CategoryDao : BaseDao<Category>("Category") {
 
     @Query("SELECT * " +
-            "FROM Category " +
-            "ORDER BY name ASC")
+            "FROM Category ")
     abstract fun getAllCategories(): Flow<List<Category>>
 }

@@ -121,8 +121,22 @@ fun RoomUtilScreen(
                 Text(text = "CSV Export")
             }
         }
-        Button(onClick = { roomUtilVM.updateAppDirectoryUriToNull()}) {
-            Text(text = "Clear sample app directory")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = { roomUtilVM.updateAppDirectoryUriToNull()},
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "Clear app directory")
+            }
+            Button(
+                onClick = { roomUtilVM.deleteAll() },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "Clear database")
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

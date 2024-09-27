@@ -110,6 +110,12 @@ class RoomUtilViewModel @Inject constructor(
         }
     }
 
+    fun deleteAll() {
+        viewModelScope.launch {
+            repository.deleteAll()
+        }
+    }
+
     fun restoreDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.callCheckpoint()
