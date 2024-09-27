@@ -185,13 +185,12 @@ fun CategoryPage(categories: List<Category>) {
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     Text(
-                        text = "${it.id}",
+                        text = "Id: ${it.id}",
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = it.name,
+                        text = "Name: ${it.name}",
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
                     )
                 }
                 HorizontalDivider()
@@ -213,27 +212,12 @@ fun ItemPage(items: List<Item>) {
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     Text(
-                        text = "${it.itemId}",
+                        text = "Id: ${it.itemId}",
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = it.name,
+                        text = "Name: ${it.name}",
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                ) {
-                    Text(
-                        text = it.category,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Text(
-                        text = "${it.quantity}",
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
                     )
                 }
                 Row(
@@ -241,27 +225,28 @@ fun ItemPage(items: List<Item>) {
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     Text(
-                        text = it.outerEmbed.sameName,
+                        text = "Category: ${it.category}",
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = it.outerEmbed.embed.sameName,
+                        text = "Unit: ${it.unit}",
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
                     )
                 }
+                Text(text = "Quantity: ${it.quantity}")
+                Text(text = "Outer Embed Same Name: ${it.outerEmbed.sameName}")
+                Text(text = "Inner Embed Same Name: ${it.outerEmbed.embed.sameName}")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     Text(
-                        text = "${it.outerEmbed.embed.nullableByteArray}",
+                        text = "Short: ${it.outerEmbed.embed.nullableShort}",
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = String(it.outerEmbed.embed.nullableByteArray!!),
+                        text = "ByteArray: ${String(it.outerEmbed.embed.nullableByteArray!!)}",
                         modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.End,
                     )
                 }
                 HorizontalDivider()
