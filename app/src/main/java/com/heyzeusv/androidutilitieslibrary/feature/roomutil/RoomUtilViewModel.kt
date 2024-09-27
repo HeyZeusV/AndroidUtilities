@@ -10,8 +10,9 @@ import com.heyzeusv.androidutilitieslibrary.database.models.Category
 import com.heyzeusv.androidutilitieslibrary.database.models.Item
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleInnerEmbed
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleOuterEmbed
+import com.heyzeusv.androidutilitieslibrary.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class RoomUtilViewModel @Inject constructor(
+    @IODispatcher
+    private val ioDispatcher: CoroutineDispatcher,
     private val repository: Repository,
     private val roomBackupRestore: RoomBackupRestore,
     private val csvConverter: CsvConverter,
@@ -74,7 +77,7 @@ class RoomUtilViewModel @Inject constructor(
      *  Add 1000 Categories to database with random name.
      */
     fun insert1000RandomCategories() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 val categoryList = mutableListOf<Category>()
                 repeat(1000) {
@@ -90,7 +93,7 @@ class RoomUtilViewModel @Inject constructor(
      *  Add 1000 Items to database with mostly random values.
      */
     fun insert1000RandomItems() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 val itemList = mutableListOf<Item>()
                 repeat(1000) {
@@ -127,7 +130,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun deleteAll() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 repository.deleteAll()
             }
@@ -135,7 +138,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun restoreDatabase(selectedDirectoryUri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 repository.callCheckpoint()
                 roomBackupRestore.restore(selectedDirectoryUri)
@@ -144,7 +147,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun setupAppDirectoryAndBackupDatabase(selectedDirectoryUri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 _appDbDirectoryUri =
                     roomBackupRestore.findOrCreateAppDirectory(selectedDirectoryUri)
@@ -161,7 +164,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun backupDatabase() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 val directoryUri = _appDbDirectoryUri
 
@@ -174,7 +177,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun importCsvToRoom(selectedDirectoryUri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 val data = csvConverter.importCsvToRoom(selectedDirectoryUri)
 
@@ -192,7 +195,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun setupAppDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 _appCsvDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
                 _appCsvDirectoryUri?.let {
@@ -208,7 +211,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     fun exportToCsv() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             isBusyRun {
                 val roomData = repository.getAllRoomData()
                 val directoryUri = _appCsvDirectoryUri
