@@ -9,7 +9,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "a_default_item_table_name",
+    tableName = "an_item_table_name",
     foreignKeys = [ForeignKey(
         entity = Category::class,
         parentColumns = ["name"],
@@ -22,7 +22,7 @@ import androidx.room.PrimaryKey
         name = "index_default_category_name"
     )]
 )
-data class DefaultItem(
+data class Item(
     @PrimaryKey(autoGenerate = true)
     var itemId: Long = 0L,
     var name: String = "",
@@ -36,9 +36,9 @@ data class DefaultItem(
     var ignoreField: String = "",
 )
 
-@Fts4(contentEntity = DefaultItem::class)
+@Fts4(contentEntity = Item::class)
 @Entity
-data class DefaultItemFts(
+data class ItemFts(
     val name: String,
     val category: String
 )

@@ -7,7 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.heyzeusv.androidutilitieslibrary.database.Database
 import com.heyzeusv.androidutilitieslibrary.database.dao.AllDao
 import com.heyzeusv.androidutilitieslibrary.database.dao.CategoryDao
-import com.heyzeusv.androidutilitieslibrary.database.dao.DefaultItemDao
+import com.heyzeusv.androidutilitieslibrary.database.dao.ItemDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +22,7 @@ object DatabaseModule {
     fun provideAllDao(database: Database): AllDao = database.allDao()
 
     @Provides
-    fun provideDefaultItemDao(database: Database): DefaultItemDao = database.defaultItemDao()
+    fun provideItemDao(database: Database): ItemDao = database.itemDao()
 
     @Provides
     fun provideCategoryDao(database: Database): CategoryDao = database.categoryDao()
@@ -39,7 +39,7 @@ object DatabaseModule {
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    db.execSQL("INSERT INTO DefaultItemFts(DefaultItemFts) VALUES ('rebuild')")
+                    db.execSQL("INSERT INTO ItemFts(ItemFts) VALUES ('rebuild')")
                 }
             })
             .fallbackToDestructiveMigration()

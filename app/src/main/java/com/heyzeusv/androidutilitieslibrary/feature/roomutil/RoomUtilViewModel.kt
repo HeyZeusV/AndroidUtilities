@@ -8,7 +8,7 @@ import com.heyzeusv.androidutilitieslibrary.database.Repository
 import com.heyzeusv.androidutilitieslibrary.database.RoomBackupRestore
 import com.heyzeusv.androidutilitieslibrary.database.RoomData
 import com.heyzeusv.androidutilitieslibrary.database.models.Category
-import com.heyzeusv.androidutilitieslibrary.database.models.DefaultItem
+import com.heyzeusv.androidutilitieslibrary.database.models.Item
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleInnerEmbed
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleOuterEmbed
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +35,7 @@ class RoomUtilViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    private val items = repository.getAllDefaultItems()
+    private val items = repository.getAllItems()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -76,11 +76,11 @@ class RoomUtilViewModel @Inject constructor(
     /**
      *  Add 10 Items to database with mostly random values.
      */
-    fun add10RandomDefaultItems() {
+    fun add10RandomItems() {
         viewModelScope.launch {
-            val itemList = mutableListOf<DefaultItem>()
+            val itemList = mutableListOf<Item>()
             repeat(10) {
-                val item = DefaultItem(
+                val item = Item(
                     name = randomString(),
                     category = categories.value.random().name,
                     quantity = Random.nextDouble(),
@@ -107,7 +107,7 @@ class RoomUtilViewModel @Inject constructor(
                 )
                 itemList.add(item)
             }
-            repository.upsertDefaultItems(*itemList.toTypedArray())
+            repository.upsertItems(*itemList.toTypedArray())
         }
     }
 
@@ -148,7 +148,7 @@ class RoomUtilViewModel @Inject constructor(
                     repository.run {
                         deleteAll()
                         insertRoomData(it)
-                        rebuildDefaultItemFts()
+                        rebuildItemFts()
                     }
                 }
             }

@@ -8,8 +8,8 @@ import androidx.sqlite.db.SupportSQLiteQuery
 @Dao
 abstract class AllDao {
 
-    @Query("INSERT INTO DefaultItemFts(DefaultItemFts) VALUES ('rebuild')")
-    abstract suspend fun rebuildDefaultItemFts()
+    @Query("INSERT INTO ItemFts(ItemFts) VALUES ('rebuild')")
+    abstract suspend fun rebuildItemFts()
 
     @Query("DELETE FROM sqlite_sequence")
     abstract suspend fun deleteAllPrimaryKeys()

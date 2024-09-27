@@ -2,19 +2,19 @@ package com.heyzeusv.androidutilitieslibrary.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.heyzeusv.androidutilitieslibrary.database.models.DefaultItem
+import com.heyzeusv.androidutilitieslibrary.database.models.Item
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class DefaultItemDao : BaseDao<DefaultItem>("a_default_item_table_name") {
+abstract class ItemDao : BaseDao<Item>("an_item_table_name") {
 
     @Query("SELECT * " +
-            "FROM a_default_item_table_name")
-    abstract fun getAllDefaultItems(): Flow<List<DefaultItem>>
+            "FROM an_item_table_name")
+    abstract fun getAllItems(): Flow<List<Item>>
 
     @Query("SELECT * " +
-            "FROM a_default_item_table_name " +
-            "JOIN DefaultItemFts ON a_default_item_table_name.name = DefaultItemFts.name " +
-            "WHERE DefaultItemFts MATCH :query")
-    abstract fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
+            "FROM an_item_table_name " +
+            "JOIN ItemFts ON an_item_table_name.name = ItemFts.name " +
+            "WHERE ItemFts MATCH :query")
+    abstract fun searchItems(query: String): Flow<List<Item>>
 }
