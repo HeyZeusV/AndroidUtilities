@@ -126,75 +126,31 @@ fun RoomUtilScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Button(
-                onClick = dbRestoreOnClick,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = "DB Restore")
-            }
-            Button(
-                onClick = dbBackupOnClick,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = "Db Backup")
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Button(
-                onClick = csvImportOnClick,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = "CSV Import")
-            }
-            Button(
-                onClick = csvExportOnClick,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = "CSV Export")
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Button(
-                onClick = clearUriOnClick,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = "Clear app directory")
-            }
-            Button(
-                onClick = deleteAllOnClick,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = "Clear database")
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Button(
-                onClick = insertCategoriesOnClick,
-                modifier = Modifier.weight(1f),
-            ) {
-                Text(text = "Insert 1k Categories")
-            }
-            Button(
-                onClick = insertItemsOnClick,
-                modifier = Modifier.weight(1f),
-                enabled = categories.isNotEmpty(),
-            ) {
-                Text(text = "Insert 1k Items")
-            }
-        }
+        TwoButtonRow(
+            leftText = "DB Restore",
+            leftOnClick = dbRestoreOnClick,
+            rightText = "Db Backup",
+            rightOnClick = dbBackupOnClick,
+        )
+        TwoButtonRow(
+            leftText = "CSV Import",
+            leftOnClick = csvImportOnClick,
+            rightText = "CSV Export",
+            rightOnClick = csvExportOnClick,
+        )
+        TwoButtonRow(
+            leftText = "Clear App Directory",
+            leftOnClick = clearUriOnClick,
+            rightText = "Clear Database",
+            rightOnClick = deleteAllOnClick,
+        )
+        TwoButtonRow(
+            leftText = "Insert 1k Categories",
+            leftOnClick = insertCategoriesOnClick,
+            rightText = "Insert 1k Items",
+            rightOnClick = insertItemsOnClick,
+            rightEnabled = categories.isNotEmpty()
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
@@ -248,6 +204,36 @@ fun RoomUtilScreen(
                     style = MaterialTheme.typography.headlineLarge,
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun TwoButtonRow(
+    leftText: String,
+    leftOnClick: () -> Unit,
+    leftEnabled: Boolean = true,
+    rightText: String,
+    rightOnClick: () -> Unit,
+    rightEnabled: Boolean = true,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Button(
+            onClick = leftOnClick,
+            modifier = Modifier.weight(1f),
+            enabled = leftEnabled,
+        ) {
+            Text(text = leftText)
+        }
+        Button(
+            onClick = rightOnClick,
+            modifier = Modifier.weight(1f),
+            enabled = rightEnabled,
+        ) {
+            Text(text = rightText)
         }
     }
 }
