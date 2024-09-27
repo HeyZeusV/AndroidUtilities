@@ -42,7 +42,6 @@ fun RoomUtilScreen(
     roomUtilVM: RoomUtilViewModel,
 ) {
     val context = LocalContext.current
-    val pagerState = rememberPagerState { 2 }
 
     val categories by roomUtilVM.categories.collectAsStateWithLifecycle()
     val items by roomUtilVM.items.collectAsStateWithLifecycle()
@@ -77,6 +76,49 @@ fun RoomUtilScreen(
         }
     }
 
+    RoomUtilScreen(
+        isBusy = isBusy,
+        categories = categories,
+        items = items,
+        dbRestoreOnClick = { dbRestoreLauncher.launch(null) },
+        dbBackupOnClick = {
+            if (roomUtilVM.appDbDirectoryUri == null) {
+                dbBackupLauncher.launch(null)
+            } else {
+                roomUtilVM.backupDatabase()
+            }
+        },
+        csvImportOnClick = { csvImportLauncher.launch(null) },
+        csvExportOnClick = {
+            if (roomUtilVM.appCsvDirectoryUri == null) {
+                csvExportLauncher.launch(null)
+            } else {
+                roomUtilVM.exportToCsv()
+            }
+        },
+        clearUriOnClick = { roomUtilVM.updateAppDirectoryUriToNull() },
+        deleteAllOnClick = { roomUtilVM.deleteAll() },
+        insertCategoriesOnClick = { roomUtilVM.insert1000RandomCategories()},
+        insertItemsOnClick = { roomUtilVM.insert1000RandomItems() },
+    )
+}
+
+@Composable
+fun RoomUtilScreen(
+    isBusy: Boolean,
+    categories: List<Category>,
+    items: List<Item>,
+    dbRestoreOnClick: () -> Unit,
+    dbBackupOnClick: () -> Unit,
+    csvImportOnClick: () -> Unit,
+    csvExportOnClick: () -> Unit,
+    clearUriOnClick: () -> Unit,
+    deleteAllOnClick: () -> Unit,
+    insertCategoriesOnClick: () -> Unit,
+    insertItemsOnClick: () -> Unit,
+) {
+    val pagerState = rememberPagerState { 2 }
+
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -89,19 +131,13 @@ fun RoomUtilScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(
-                onClick = { dbRestoreLauncher.launch(null) },
+                onClick = dbRestoreOnClick,
                 modifier = Modifier.weight(1f),
             ) {
                 Text(text = "DB Restore")
             }
             Button(
-                onClick = {
-                    if (roomUtilVM.appDbDirectoryUri == null) {
-                        dbBackupLauncher.launch(null)
-                    } else {
-                        roomUtilVM.backupDatabase()
-                    }
-                },
+                onClick = dbBackupOnClick,
                 modifier = Modifier.weight(1f),
             ) {
                 Text(text = "Db Backup")
@@ -112,19 +148,13 @@ fun RoomUtilScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(
-                onClick = { csvImportLauncher.launch(null) },
+                onClick = csvImportOnClick,
                 modifier = Modifier.weight(1f),
             ) {
                 Text(text = "CSV Import")
             }
             Button(
-                onClick = {
-                    if (roomUtilVM.appCsvDirectoryUri == null) {
-                        csvExportLauncher.launch(null)
-                    } else {
-                        roomUtilVM.exportToCsv()
-                    }
-                },
+                onClick = csvExportOnClick,
                 modifier = Modifier.weight(1f),
             ) {
                 Text(text = "CSV Export")
@@ -135,13 +165,13 @@ fun RoomUtilScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(
-                onClick = { roomUtilVM.updateAppDirectoryUriToNull()},
+                onClick = clearUriOnClick,
                 modifier = Modifier.weight(1f)
             ) {
                 Text(text = "Clear app directory")
             }
             Button(
-                onClick = { roomUtilVM.deleteAll() },
+                onClick = deleteAllOnClick,
                 modifier = Modifier.weight(1f),
             ) {
                 Text(text = "Clear database")
@@ -152,17 +182,17 @@ fun RoomUtilScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(
-                onClick = { roomUtilVM.insert1000RandomCategories() },
+                onClick = insertCategoriesOnClick,
                 modifier = Modifier.weight(1f),
             ) {
-                Text(text = "Add 1k Categories")
+                Text(text = "Insert 1k Categories")
             }
             Button(
-                onClick = { roomUtilVM.insert1000RandomItems() },
+                onClick = insertItemsOnClick,
                 modifier = Modifier.weight(1f),
                 enabled = categories.isNotEmpty(),
             ) {
-                Text(text = "Add 1k Items")
+                Text(text = "Insert 1k Items")
             }
         }
         Row(
