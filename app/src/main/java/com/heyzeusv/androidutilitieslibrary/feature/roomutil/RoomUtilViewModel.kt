@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
 import com.heyzeusv.androidutilitieslibrary.database.Repository
 import com.heyzeusv.androidutilitieslibrary.database.RoomBackupRestore
-import com.heyzeusv.androidutilitieslibrary.database.RoomData
 import com.heyzeusv.androidutilitieslibrary.database.models.Category
 import com.heyzeusv.androidutilitieslibrary.database.models.Item
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleInnerEmbed
@@ -28,14 +27,14 @@ class RoomUtilViewModel @Inject constructor(
 
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
-    private val categories = repository.getAllCategoriesFlow()
+    val categories = repository.getAllCategoriesFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList(),
         )
 
-    private val items = repository.getAllItems()
+    val items = repository.getAllItems()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -62,7 +61,7 @@ class RoomUtilViewModel @Inject constructor(
     /**
      *  Add 10 Categories to database with random name.
      */
-    fun add10RandomCategories() {
+    fun insert10RandomCategories() {
         viewModelScope.launch {
             val categoryList = mutableListOf<Category>()
             repeat(10) {
@@ -76,7 +75,7 @@ class RoomUtilViewModel @Inject constructor(
     /**
      *  Add 10 Items to database with mostly random values.
      */
-    fun add10RandomItems() {
+    fun insert10RandomItems() {
         viewModelScope.launch {
             val itemList = mutableListOf<Item>()
             repeat(10) {
@@ -159,7 +158,7 @@ class RoomUtilViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _appCsvDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
             _appCsvDirectoryUri?.let {
-                val roomData = RoomData()
+                val roomData = repository.getAllRoomData()
                 val directoryUri = _appCsvDirectoryUri ?: return@launch
 
                 csvConverter.exportRoomToCsv(directoryUri, roomData)

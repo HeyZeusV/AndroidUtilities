@@ -13,16 +13,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun RoomUtilScreen(
     roomUtilVM: RoomUtilViewModel,
 ) {
     val context = LocalContext.current
+
+    val categories by roomUtilVM.categories.collectAsStateWithLifecycle()
+    val items by roomUtilVM.items.collectAsStateWithLifecycle()
 
     val dbRestoreLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
@@ -108,6 +114,38 @@ fun RoomUtilScreen(
         }
         Button(onClick = { roomUtilVM.updateAppDirectoryUriToNull()}) {
             Text(text = "Clear sample app directory")
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = { roomUtilVM.insert10RandomCategories() },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "Add 10 Categories")
+            }
+            Button(
+                onClick = { roomUtilVM.insert10RandomItems() },
+                modifier = Modifier.weight(1f),
+                enabled = categories.isNotEmpty(),
+            ) {
+                Text(text = "Add 10 Items")
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+        ) {
+            Text(
+                text = "# of Categories: ${categories.size}",
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = "${items.size} : # of Items",
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End,
+            )
         }
     }
 }
