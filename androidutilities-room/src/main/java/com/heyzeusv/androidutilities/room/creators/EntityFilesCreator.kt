@@ -71,7 +71,7 @@ internal class EntityFilesCreator(
      *  Go through all [symbols] and create a *RoomUtil file from each using inner class
      *  [EntityBuilder].
      */
-    fun createEntityFiles() {
+    private fun createEntityFiles() {
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 // skip any classes that are annotated with Room.Fts4
@@ -93,6 +93,10 @@ internal class EntityFilesCreator(
                 ).bufferedWriter().use { entityBuilder.fileBuilder.build().writeTo(it) }
             }
         }
+    }
+
+    init {
+        createEntityFiles()
     }
 
     /**

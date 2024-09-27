@@ -34,7 +34,6 @@ class RoomProcessor(
             typeConverterInfoList = typeConverterInfoList,
             logger = logger
         )
-        entityFilesCreator.createEntityFiles()
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
