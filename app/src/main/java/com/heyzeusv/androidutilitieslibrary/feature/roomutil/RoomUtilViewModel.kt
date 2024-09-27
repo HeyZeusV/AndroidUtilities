@@ -12,7 +12,10 @@ import com.heyzeusv.androidutilitieslibrary.database.models.SampleInnerEmbed
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleOuterEmbed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,7 +53,16 @@ class RoomUtilViewModel @Inject constructor(
     fun updateAppDirectoryUriToNull() {
         _appDbDirectoryUri = null
         _appCsvDirectoryUri = null
+    }
 
+    private var _isBusy = MutableStateFlow(false)
+    val isBusy: StateFlow<Boolean> get() = _isBusy.asStateFlow()
+    private suspend fun isBusyRun(block: suspend () -> Unit) {
+        run {
+            _isBusy.value = true
+            block()
+            _isBusy.value = false
+        }
     }
 
     /**
@@ -62,13 +74,15 @@ class RoomUtilViewModel @Inject constructor(
      *  Add 1000 Categories to database with random name.
      */
     fun insert1000RandomCategories() {
-        viewModelScope.launch {
-            val categoryList = mutableListOf<Category>()
-            repeat(1000) {
-                val category = Category(name = randomString())
-                categoryList.add(category)
+        viewModelScope.launch(Dispatchers.IO) {
+            isBusyRun {
+                val categoryList = mutableListOf<Category>()
+                repeat(1000) {
+                    val category = Category(name = randomString())
+                    categoryList.add(category)
+                }
+                repository.insertCategories(*categoryList.toTypedArray())
             }
-            repository.insertCategories(*categoryList.toTypedArray())
         }
     }
 
@@ -76,84 +90,101 @@ class RoomUtilViewModel @Inject constructor(
      *  Add 1000 Items to database with mostly random values.
      */
     fun insert1000RandomItems() {
-        viewModelScope.launch {
-            val itemList = mutableListOf<Item>()
-            repeat(1000) {
-                val item = Item(
-                    name = randomString(),
-                    category = categories.value.random().name,
-                    quantity = Random.nextDouble(),
-                    unit = randomString(4),
-                    memo = randomString(32),
-                    outerEmbed = SampleOuterEmbed(
-                        sameName = randomString(),
-                        someField = Random.nextInt(),
-                        uselessField = Random.nextLong(),
-                        embed = SampleInnerEmbed(
+        viewModelScope.launch(Dispatchers.IO) {
+            isBusyRun {
+                val itemList = mutableListOf<Item>()
+                repeat(1000) {
+                    val item = Item(
+                        name = randomString(),
+                        category = categories.value.random().name,
+                        quantity = Random.nextDouble(),
+                        unit = randomString(4),
+                        memo = randomString(32),
+                        outerEmbed = SampleOuterEmbed(
                             sameName = randomString(),
-                            nullableBoolean = Random.nextBoolean(),
-                            nullableShort = null,
-                            nullableInt = Random.nextInt(),
-                            nullableLong = Random.nextLong(),
-                            nullableByte = null,
-                            nullableString = randomString(),
-                            nullableChar = null,
-                            nullableDouble = Random.nextDouble(),
-                            nullableFloat = Random.nextFloat(),
-                            nullableByteArray = Random.nextBytes(4)
+                            someField = Random.nextInt(),
+                            uselessField = Random.nextLong(),
+                            embed = SampleInnerEmbed(
+                                sameName = randomString(),
+                                nullableBoolean = Random.nextBoolean(),
+                                nullableShort = null,
+                                nullableInt = Random.nextInt(),
+                                nullableLong = Random.nextLong(),
+                                nullableByte = null,
+                                nullableString = randomString(),
+                                nullableChar = null,
+                                nullableDouble = Random.nextDouble(),
+                                nullableFloat = Random.nextFloat(),
+                                nullableByteArray = Random.nextBytes(4)
+                            )
                         )
                     )
-                )
-                itemList.add(item)
+                    itemList.add(item)
+                }
+                repository.upsertItems(*itemList.toTypedArray())
             }
-            repository.upsertItems(*itemList.toTypedArray())
         }
     }
 
     fun deleteAll() {
-        viewModelScope.launch {
-            repository.deleteAll()
+        viewModelScope.launch(Dispatchers.IO) {
+            isBusyRun {
+                repository.deleteAll()
+            }
         }
     }
 
     fun restoreDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.callCheckpoint()
-            roomBackupRestore.restore(selectedDirectoryUri)
+            isBusyRun {
+                repository.callCheckpoint()
+                roomBackupRestore.restore(selectedDirectoryUri)
+            }
         }
     }
 
     fun setupAppDirectoryAndBackupDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            _appDbDirectoryUri = roomBackupRestore.findOrCreateAppDirectory(selectedDirectoryUri)
-            _appDbDirectoryUri?.let {
-                val directoryUri = _appDbDirectoryUri ?: return@launch
+            isBusyRun {
+                _appDbDirectoryUri =
+                    roomBackupRestore.findOrCreateAppDirectory(selectedDirectoryUri)
+                _appDbDirectoryUri?.let {
+                    val directoryUri = _appDbDirectoryUri
 
-                repository.callCheckpoint()
-                roomBackupRestore.backup(directoryUri)
+                    directoryUri?.let {
+                        repository.callCheckpoint()
+                        roomBackupRestore.backup(directoryUri)
+                    }
+                }
             }
         }
     }
 
     fun backupDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
-            val directoryUri = _appDbDirectoryUri ?: return@launch
+            isBusyRun {
+                val directoryUri = _appDbDirectoryUri
 
-            repository.callCheckpoint()
-            roomBackupRestore.backup(directoryUri)
+                directoryUri?.let {
+                    repository.callCheckpoint()
+                    roomBackupRestore.backup(directoryUri)
+                }
+            }
         }
     }
 
     fun importCsvToRoom(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            val data = csvConverter.importCsvToRoom(selectedDirectoryUri)
+            isBusyRun {
+                val data = csvConverter.importCsvToRoom(selectedDirectoryUri)
 
-            data?.let {
-                repository.transactionProvider.runAsTransaction {
-                    repository.run {
-                        deleteAll()
-                        insertRoomData(it)
-                        rebuildItemFts()
+                data?.let {
+                    repository.transactionProvider.runAsTransaction {
+                        repository.run {
+                            deleteAll()
+                            insertRoomData(it)
+                            rebuildItemFts()
+                        }
                     }
                 }
             }
@@ -162,22 +193,30 @@ class RoomUtilViewModel @Inject constructor(
 
     fun setupAppDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            _appCsvDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
-            _appCsvDirectoryUri?.let {
-                val roomData = repository.getAllRoomData()
-                val directoryUri = _appCsvDirectoryUri ?: return@launch
+            isBusyRun {
+                _appCsvDirectoryUri = csvConverter.findOrCreateAppDirectory(selectedDirectoryUri)
+                _appCsvDirectoryUri?.let {
+                    val roomData = repository.getAllRoomData()
+                    val directoryUri = _appCsvDirectoryUri
 
-                csvConverter.exportRoomToCsv(directoryUri, roomData)
+                    directoryUri?.let {
+                        csvConverter.exportRoomToCsv(directoryUri, roomData)
+                    }
+                }
             }
         }
     }
 
     fun exportToCsv() {
         viewModelScope.launch(Dispatchers.IO) {
-            val roomData = repository.getAllRoomData()
-            val directoryUri = _appCsvDirectoryUri ?: return@launch
+            isBusyRun {
+                val roomData = repository.getAllRoomData()
+                val directoryUri = _appCsvDirectoryUri
 
-            csvConverter.exportRoomToCsv(directoryUri, roomData)
+                directoryUri?.let {
+                    csvConverter.exportRoomToCsv(directoryUri, roomData)
+                }
+            }
         }
     }
 }

@@ -4,23 +4,31 @@ import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,6 +46,7 @@ fun RoomUtilScreen(
 
     val categories by roomUtilVM.categories.collectAsStateWithLifecycle()
     val items by roomUtilVM.items.collectAsStateWithLifecycle()
+    val isBusy by roomUtilVM.isBusy.collectAsStateWithLifecycle()
 
     val dbRestoreLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
@@ -146,14 +155,14 @@ fun RoomUtilScreen(
                 onClick = { roomUtilVM.insert1000RandomCategories() },
                 modifier = Modifier.weight(1f),
             ) {
-                Text(text = "Add 1000 Categories")
+                Text(text = "Add 1k Categories")
             }
             Button(
                 onClick = { roomUtilVM.insert1000RandomItems() },
                 modifier = Modifier.weight(1f),
                 enabled = categories.isNotEmpty(),
             ) {
-                Text(text = "Add 1000 Items")
+                Text(text = "Add 1k Items")
             }
         }
         Row(
@@ -183,6 +192,33 @@ fun RoomUtilScreen(
             pagerState = pagerState,
             pageCount = 2,
         )
+    }
+
+    if (isBusy) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xE6000000))
+                .clickable(enabled = false) { },
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(250.dp),
+                    strokeWidth = 16.dp,
+                    strokeCap = StrokeCap.Round,
+                )
+                Text(
+                    text = "Busy...",
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+            }
+        }
     }
 }
 
