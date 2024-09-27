@@ -143,17 +143,17 @@ fun RoomUtilScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(
-                onClick = { roomUtilVM.insert10RandomCategories() },
+                onClick = { roomUtilVM.insert1000RandomCategories() },
                 modifier = Modifier.weight(1f),
             ) {
-                Text(text = "Add 10 Categories")
+                Text(text = "Add 1000 Categories")
             }
             Button(
-                onClick = { roomUtilVM.insert10RandomItems() },
+                onClick = { roomUtilVM.insert1000RandomItems() },
                 modifier = Modifier.weight(1f),
                 enabled = categories.isNotEmpty(),
             ) {
-                Text(text = "Add 10 Items")
+                Text(text = "Add 1000 Items")
             }
         }
         Row(

@@ -59,12 +59,12 @@ class RoomUtilViewModel @Inject constructor(
     private fun randomString(size: Int = 8) = List(size) { charPool.random() }.joinToString("")
 
     /**
-     *  Add 10 Categories to database with random name.
+     *  Add 1000 Categories to database with random name.
      */
-    fun insert10RandomCategories() {
+    fun insert1000RandomCategories() {
         viewModelScope.launch {
             val categoryList = mutableListOf<Category>()
-            repeat(10) {
+            repeat(1000) {
                 val category = Category(name = randomString())
                 categoryList.add(category)
             }
@@ -73,12 +73,12 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     /**
-     *  Add 10 Items to database with mostly random values.
+     *  Add 1000 Items to database with mostly random values.
      */
-    fun insert10RandomItems() {
+    fun insert1000RandomItems() {
         viewModelScope.launch {
             val itemList = mutableListOf<Item>()
-            repeat(10) {
+            repeat(1000) {
                 val item = Item(
                     name = randomString(),
                     category = categories.value.random().name,
