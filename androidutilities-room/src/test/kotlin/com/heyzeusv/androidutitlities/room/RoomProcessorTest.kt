@@ -51,6 +51,47 @@ class RoomProcessorTest  {
     }
 
     @Test
+    fun `Generate two basic entities with two fields`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "BasicTwoField.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Entity
+                    
+                    @Entity
+                    class BasicTwoField(
+                        val basicIntField: Int = 0,
+                        val basicStringField: String = "",
+                    )
+
+                    @Entity
+                    class TwoFieldBasic(
+                        val basicIntField: Int = 0,
+                        val basicStringField: String = "",
+                    )
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(2, kspCompileResult.generatedFiles.size)
+        kspCompileResult.generatedFiles.forEach {
+            println(it.name)
+        }
+        kspCompileResult.generatedFiles.find { it.name == "BasicTwoFieldRoomUtil.kt" }!!
+            .inputStream().use {
+                val generatedFileText = String(it.readBytes()).trimIndent()
+                assertEquals(expectedBasicEntityWithTwoFields("BasicTwoField"), generatedFileText)
+            }
+        kspCompileResult.generatedFiles.find { it.name == "TwoFieldBasicRoomUtil.kt" }!!
+            .inputStream().use {
+                val generatedFileText = String(it.readBytes()).trimIndent()
+                assertEquals(expectedBasicEntityWithTwoFields("TwoFieldBasic"), generatedFileText)
+            }
+    }
+
+    @Test
     fun `Generate entity with custom table name`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
@@ -267,11 +308,6 @@ class RoomProcessorTest  {
             }
 
     private fun findGeneratedFiles(compilation: KotlinCompilation): List<File> {
-        val list = compilation.kspSourcesDir.listFiles()
-        list?.forEach {
-            println("name ${it.name}, isFile ${it.isFile}")
-        }
-        print("${compilation.kspSourcesDir.listFiles()?.size}")
         return compilation.kspSourcesDir
             .walkTopDown()
             .filter { it.isFile }
