@@ -191,6 +191,37 @@ class RoomProcessorTest  {
         }
     }
 
+
+    @Test
+    fun `Generate entity with two fields with column info`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "TwoFieldColumnInfo.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.ColumnInfo
+                    import androidx.room.Entity
+                    
+                    @Entity
+                    class TwoFieldColumnInfo(
+                        @ColumnInfo
+                        val intField: Int = 0,
+                        @ColumnInfo(name = "customColumnName")
+                        val stringField: String = "",
+                    )
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        val file = kspCompileResult.generatedFiles[0]
+        file.inputStream().use {
+            val generatedFileText = String(it.readBytes()).trimIndent()
+            assertEquals(expectedEntityWithTwoFieldsWithColumnInfo, generatedFileText)
+        }
+    }
+
     private fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
         val compilation = prepareCompilation(*sourceFiles)
         val result = compilation.compile()
@@ -491,6 +522,50 @@ class RoomProcessorTest  {
                   levelOne_stringFieldOne = entity.embedOne.stringFieldOne,
                   levelOne_levelTwo_intFieldTwo = entity.embedOne.embedTwo.intFieldTwo,
                   levelOne_levelTwo_stringFieldTwo = entity.embedOne.embedTwo.stringFieldTwo,
+                )
+              }
+            }
+        """.trimIndent()
+
+        private val expectedEntityWithTwoFieldsWithColumnInfo = """
+            package test
+
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.Any
+            import kotlin.Int
+            import kotlin.String
+            import kotlin.collections.List
+            import kotlin.collections.Map
+
+            public data class TwoFieldColumnInfoRoomUtil(
+              public val intField: Int,
+              public val customColumnName: String,
+            ) : CsvData {
+              public val tableName: String = "TwoFieldColumnInfo"
+
+              override val csvRow: List<Any?> = listOf(
+                intField,
+                customColumnName,
+              )
+
+              public fun toOriginal(): TwoFieldColumnInfo = TwoFieldColumnInfo(
+                intField = intField,
+                stringField = customColumnName,
+              )
+
+              public companion object : CsvInfo {
+                override val csvFileName: String = "TwoFieldColumnInfo.csv"
+
+                override val csvFieldToTypeMap: Map<String, String> = mapOf(
+                  "intField" to "Int",
+                  "customColumnName" to "String",
+                )
+
+                public fun toUtil(entity: TwoFieldColumnInfo): TwoFieldColumnInfoRoomUtil =
+                    TwoFieldColumnInfoRoomUtil(
+                  intField = entity.intField,
+                  customColumnName = entity.stringField,
                 )
               }
             }

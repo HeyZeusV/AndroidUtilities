@@ -21,6 +21,12 @@ annotation class Ignore
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.BINARY)
-public annotation class Embedded(
+annotation class Embedded(
     val prefix: String = ""
+)
+
+@Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+annotation class ColumnInfo(
+    val name: String = "[field-name]"
 )
