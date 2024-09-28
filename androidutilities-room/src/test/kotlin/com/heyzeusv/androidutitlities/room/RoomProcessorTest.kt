@@ -107,6 +107,90 @@ class RoomProcessorTest  {
         }
     }
 
+    @Test
+    fun `Generate entity with two levels of embedded`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "TwoLevelEmbedded.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Embedded
+                    import androidx.room.Entity
+
+                    @Entity
+                    data class TwoLevelEmbedded(
+                        val intField: Int = 0,
+                        val stringField: String = "",
+                        @Embedded
+                        val embedOne: EmbedOne = EmbedOne() 
+                    )
+
+                    data class EmbedOne(
+                        val intFieldOne: Int = 0,
+                        val stringFieldOne: String = "",
+                        @Embedded
+                        val embedTwo: EmbedTwo = EmbedTwo()
+                    )
+
+                    data class EmbedTwo(
+                        val intFieldTwo: Int = 0,
+                        val stringFieldTwo: String = "",
+                    )
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        val file = kspCompileResult.generatedFiles[0]
+        file.inputStream().use {
+            val generatedFileText = String(it.readBytes()).trimIndent()
+            assertEquals(expectedTwoLevelEmbedded, generatedFileText)
+        }
+    }
+
+    @Test
+    fun `Generate entity with two levels of embedded with prefixes`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "TwoLevelEmbedded.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Embedded
+                    import androidx.room.Entity
+
+                    @Entity
+                    data class TwoLevelEmbedded(
+                        val intField: Int = 0,
+                        val stringField: String = "",
+                        @Embedded(prefix = "levelOne_")
+                        val embedOne: EmbedOne = EmbedOne() 
+                    )
+
+                    data class EmbedOne(
+                        val intFieldOne: Int = 0,
+                        val stringFieldOne: String = "",
+                        @Embedded(prefix = "levelTwo_")
+                        val embedTwo: EmbedTwo = EmbedTwo()
+                    )
+
+                    data class EmbedTwo(
+                        val intFieldTwo: Int = 0,
+                        val stringFieldTwo: String = "",
+                    )
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        val file = kspCompileResult.generatedFiles[0]
+        file.inputStream().use {
+            val generatedFileText = String(it.readBytes()).trimIndent()
+            assertEquals(expectedTwoLevelEmbeddedWithPrefixes, generatedFileText)
+        }
+    }
+
     private fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
         val compilation = prepareCompilation(*sourceFiles)
         val result = compilation.compile()
@@ -271,6 +355,142 @@ class RoomProcessorTest  {
                     BasicIgnoredFieldRoomUtil(
                   basicIntField = entity.basicIntField,
                   basicStringField = entity.basicStringField,
+                )
+              }
+            }
+        """.trimIndent()
+
+        private val expectedTwoLevelEmbedded = """
+            package test
+
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.Any
+            import kotlin.Int
+            import kotlin.String
+            import kotlin.collections.List
+            import kotlin.collections.Map
+
+            public data class TwoLevelEmbeddedRoomUtil(
+              public val intField: Int,
+              public val stringField: String,
+              public val intFieldOne: Int,
+              public val stringFieldOne: String,
+              public val intFieldTwo: Int,
+              public val stringFieldTwo: String,
+            ) : CsvData {
+              public val tableName: String = "TwoLevelEmbedded"
+
+              override val csvRow: List<Any?> = listOf(
+                intField,
+                stringField,
+                intFieldOne,
+                stringFieldOne,
+                intFieldTwo,
+                stringFieldTwo,
+              )
+
+              public fun toOriginal(): TwoLevelEmbedded = TwoLevelEmbedded(
+                intField = intField,
+                stringField = stringField,
+                embedOne = EmbedOne(
+                  intFieldOne = intFieldOne,
+                  stringFieldOne = stringFieldOne,
+                  embedTwo = EmbedTwo(
+                    intFieldTwo = intFieldTwo,
+                    stringFieldTwo = stringFieldTwo,
+                  ),
+                ),
+              )
+
+              public companion object : CsvInfo {
+                override val csvFileName: String = "TwoLevelEmbedded.csv"
+
+                override val csvFieldToTypeMap: Map<String, String> = mapOf(
+                  "intField" to "Int",
+                  "stringField" to "String",
+                  "intFieldOne" to "Int",
+                  "stringFieldOne" to "String",
+                  "intFieldTwo" to "Int",
+                  "stringFieldTwo" to "String",
+                )
+
+                public fun toUtil(entity: TwoLevelEmbedded): TwoLevelEmbeddedRoomUtil =
+                    TwoLevelEmbeddedRoomUtil(
+                  intField = entity.intField,
+                  stringField = entity.stringField,
+                  intFieldOne = entity.embedOne.intFieldOne,
+                  stringFieldOne = entity.embedOne.stringFieldOne,
+                  intFieldTwo = entity.embedOne.embedTwo.intFieldTwo,
+                  stringFieldTwo = entity.embedOne.embedTwo.stringFieldTwo,
+                )
+              }
+            }
+        """.trimIndent()
+
+        private val expectedTwoLevelEmbeddedWithPrefixes = """
+            package test
+
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.Any
+            import kotlin.Int
+            import kotlin.String
+            import kotlin.collections.List
+            import kotlin.collections.Map
+
+            public data class TwoLevelEmbeddedRoomUtil(
+              public val intField: Int,
+              public val stringField: String,
+              public val levelOne_intFieldOne: Int,
+              public val levelOne_stringFieldOne: String,
+              public val levelOne_levelTwo_intFieldTwo: Int,
+              public val levelOne_levelTwo_stringFieldTwo: String,
+            ) : CsvData {
+              public val tableName: String = "TwoLevelEmbedded"
+
+              override val csvRow: List<Any?> = listOf(
+                intField,
+                stringField,
+                levelOne_intFieldOne,
+                levelOne_stringFieldOne,
+                levelOne_levelTwo_intFieldTwo,
+                levelOne_levelTwo_stringFieldTwo,
+              )
+
+              public fun toOriginal(): TwoLevelEmbedded = TwoLevelEmbedded(
+                intField = intField,
+                stringField = stringField,
+                embedOne = EmbedOne(
+                  intFieldOne = levelOne_intFieldOne,
+                  stringFieldOne = levelOne_stringFieldOne,
+                  embedTwo = EmbedTwo(
+                    intFieldTwo = levelOne_levelTwo_intFieldTwo,
+                    stringFieldTwo = levelOne_levelTwo_stringFieldTwo,
+                  ),
+                ),
+              )
+
+              public companion object : CsvInfo {
+                override val csvFileName: String = "TwoLevelEmbedded.csv"
+
+                override val csvFieldToTypeMap: Map<String, String> = mapOf(
+                  "intField" to "Int",
+                  "stringField" to "String",
+                  "levelOne_intFieldOne" to "Int",
+                  "levelOne_stringFieldOne" to "String",
+                  "levelOne_levelTwo_intFieldTwo" to "Int",
+                  "levelOne_levelTwo_stringFieldTwo" to "String",
+                )
+
+                public fun toUtil(entity: TwoLevelEmbedded): TwoLevelEmbeddedRoomUtil =
+                    TwoLevelEmbeddedRoomUtil(
+                  intField = entity.intField,
+                  stringField = entity.stringField,
+                  levelOne_intFieldOne = entity.embedOne.intFieldOne,
+                  levelOne_stringFieldOne = entity.embedOne.stringFieldOne,
+                  levelOne_levelTwo_intFieldTwo = entity.embedOne.embedTwo.intFieldTwo,
+                  levelOne_levelTwo_stringFieldTwo = entity.embedOne.embedTwo.stringFieldTwo,
                 )
               }
             }

@@ -18,3 +18,9 @@ annotation class Entity(
 )
 @Retention(AnnotationRetention.BINARY)
 annotation class Ignore
+
+@Target(AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+public annotation class Embedded(
+    val prefix: String = ""
+)
