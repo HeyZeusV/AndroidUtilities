@@ -30,3 +30,7 @@ annotation class Embedded(
 annotation class ColumnInfo(
     val name: String = "[field-name]"
 )
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
+annotation class Fts4

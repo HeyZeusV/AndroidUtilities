@@ -46,7 +46,7 @@ class RoomProcessorTest  {
         val file = kspCompileResult.generatedFiles[0]
         file.inputStream().use {
             val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedBasicEntityWithTwoFields, generatedFileText)
+            assertEquals(expectedBasicEntityWithTwoFields("BasicTwoField"), generatedFileText)
         }
     }
 
@@ -222,6 +222,29 @@ class RoomProcessorTest  {
         }
     }
 
+    @Test
+    fun `Do not generate FTS4 entity`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "BasicTwoField.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Fts4
+                    
+                    @Fts4
+                    @Entity
+                    class BasicTwoField(
+                        val basicIntField: Int = 0,
+                        val basicStringField: String = "",
+                    )
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(0, kspCompileResult.generatedFiles.size)
+    }
+
     private fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
         val compilation = prepareCompilation(*sourceFiles)
         val result = compilation.compile()
@@ -261,7 +284,7 @@ class RoomProcessorTest  {
     )
 
     companion object {
-        private val expectedBasicEntityWithTwoFields = """
+        private fun expectedBasicEntityWithTwoFields(name: String) = """
             package test
 
             import com.heyzeusv.androidutilities.room.util.CsvData
@@ -272,31 +295,31 @@ class RoomProcessorTest  {
             import kotlin.collections.List
             import kotlin.collections.Map
 
-            public data class BasicTwoFieldRoomUtil(
+            public data class ${name}RoomUtil(
               public val basicIntField: Int,
               public val basicStringField: String,
             ) : CsvData {
-              public val tableName: String = "BasicTwoField"
+              public val tableName: String = "$name"
 
               override val csvRow: List<Any?> = listOf(
                 basicIntField,
                 basicStringField,
               )
 
-              public fun toOriginal(): BasicTwoField = BasicTwoField(
+              public fun toOriginal(): $name = $name(
                 basicIntField = basicIntField,
                 basicStringField = basicStringField,
               )
 
               public companion object : CsvInfo {
-                override val csvFileName: String = "BasicTwoField.csv"
+                override val csvFileName: String = "$name.csv"
 
                 override val csvFieldToTypeMap: Map<String, String> = mapOf(
                   "basicIntField" to "Int",
                   "basicStringField" to "String",
                 )
 
-                public fun toUtil(entity: BasicTwoField): BasicTwoFieldRoomUtil = BasicTwoFieldRoomUtil(
+                public fun toUtil(entity: $name): ${name}RoomUtil = ${name}RoomUtil(
                   basicIntField = entity.basicIntField,
                   basicStringField = entity.basicStringField,
                 )
