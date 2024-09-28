@@ -13,6 +13,10 @@ import org.junit.rules.TemporaryFolder
 import java.io.File
 import kotlin.test.assertEquals
 
+/**
+ *  Used [this article](https://dev.to/chigichan24/why-dont-you-write-unit-tests-and-integration-tests-to-ksp-project-2oio)
+ *  as a guide to write these tests.
+ */
 @OptIn(ExperimentalCompilerApi::class)
 class RoomProcessorTest  {
 
@@ -70,6 +74,36 @@ class RoomProcessorTest  {
         file.inputStream().use {
             val generatedFileText = String(it.readBytes()).trimIndent()
             assertEquals(expectedBasicEntityWithCustomName, generatedFileText)
+        }
+    }
+
+    @Test
+    fun `Generate entity with ignored field`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "BasicIgnoredField.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Entity
+                    import androidx.room.Ignore
+                    
+                    @Entity
+                    class BasicIgnoredField(
+                        var basicIntField: Int = 0,
+                        var basicStringField: String = "",
+                        @Ignore
+                        var ignoredLongField: Long = ""
+                    )
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        val file = kspCompileResult.generatedFiles[0]
+        file.inputStream().use {
+            val generatedFileText = String(it.readBytes()).trimIndent()
+            assertEquals(expectedBasicEntityWithIgnoredField, generatedFileText)
         }
     }
 
@@ -191,6 +225,50 @@ class RoomProcessorTest  {
                 )
 
                 public fun toUtil(entity: BasicTwoField): BasicTwoFieldRoomUtil = BasicTwoFieldRoomUtil(
+                  basicIntField = entity.basicIntField,
+                  basicStringField = entity.basicStringField,
+                )
+              }
+            }
+        """.trimIndent()
+
+        private val expectedBasicEntityWithIgnoredField = """
+            package test
+
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.Any
+            import kotlin.Int
+            import kotlin.String
+            import kotlin.collections.List
+            import kotlin.collections.Map
+
+            public data class BasicIgnoredFieldRoomUtil(
+              public val basicIntField: Int,
+              public val basicStringField: String,
+            ) : CsvData {
+              public val tableName: String = "BasicIgnoredField"
+
+              override val csvRow: List<Any?> = listOf(
+                basicIntField,
+                basicStringField,
+              )
+
+              public fun toOriginal(): BasicIgnoredField = BasicIgnoredField(
+                basicIntField = basicIntField,
+                basicStringField = basicStringField,
+              )
+
+              public companion object : CsvInfo {
+                override val csvFileName: String = "BasicIgnoredField.csv"
+
+                override val csvFieldToTypeMap: Map<String, String> = mapOf(
+                  "basicIntField" to "Int",
+                  "basicStringField" to "String",
+                )
+
+                public fun toUtil(entity: BasicIgnoredField): BasicIgnoredFieldRoomUtil =
+                    BasicIgnoredFieldRoomUtil(
                   basicIntField = entity.basicIntField,
                   basicStringField = entity.basicStringField,
                 )
