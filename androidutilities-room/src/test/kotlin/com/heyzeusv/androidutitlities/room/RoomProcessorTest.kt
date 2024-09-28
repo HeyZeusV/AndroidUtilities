@@ -46,7 +46,7 @@ class RoomProcessorTest  {
         val file = kspCompileResult.generatedFiles[0]
         file.inputStream().use {
             val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedBasicEntityWithTwoFields("BasicTwoField"), generatedFileText)
+            assertEquals(basicEntityTwoFields("BasicTwoField"), generatedFileText)
         }
     }
 
@@ -82,12 +82,12 @@ class RoomProcessorTest  {
         kspCompileResult.generatedFiles.find { it.name == "BasicTwoFieldRoomUtil.kt" }!!
             .inputStream().use {
                 val generatedFileText = String(it.readBytes()).trimIndent()
-                assertEquals(expectedBasicEntityWithTwoFields("BasicTwoField"), generatedFileText)
+                assertEquals(basicEntityTwoFields("BasicTwoField"), generatedFileText)
             }
         kspCompileResult.generatedFiles.find { it.name == "TwoFieldBasicRoomUtil.kt" }!!
             .inputStream().use {
                 val generatedFileText = String(it.readBytes()).trimIndent()
-                assertEquals(expectedBasicEntityWithTwoFields("TwoFieldBasic"), generatedFileText)
+                assertEquals(basicEntityTwoFields("TwoFieldBasic"), generatedFileText)
             }
     }
 
@@ -114,7 +114,10 @@ class RoomProcessorTest  {
         val file = kspCompileResult.generatedFiles[0]
         file.inputStream().use {
             val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedBasicEntityWithCustomName, generatedFileText)
+            assertEquals(
+                basicEntityTwoFields("BasicTwoField", "custom_name"),
+                generatedFileText
+            )
         }
     }
 
@@ -130,7 +133,7 @@ class RoomProcessorTest  {
                     import androidx.room.Ignore
                     
                     @Entity
-                    class BasicIgnoredField(
+                    class IgnoredField(
                         var basicIntField: Int = 0,
                         var basicStringField: String = "",
                         @Ignore
@@ -144,7 +147,7 @@ class RoomProcessorTest  {
         val file = kspCompileResult.generatedFiles[0]
         file.inputStream().use {
             val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedBasicEntityWithIgnoredField, generatedFileText)
+            assertEquals(basicEntityTwoFields("IgnoredField"), generatedFileText)
         }
     }
 
@@ -286,6 +289,44 @@ class RoomProcessorTest  {
         assertEquals(0, kspCompileResult.generatedFiles.size)
     }
 
+    @Test
+    fun `Generate entity that requires type converter`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "TypeConverterEntity.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Entity
+                    import androidx.room.TypeConverter
+                    import java.util.Date
+                    
+                    class TypeConverters {
+                        @TypeConverter
+                        fun toDate(value: Long): Date {
+                            return Date(value)
+                        }
+                    
+                        @TypeConverter
+                        fun fromDate(date: Date): Long {
+                            return date.time
+                        }
+                    }
+
+                    @Entity
+                    class TypeConverterEntity(val date: Date = 0)
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        val file = kspCompileResult.generatedFiles[0]
+        file.inputStream().use {
+            val generatedFileText = String(it.readBytes()).trimIndent()
+            assertEquals(expectedEntityRequiringTypeConverter, generatedFileText)
+        }
+    }
+
     private fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
         val compilation = prepareCompilation(*sourceFiles)
         val result = compilation.compile()
@@ -320,7 +361,7 @@ class RoomProcessorTest  {
     )
 
     companion object {
-        private fun expectedBasicEntityWithTwoFields(name: String) = """
+        private fun basicEntityTwoFields(name: String, tableName: String = name) = """
             package test
 
             import com.heyzeusv.androidutilities.room.util.CsvData
@@ -335,7 +376,7 @@ class RoomProcessorTest  {
               public val basicIntField: Int,
               public val basicStringField: String,
             ) : CsvData {
-              public val tableName: String = "$name"
+              public val tableName: String = "$tableName"
 
               override val csvRow: List<Any?> = listOf(
                 basicIntField,
@@ -348,7 +389,7 @@ class RoomProcessorTest  {
               )
 
               public companion object : CsvInfo {
-                override val csvFileName: String = "$name.csv"
+                override val csvFileName: String = "$tableName.csv"
 
                 override val csvFieldToTypeMap: Map<String, String> = mapOf(
                   "basicIntField" to "Int",
@@ -356,93 +397,6 @@ class RoomProcessorTest  {
                 )
 
                 public fun toUtil(entity: $name): ${name}RoomUtil = ${name}RoomUtil(
-                  basicIntField = entity.basicIntField,
-                  basicStringField = entity.basicStringField,
-                )
-              }
-            }
-        """.trimIndent()
-
-        private val expectedBasicEntityWithCustomName = """
-            package test
-
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
-            import kotlin.Any
-            import kotlin.Int
-            import kotlin.String
-            import kotlin.collections.List
-            import kotlin.collections.Map
-
-            public data class BasicTwoFieldRoomUtil(
-              public val basicIntField: Int,
-              public val basicStringField: String,
-            ) : CsvData {
-              public val tableName: String = "custom_name"
-
-              override val csvRow: List<Any?> = listOf(
-                basicIntField,
-                basicStringField,
-              )
-
-              public fun toOriginal(): BasicTwoField = BasicTwoField(
-                basicIntField = basicIntField,
-                basicStringField = basicStringField,
-              )
-
-              public companion object : CsvInfo {
-                override val csvFileName: String = "custom_name.csv"
-
-                override val csvFieldToTypeMap: Map<String, String> = mapOf(
-                  "basicIntField" to "Int",
-                  "basicStringField" to "String",
-                )
-
-                public fun toUtil(entity: BasicTwoField): BasicTwoFieldRoomUtil = BasicTwoFieldRoomUtil(
-                  basicIntField = entity.basicIntField,
-                  basicStringField = entity.basicStringField,
-                )
-              }
-            }
-        """.trimIndent()
-
-        private val expectedBasicEntityWithIgnoredField = """
-            package test
-
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
-            import kotlin.Any
-            import kotlin.Int
-            import kotlin.String
-            import kotlin.collections.List
-            import kotlin.collections.Map
-
-            public data class BasicIgnoredFieldRoomUtil(
-              public val basicIntField: Int,
-              public val basicStringField: String,
-            ) : CsvData {
-              public val tableName: String = "BasicIgnoredField"
-
-              override val csvRow: List<Any?> = listOf(
-                basicIntField,
-                basicStringField,
-              )
-
-              public fun toOriginal(): BasicIgnoredField = BasicIgnoredField(
-                basicIntField = basicIntField,
-                basicStringField = basicStringField,
-              )
-
-              public companion object : CsvInfo {
-                override val csvFileName: String = "BasicIgnoredField.csv"
-
-                override val csvFieldToTypeMap: Map<String, String> = mapOf(
-                  "basicIntField" to "Int",
-                  "basicStringField" to "String",
-                )
-
-                public fun toUtil(entity: BasicIgnoredField): BasicIgnoredFieldRoomUtil =
-                    BasicIgnoredFieldRoomUtil(
                   basicIntField = entity.basicIntField,
                   basicStringField = entity.basicStringField,
                 )
@@ -625,6 +579,45 @@ class RoomProcessorTest  {
                     TwoFieldColumnInfoRoomUtil(
                   intField = entity.intField,
                   customColumnName = entity.stringField,
+                )
+              }
+            }
+        """.trimIndent()
+
+        private val expectedEntityRequiringTypeConverter = """
+            package test
+
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.Any
+            import kotlin.Long
+            import kotlin.String
+            import kotlin.collections.List
+            import kotlin.collections.Map
+
+            public data class TypeConverterEntityRoomUtil(
+              public val date: Long,
+            ) : CsvData {
+              public val tableName: String = "TypeConverterEntity"
+
+              override val csvRow: List<Any?> = listOf(
+                date,
+              )
+
+              public fun toOriginal(): TypeConverterEntity = TypeConverterEntity(
+                date = TypeConverters().toDate(date),
+              )
+
+              public companion object : CsvInfo {
+                override val csvFileName: String = "TypeConverterEntity.csv"
+
+                override val csvFieldToTypeMap: Map<String, String> = mapOf(
+                  "date" to "Long",
+                )
+
+                public fun toUtil(entity: TypeConverterEntity): TypeConverterEntityRoomUtil =
+                    TypeConverterEntityRoomUtil(
+                  date = TypeConverters().fromDate(entity.date),
                 )
               }
             }

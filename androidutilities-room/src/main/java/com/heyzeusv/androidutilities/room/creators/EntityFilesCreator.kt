@@ -292,7 +292,7 @@ internal class EntityFilesCreator(
                         // use KotlinPoet format specifier to automatically import TypeConverter
                         // and call it.
                         add(
-                            "%L = %T().%L(entity.%L%L), \n",
+                            "%L = %T().%L(entity.%L%L),\n",
                             info.fieldName, tcClass, tcInfo.functionName, prefix, info.name
                         )
                     }
