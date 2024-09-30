@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import java.io.File
+import kotlin.test.assertEquals
 
 /**
  *  Used [this article](https://dev.to/chigichan24/why-dont-you-write-unit-tests-and-integration-tests-to-ksp-project-2oio)
@@ -18,7 +19,7 @@ import java.io.File
 @OptIn(ExperimentalCompilerApi::class)
 abstract class CreatorTestBase {
     @get:Rule
-    protected val tempFolder: TemporaryFolder = TemporaryFolder()
+    val tempFolder: TemporaryFolder = TemporaryFolder()
 
     protected fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
         val compilation = prepareCompilation(*sourceFiles)
@@ -51,5 +52,13 @@ abstract class CreatorTestBase {
     protected data class KspCompileResult(
         val result: KotlinCompilation.Result,
         val generatedFiles: List<File>,
-    )
+    ) {
+        fun assertFileEquals(expected: String, actualFile: String) {
+            generatedFiles.find { it.name == actualFile }!!
+                .inputStream().use {
+                    val generatedFileText = String(it.readBytes()).trimIndent()
+                    assertEquals(expected, generatedFileText)
+                }
+        }
+    }
 }

@@ -66,9 +66,6 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(2, kspCompileResult.generatedFiles.size)
-        kspCompileResult.generatedFiles.forEach {
-            println(it.name)
-        }
         kspCompileResult.generatedFiles.find { it.name == "BasicTwoFieldRoomUtil.kt" }!!
             .inputStream().use {
                 val generatedFileText = String(it.readBytes()).trimIndent()
