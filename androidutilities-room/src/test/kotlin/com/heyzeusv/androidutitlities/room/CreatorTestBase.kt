@@ -18,6 +18,7 @@ import kotlin.test.assertEquals
  */
 @OptIn(ExperimentalCompilerApi::class)
 abstract class CreatorTestBase {
+
     @get:Rule
     val tempFolder: TemporaryFolder = TemporaryFolder()
 
