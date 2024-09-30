@@ -274,6 +274,7 @@ class RoomProcessorTest  {
                 contents = """
                     package test
                     
+                    import androidx.room.Entity
                     import androidx.room.Fts4
                     
                     @Fts4
@@ -324,6 +325,72 @@ class RoomProcessorTest  {
         file.inputStream().use {
             val generatedFileText = String(it.readBytes()).trimIndent()
             assertEquals(expectedEntityRequiringTypeConverter, generatedFileText)
+        }
+    }
+
+    /**
+     *  @Entity
+     *  @ColumnInfo
+     *  @Ignore
+     *  @Embedded
+     *  @Fts4
+     *  @TypeConverter
+     */
+    @Test
+    fun `Generate entity using every scanned annotation`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "AllOptions.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.ColumnInfo
+                    import androidx.room.Embedded
+                    import androidx.room.Entity
+                    import androidx.room.Fts4
+                    import androidx.room.Ignore
+                    import androidx.room.TypeConverter
+                    import java.util.Date
+                    
+                    class TypeConverters {
+                        @TypeConverter
+                        fun toDate(value: Long): Date {
+                            return Date(value)
+                        }
+                    
+                        @TypeConverter
+                        fun fromDate(date: Date): Long {
+                            return date.time
+                        }
+                    }
+
+                    @Entity(tableName = "custom_name")
+                    class AllOptions(
+                        @ColumnInfo(name = "customDate")
+                        val date: Date = 0,
+                        @Ignore
+                        val ignoredField: String = "",
+                        @Embedded(prefix = "embed_")
+                        val embedOne: EmbedOne = EmbedOne(),
+                    )
+
+                    data class EmbedOne(
+                        val intFieldOne: Int = 0,
+                        val stringFieldOne: String = "",
+                    )
+
+                    @Fts4
+                    @Entity
+                    class FtsTable(val basicIntField: Int = 0)
+                """
+            )
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        val file = kspCompileResult.generatedFiles[0]
+        file.inputStream().use {
+            val generatedFileText = String(it.readBytes()).trimIndent()
+            assertEquals(expectedEntityWithEveryAnnotation, generatedFileText)
         }
     }
 
@@ -618,6 +685,57 @@ class RoomProcessorTest  {
                 public fun toUtil(entity: TypeConverterEntity): TypeConverterEntityRoomUtil =
                     TypeConverterEntityRoomUtil(
                   date = TypeConverters().fromDate(entity.date),
+                )
+              }
+            }
+        """.trimIndent()
+
+        private val expectedEntityWithEveryAnnotation = """
+            package test
+
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.Any
+            import kotlin.Int
+            import kotlin.Long
+            import kotlin.String
+            import kotlin.collections.List
+            import kotlin.collections.Map
+
+            public data class AllOptionsRoomUtil(
+              public val customDate: Long,
+              public val embed_intFieldOne: Int,
+              public val embed_stringFieldOne: String,
+            ) : CsvData {
+              public val tableName: String = "custom_name"
+
+              override val csvRow: List<Any?> = listOf(
+                customDate,
+                embed_intFieldOne,
+                embed_stringFieldOne,
+              )
+
+              public fun toOriginal(): AllOptions = AllOptions(
+                date = TypeConverters().toDate(customDate),
+                embedOne = EmbedOne(
+                  intFieldOne = embed_intFieldOne,
+                  stringFieldOne = embed_stringFieldOne,
+                ),
+              )
+
+              public companion object : CsvInfo {
+                override val csvFileName: String = "custom_name.csv"
+
+                override val csvFieldToTypeMap: Map<String, String> = mapOf(
+                  "customDate" to "Long",
+                  "embed_intFieldOne" to "Int",
+                  "embed_stringFieldOne" to "String",
+                )
+
+                public fun toUtil(entity: AllOptions): AllOptionsRoomUtil = AllOptionsRoomUtil(
+                  customDate = TypeConverters().fromDate(entity.date),
+                  embed_intFieldOne = entity.embedOne.intFieldOne,
+                  embed_stringFieldOne = entity.embedOne.stringFieldOne,
                 )
               }
             }
