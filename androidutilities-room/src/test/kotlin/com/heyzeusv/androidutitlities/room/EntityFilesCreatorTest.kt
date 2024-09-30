@@ -33,11 +33,8 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(basicEntityTwoFields("BasicTwoField"), generatedFileText)
-        }
+        kspCompileResult
+            .assertFileEquals(basicEntityTwoFields("BasicTwoField"), "BasicTwoFieldRoomUtil.kt")
     }
 
     @Test
@@ -66,16 +63,10 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(2, kspCompileResult.generatedFiles.size)
-        kspCompileResult.generatedFiles.find { it.name == "BasicTwoFieldRoomUtil.kt" }!!
-            .inputStream().use {
-                val generatedFileText = String(it.readBytes()).trimIndent()
-                assertEquals(basicEntityTwoFields("BasicTwoField"), generatedFileText)
-            }
-        kspCompileResult.generatedFiles.find { it.name == "TwoFieldBasicRoomUtil.kt" }!!
-            .inputStream().use {
-                val generatedFileText = String(it.readBytes()).trimIndent()
-                assertEquals(basicEntityTwoFields("TwoFieldBasic"), generatedFileText)
-            }
+        kspCompileResult
+            .assertFileEquals(basicEntityTwoFields("BasicTwoField"), "BasicTwoFieldRoomUtil.kt")
+        kspCompileResult
+            .assertFileEquals(basicEntityTwoFields("TwoFieldBasic"), "TwoFieldBasicRoomUtil.kt")
     }
 
     @Test
@@ -98,21 +89,17 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(
-                basicEntityTwoFields("BasicTwoField", "custom_name"),
-                generatedFileText
-            )
-        }
+        kspCompileResult.assertFileEquals(
+            basicEntityTwoFields("BasicTwoField", "custom_name"),
+            "BasicTwoFieldRoomUtil.kt"
+        )
     }
 
     @Test
     fun `Generate entity with ignored field`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
-                name = "BasicIgnoredField.kt",
+                name = "IgnoredField.kt",
                 contents = """
                     package test
                     
@@ -131,11 +118,8 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(basicEntityTwoFields("IgnoredField"), generatedFileText)
-        }
+        kspCompileResult
+            .assertFileEquals(basicEntityTwoFields("IgnoredField"), "IgnoredFieldRoomUtil.kt")
     }
 
     @Test
@@ -173,11 +157,8 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedTwoLevelEmbedded, generatedFileText)
-        }
+        kspCompileResult
+            .assertFileEquals(expectedTwoLevelEmbedded, "TwoLevelEmbeddedRoomUtil.kt")
     }
 
     @Test
@@ -215,11 +196,8 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedTwoLevelEmbeddedWithPrefixes, generatedFileText)
-        }
+        kspCompileResult
+            .assertFileEquals(expectedTwoLevelEmbeddedWithPrefixes, "TwoLevelEmbeddedRoomUtil.kt")
     }
 
 
@@ -246,11 +224,10 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedEntityWithTwoFieldsWithColumnInfo, generatedFileText)
-        }
+        kspCompileResult.assertFileEquals(
+            expectedEntityWithTwoFieldsWithColumnInfo,
+            "TwoFieldColumnInfoRoomUtil.kt"
+        )
     }
 
     @Test
@@ -308,11 +285,10 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedEntityRequiringTypeConverter, generatedFileText)
-        }
+        kspCompileResult.assertFileEquals(
+            expectedEntityRequiringTypeConverter,
+            "TypeConverterEntityRoomUtil.kt"
+        )
     }
 
     /**
@@ -374,11 +350,10 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
-        val file = kspCompileResult.generatedFiles[0]
-        file.inputStream().use {
-            val generatedFileText = String(it.readBytes()).trimIndent()
-            assertEquals(expectedEntityWithEveryAnnotation, generatedFileText)
-        }
+        kspCompileResult.assertFileEquals(
+            expectedEntityWithEveryAnnotation,
+            "AllOptionsRoomUtil.kt"
+        )
     }
 
     companion object {
