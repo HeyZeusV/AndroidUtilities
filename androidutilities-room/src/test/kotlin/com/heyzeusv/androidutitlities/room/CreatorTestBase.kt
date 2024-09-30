@@ -3,6 +3,7 @@ package com.heyzeusv.androidutitlities.room
 import com.heyzeusv.androidutilities.room.RoomProcessorProvider
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
+import com.tschuchort.compiletesting.kspArgs
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessorProviders
@@ -22,8 +23,11 @@ abstract class CreatorTestBase {
     @get:Rule
     val tempFolder: TemporaryFolder = TemporaryFolder()
 
-    protected fun compile(vararg sourceFiles: SourceFile): KspCompileResult {
-        val compilation = prepareCompilation(*sourceFiles)
+    protected fun compile(
+        vararg sourceFiles: SourceFile,
+        kspArguments: MutableMap<String, String> = mutableMapOf(),
+    ): KspCompileResult {
+        val compilation = prepareCompilation(*sourceFiles, kspArguments = kspArguments)
         val result = compilation.compile()
         return KspCompileResult(
             result = result,
@@ -31,7 +35,10 @@ abstract class CreatorTestBase {
         )
     }
 
-    private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation =
+    private fun prepareCompilation(
+        vararg sourceFiles: SourceFile,
+        kspArguments: MutableMap<String, String>,
+    ): KotlinCompilation =
         KotlinCompilation()
             .apply {
                 workingDir = tempFolder.root
@@ -39,6 +46,7 @@ abstract class CreatorTestBase {
                 symbolProcessorProviders = listOf(RoomProcessorProvider())
                 sources = sourceFiles.asList()
                 verbose = false
+                kspArgs = kspArguments
                 kspIncremental = true
                 messageOutputStream = System.out
             }
