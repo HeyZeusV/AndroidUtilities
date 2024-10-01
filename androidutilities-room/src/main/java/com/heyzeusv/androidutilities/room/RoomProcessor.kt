@@ -14,7 +14,6 @@ import com.heyzeusv.androidutilities.room.creators.RoomBackupRestoreCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
 import com.heyzeusv.androidutilities.room.creators.RoomUtilBaseCreator
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
-import javax.swing.text.html.HTML.Tag.P
 
 class RoomProcessor(
     private val codeGenerator: CodeGenerator,
@@ -58,6 +57,7 @@ class RoomProcessor(
                     )
                     CsvConverterCreator(
                         codeGenerator = codeGenerator,
+                        hiltOption = hiltOption,
                         dbClassDeclaration = dbClass,
                         entityInfoList = entityInfoList,
                         logger = logger,
@@ -66,6 +66,7 @@ class RoomProcessor(
                 if (dbOption == null) {
                     RoomBackupRestoreCreator(
                         codeGenerator = codeGenerator,
+                        hiltOption = hiltOption,
                         dbClassDeclaration = dbClass,
                         logger = logger,
                     )

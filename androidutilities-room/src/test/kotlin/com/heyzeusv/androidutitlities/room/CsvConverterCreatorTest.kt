@@ -100,6 +100,41 @@ class CsvConverterCreatorTest : CreatorTestBase() {
     }
 
     @Test
+    fun `Generate CsvConverter when roomUtilHilt option has any value`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "BasicTwoField.kt",
+                contents = """
+                    package test.entity
+                    
+                    import androidx.room.Entity
+                    
+                    @Entity
+                    class BasicTwoField(
+                        val intField: Int = 0,
+                        val stringField: String = "",
+                    )
+                """
+            ),
+            SourceFile.kotlin(
+                name = "TestDatabase.kt",
+                contents = """
+                    package test
+
+                    import androidx.room.Database
+
+                    @Database
+                    abstract class TestDatabase
+                """.trimIndent()
+            ),
+            kspArguments = mutableMapOf("roomUtilHilt" to "The cow jumped over the moon"),
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(5, kspCompileResult.generatedFiles.size)
+        kspCompileResult.assertFileEquals(expectedCsvConverterWithHiltOptionValue, "CsvConverter.kt")
+    }
+
+    @Test
     fun `Do not generate CsvConverter when roomUtilCsv option has any value`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
@@ -361,6 +396,126 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                         val entry = EntityFourRoomUtil(
                           booleanField = it[0].toBoolean(),
                           byteField = it[1].toByte(),
+                        )
+                        entityData.add(entry)
+                      }
+                    }
+                  }
+                  return entityData
+                } catch (e: Exception) {
+                  return null // invalid data, wrong type data
+                }
+              }
+
+              public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
+                if (!appExportDirectory.exists()) {
+                  // given directory doesn't exist
+                  return
+                } else {
+                  // returns if fails to create directory
+                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newCsvFiles = mutableListOf<DocumentFile>()
+                  roomData.csvDataMap.entries.forEach {
+                    val csvFile = exportRoomEntityToCsv(
+                      newExportDirectory = newExportDirectory,
+                      csvInfo = it.key,
+                      csvDataList = it.value,
+                    )
+                    if (csvFile == null) {
+                      // delete previously created csv files
+                      newCsvFiles.forEach { file -> file.delete() }
+                      // delete directory created for this export
+                      newExportDirectory.delete()
+                      return // failed to create csv file
+                    }
+                    newCsvFiles.add(csvFile)
+                  }
+                }
+              }
+
+              private fun exportRoomEntityToCsv(
+                newExportDirectory: DocumentFile,
+                csvInfo: CsvInfo,
+                csvDataList: List<CsvData>,
+              ): DocumentFile? {
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
+                  return null // failed to create file
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
+                  return null // failed to open output stream
+
+                csvWriter().open(outputStream) {
+                  writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
+                  csvDataList.forEach { writeRow(it.csvRow) }
+                }
+                return csvFile
+              }
+            }
+        """.trimIndent()
+
+        val expectedCsvConverterWithHiltOptionValue = """
+            package test
+
+            import android.content.Context
+            import android.net.Uri
+            import androidx.documentfile.provider.DocumentFile
+            import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+            import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+            import com.heyzeusv.androidutilities.room.util.CsvData
+            import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import kotlin.String
+            import kotlin.Suppress
+            import kotlin.collections.List
+            import test.entity.BasicTwoFieldRoomUtil
+
+            public class CsvConverter(
+              private val context: Context,
+              private val appDirectoryName: String,
+            ) : RoomUtilBase(context, appDirectoryName) {
+              private val csvFileNames: List<String> = listOf(
+                "BasicTwoField.csv", 
+              )
+
+              @Suppress("UNCHECKED_CAST")
+              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
+                if (!selectedDirectory.exists()) {
+                  // selected directory does not exist
+                  return null
+                }
+                val csvDocumentFiles = mutableListOf<DocumentFile>()
+                csvFileNames.forEach {
+                  val file = selectedDirectory.findFile(it) ?: return null // file was not found
+                  csvDocumentFiles.add(file)
+                }
+
+                val basicTwoFieldRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[0])
+                if (basicTwoFieldRoomUtilData == null) return null // error importing data
+
+                return RoomData(
+                  basicTwoFieldData =
+                    (basicTwoFieldRoomUtilData as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
+                )
+              }
+
+              private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
+                val inputStream = context.contentResolver.openInputStream(csvFile.uri)
+                  ?: return null // corrupt file
+                try {
+                  val content = csvReader().readAll(inputStream)
+                  if (content.size == 1) {
+                    return emptyList()
+                  }
+
+                  val header = content[0]
+                  val rows = content.drop(1)
+                  val entityData = mutableListOf<CsvData>()
+                  when (header) {
+                    BasicTwoFieldRoomUtil.csvFieldToTypeMap.keys.toList() -> {
+                      rows.forEach {
+                        val entry = BasicTwoFieldRoomUtil(
+                          intField = it[0].toInt(),
+                          stringField = it[1],
                         )
                         entityData.add(entry)
                       }

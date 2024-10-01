@@ -25,6 +25,7 @@ private const val TEXT_MIME = "text/*"
 
 internal class RoomBackupRestoreCreator(
     private val codeGenerator: CodeGenerator,
+    private val hiltOption: String?,
     private val dbClassDeclaration: KSClassDeclaration,
     private val logger: KSPLogger,
 ) {
@@ -58,16 +59,15 @@ internal class RoomBackupRestoreCreator(
         addSuperclassConstructorParameter("appDirectoryName")
 
         // context parameter/property in order to read/write files
-        primaryConstructor(
-            FunSpec.constructorBuilder()
-                .addComment("include file extension to dbFileName!!")
-                // TODO: Make this option through gradle options
-                .addAnnotation(ClassName("javax.inject", "Inject"))
-                .addParameter(CONTEXT, contextClassName)
-                .addParameter(DB_FILE_NAME, String::class)
-                .addParameter("appDirectoryName", String::class)
-                .build()
-        )
+        val constructorBuilder = FunSpec.constructorBuilder()
+            .addComment("include file extension to dbFileName!!")
+            .addParameter(CONTEXT, contextClassName)
+            .addParameter(DB_FILE_NAME, String::class)
+            .addParameter("appDirectoryName", String::class)
+
+        if (hiltOption == null) constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
+
+        primaryConstructor(constructorBuilder.build())
         addProperty(
             PropertySpec.builder(CONTEXT, contextClassName)
                 .initializer(CONTEXT)

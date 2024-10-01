@@ -27,6 +27,7 @@ private const val CONTEXT = "context"
 
 internal class CsvConverterCreator(
     private val codeGenerator: CodeGenerator,
+    private val hiltOption: String?,
     private val dbClassDeclaration: KSClassDeclaration,
     private val entityInfoList: List<EntityInfo>,
     private val logger: KSPLogger,
@@ -67,14 +68,13 @@ internal class CsvConverterCreator(
         addSuperclassConstructorParameter("appDirectoryName")
 
         // context parameter/property in order to read/write files
-        primaryConstructor(
-            FunSpec.constructorBuilder()
-                // TODO: Make this option through gradle options
-                .addAnnotation(ClassName("javax.inject", "Inject"))
-                .addParameter(CONTEXT, contextClassName)
-                .addParameter("appDirectoryName", String::class)
-                .build()
-        )
+        val constructorBuilder = FunSpec.constructorBuilder()
+            .addParameter(CONTEXT, contextClassName)
+            .addParameter("appDirectoryName", String::class)
+
+        if (hiltOption == null) constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
+
+        primaryConstructor(constructorBuilder.build())
         addProperty(
             PropertySpec.builder(CONTEXT, contextClassName)
                 .initializer(CONTEXT)
