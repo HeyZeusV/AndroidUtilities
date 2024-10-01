@@ -8,6 +8,7 @@ class RoomProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return RoomProcessor(
             codeGenerator = environment.codeGenerator,
+            options = environment.options,
             logger = environment.logger,
         )
     }

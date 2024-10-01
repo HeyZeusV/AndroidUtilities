@@ -17,10 +17,15 @@ import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
 
 class RoomProcessor(
     private val codeGenerator: CodeGenerator,
+    private val options: Map<String, String>,
     private val logger: KSPLogger,
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        val csvOption = options["roomUtilCsv"].toBoolean()
+        val dbOption = options["roomUtilDb"].toBoolean()
+        val hiltOption = options["roomUtilHilt"].toBoolean()
+
         // get all symbols
         val tcSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
         val eSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
