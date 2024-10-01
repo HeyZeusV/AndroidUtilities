@@ -49,7 +49,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                     abstract class TestDatabase
                 """.trimIndent()
             ),
-            kspArguments = mutableMapOf("roomUtilDb" to "fdajfkfjdak;")
+            kspArguments = mutableMapOf("roomUtilDb" to "fdajfkfjdak;"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(3, kspCompileResult.generatedFiles.size)

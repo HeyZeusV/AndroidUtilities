@@ -99,6 +99,40 @@ class CsvConverterCreatorTest : CreatorTestBase() {
         kspCompileResult.assertFileEquals(expectedMultiEntityCsvConverter, "CsvConverter.kt")
     }
 
+    @Test
+    fun `Do not generate CsvConverter when roomUtilCsv option has any value`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "BasicTwoField.kt",
+                contents = """
+                    package test.entity
+                    
+                    import androidx.room.Entity
+                    
+                    @Entity
+                    class BasicTwoField(
+                        val intField: Int = 0,
+                        val stringField: String = "",
+                    )
+                """
+            ),
+            SourceFile.kotlin(
+                name = "TestDatabase.kt",
+                contents = """
+                    package test
+
+                    import androidx.room.Database
+
+                    @Database
+                    abstract class TestDatabase
+                """.trimIndent()
+            ),
+            kspArguments = mutableMapOf("roomUtilCsv" to "nullish"),
+            )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+    }
+
     companion object {
         val expectedSingleEntityCsvConverter = """
             package test

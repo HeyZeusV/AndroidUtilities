@@ -14,6 +14,7 @@ import com.heyzeusv.androidutilities.room.creators.RoomBackupRestoreCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
 import com.heyzeusv.androidutilities.room.creators.RoomUtilBaseCreator
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
+import javax.swing.text.html.HTML.Tag.P
 
 class RoomProcessor(
     private val codeGenerator: CodeGenerator,
@@ -31,34 +32,37 @@ class RoomProcessor(
         val eSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
         val dbSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        val typeConverterInfoList = createTypeConverterInfoList(tcSymbols, logger)
+        val typeConverterInfoList =
+            csvOption?.let { emptyList() } ?: createTypeConverterInfoList(tcSymbols, logger)
 
-        val entityFilesCreator = EntityFilesCreator(
+        val entityInfoList = csvOption?.let { emptyList() } ?: EntityFilesCreator(
             codeGenerator = codeGenerator,
             symbols = eSymbols,
             typeConverterInfoList = typeConverterInfoList,
             logger = logger
-        )
+        ).entityInfoList
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                RoomUtilBaseCreator(
-                    codeGenerator = codeGenerator,
-                    dbClassDeclaration = dbClass,
-                    logger = logger,
-                )
-                RoomDataCreator(
-                    codeGenerator = codeGenerator,
-                    dbClassDeclaration = dbClass,
-                    entityInfoList = entityFilesCreator.entityInfoList,
-                    logger = logger,
-                )
-                CsvConverterCreator(
-                    codeGenerator = codeGenerator,
-                    dbClassDeclaration = dbClass,
-                    entityInfoList = entityFilesCreator.entityInfoList,
-                    logger = logger,
-                )
+                if (csvOption == null) {
+                    RoomUtilBaseCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        logger = logger,
+                    )
+                    RoomDataCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        entityInfoList = entityInfoList,
+                        logger = logger,
+                    )
+                    CsvConverterCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        entityInfoList = entityInfoList,
+                        logger = logger,
+                    )
+                }
                 if (dbOption == null) {
                     RoomBackupRestoreCreator(
                         codeGenerator = codeGenerator,

@@ -5,6 +5,7 @@ import com.tschuchort.compiletesting.SourceFile
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 /**
  *  Used [this article](https://dev.to/chigichan24/why-dont-you-write-unit-tests-and-integration-tests-to-ksp-project-2oio)
@@ -97,6 +98,27 @@ class RoomDataCreatorTest : CreatorTestBase() {
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedMultipleEntityRoomData, "RoomData.kt")
+    }
+
+    @Test
+    fun `Do not generate RoomData when roomUtilCsv option has any value`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "TestDatabase.kt",
+                contents = """
+                    package test
+
+                    import androidx.room.Database
+
+                    @Database
+                    abstract class TestDatabase
+                """.trimIndent()
+            ),
+            kspArguments = mutableMapOf("roomUtilCsv" to ""),
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertFalse(kspCompileResult.generatedFiles.any { it.name == "RoomData.kt" })
     }
 
     companion object {

@@ -356,6 +356,29 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         )
     }
 
+    @Test
+    fun `Do not generate entity when roomUtilCsv option has any value`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "BasicTwoField.kt",
+                contents = """
+                    package test
+                    
+                    import androidx.room.Entity
+                    
+                    @Entity
+                    class BasicTwoField(
+                        val basicIntField: Int = 0,
+                        val basicStringField: String = "",
+                    )
+                """
+            ),
+            kspArguments = mutableMapOf("roomUtilCsv" to "true"),
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(0, kspCompileResult.generatedFiles.size)
+    }
+
     companion object {
         private fun basicEntityTwoFields(name: String, tableName: String = name) = """
             package test
