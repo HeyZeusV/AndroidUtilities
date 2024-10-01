@@ -5,6 +5,7 @@ import com.tschuchort.compiletesting.SourceFile
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 /**
  *  Used [this article](https://dev.to/chigichan24/why-dont-you-write-unit-tests-and-integration-tests-to-ksp-project-2oio)
@@ -32,6 +33,29 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
         assertEquals(4, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedRoomBackupRestore, "RoomBackupRestore.kt")
     }
+
+
+    @Test
+    fun `Do not generate RoomBackupRestore when roomUtilDb option has any value`() {
+        val kspCompileResult = compile(
+            SourceFile.kotlin(
+                name = "TestDatabase.kt",
+                contents = """
+                    package test
+
+                    import androidx.room.Database
+
+                    @Database
+                    abstract class TestDatabase
+                """.trimIndent()
+            ),
+            kspArguments = mutableMapOf("roomUtilDb" to "fdajfkfjdak;")
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
+        assertFalse(kspCompileResult.generatedFiles.any { it.name == "RoomBackupRestore.kt" })
+    }
+
 
     companion object {
         val expectedRoomBackupRestore = """

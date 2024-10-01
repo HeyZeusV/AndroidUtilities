@@ -22,9 +22,9 @@ class RoomProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val csvOption = options["roomUtilCsv"].toBoolean()
-        val dbOption = options["roomUtilDb"].toBoolean()
-        val hiltOption = options["roomUtilHilt"].toBoolean()
+        val csvOption = options["roomUtilCsv"]
+        val dbOption = options["roomUtilDb"]
+        val hiltOption = options["roomUtilHilt"]
 
         // get all symbols
         val tcSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
@@ -59,11 +59,13 @@ class RoomProcessor(
                     entityInfoList = entityFilesCreator.entityInfoList,
                     logger = logger,
                 )
-                RoomBackupRestoreCreator(
-                    codeGenerator = codeGenerator,
-                    dbClassDeclaration = dbClass,
-                    logger = logger,
-                )
+                if (dbOption == null) {
+                    RoomBackupRestoreCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        logger = logger,
+                    )
+                }
             }
         }
 
