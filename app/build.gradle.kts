@@ -55,6 +55,10 @@ android {
     }
 }
 
+ksp {
+    arg("roomUtilHilt", "true")
+}
+
 composeCompiler {
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
