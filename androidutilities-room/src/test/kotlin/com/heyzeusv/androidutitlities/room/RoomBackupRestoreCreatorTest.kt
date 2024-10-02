@@ -35,7 +35,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
     }
 
     @Test
-    fun `Generate RoomBackupRestore when roomUtilHilt option has any value`() {
+    fun `Generate RoomBackupRestore with Hilt inject when roomUtilHilt option is true`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
                 name = "TestDatabase.kt",
@@ -48,7 +48,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                     abstract class TestDatabase
                 """.trimIndent()
             ),
-            kspArguments = mutableMapOf("roomUtilHilt" to "fdafeaf"),
+            kspArguments = mutableMapOf("roomUtilHilt" to "TRUE"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(4, kspCompileResult.generatedFiles.size)
@@ -60,7 +60,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
 
 
     @Test
-    fun `Do not generate RoomBackupRestore when roomUtilDb option has any value`() {
+    fun `Do not generate RoomBackupRestore when roomUtilDb option is false`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
                 name = "TestDatabase.kt",
@@ -73,7 +73,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                     abstract class TestDatabase
                 """.trimIndent()
             ),
-            kspArguments = mutableMapOf("roomUtilDb" to "fdajfkfjdak;"),
+            kspArguments = mutableMapOf("roomUtilDb" to "FALSE"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(3, kspCompileResult.generatedFiles.size)
@@ -93,12 +93,11 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             import java.io.FileNotFoundException
             import java.io.PrintWriter
             import java.lang.Runtime
-            import javax.inject.Inject
             import kotlin.Boolean
             import kotlin.String
             import kotlin.Unit
 
-            public class RoomBackupRestore @Inject constructor(
+            public class RoomBackupRestore(
               private val context: Context,
               private val dbFileName: String,
               private val appDirectoryName: String,
@@ -247,11 +246,12 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             import java.io.FileNotFoundException
             import java.io.PrintWriter
             import java.lang.Runtime
+            import javax.inject.Inject
             import kotlin.Boolean
             import kotlin.String
             import kotlin.Unit
 
-            public class RoomBackupRestore(
+            public class RoomBackupRestore @Inject constructor(
               private val context: Context,
               private val dbFileName: String,
               private val appDirectoryName: String,

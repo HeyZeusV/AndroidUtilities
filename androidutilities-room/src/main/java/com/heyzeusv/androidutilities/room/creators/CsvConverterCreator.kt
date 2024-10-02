@@ -72,7 +72,9 @@ internal class CsvConverterCreator(
             .addParameter(CONTEXT, contextClassName)
             .addParameter("appDirectoryName", String::class)
 
-        if (hiltOption == null) constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
+        if (hiltOption?.lowercase() == "true") {
+            constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
+        }
 
         primaryConstructor(constructorBuilder.build())
         addProperty(

@@ -357,7 +357,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
     }
 
     @Test
-    fun `Do not generate entity when roomUtilCsv option has any value`() {
+    fun `Do not generate entity when roomUtilCsv option is false`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
@@ -373,7 +373,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                     )
                 """
             ),
-            kspArguments = mutableMapOf("roomUtilCsv" to "true"),
+            kspArguments = mutableMapOf("roomUtilCsv" to "false"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(0, kspCompileResult.generatedFiles.size)

@@ -31,19 +31,26 @@ class RoomProcessor(
         val eSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
         val dbSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Database")
 
-        val typeConverterInfoList =
-            csvOption?.let { emptyList() } ?: createTypeConverterInfoList(tcSymbols, logger)
+        val typeConverterInfoList = if (csvOption?.lowercase() == "false") {
+            emptyList()
+        } else {
+            createTypeConverterInfoList(tcSymbols, logger)
+        }
 
-        val entityInfoList = csvOption?.let { emptyList() } ?: EntityFilesCreator(
-            codeGenerator = codeGenerator,
-            symbols = eSymbols,
-            typeConverterInfoList = typeConverterInfoList,
-            logger = logger
-        ).entityInfoList
+        val entityInfoList = if (csvOption?.lowercase() == "false") {
+            emptyList()
+        } else {
+            EntityFilesCreator(
+                codeGenerator = codeGenerator,
+                symbols = eSymbols,
+                typeConverterInfoList = typeConverterInfoList,
+                logger = logger
+            ).entityInfoList
+        }
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                if (csvOption == null) {
+                if (csvOption?.lowercase() != "false") {
                     RoomUtilBaseCreator(
                         codeGenerator = codeGenerator,
                         dbClassDeclaration = dbClass,
@@ -63,7 +70,7 @@ class RoomProcessor(
                         logger = logger,
                     )
                 }
-                if (dbOption == null) {
+                if (dbOption?.lowercase() != "false") {
                     RoomBackupRestoreCreator(
                         codeGenerator = codeGenerator,
                         hiltOption = hiltOption,

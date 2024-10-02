@@ -100,7 +100,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
     }
 
     @Test
-    fun `Generate CsvConverter when roomUtilHilt option has any value`() {
+    fun `Generate CsvConverter with Hilt inject when roomUtilHilt option is true`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
@@ -127,7 +127,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     abstract class TestDatabase
                 """.trimIndent()
             ),
-            kspArguments = mutableMapOf("roomUtilHilt" to "The cow jumped over the moon"),
+            kspArguments = mutableMapOf("roomUtilHilt" to "TrUe"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(5, kspCompileResult.generatedFiles.size)
@@ -135,7 +135,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
     }
 
     @Test
-    fun `Do not generate CsvConverter when roomUtilCsv option has any value`() {
+    fun `Do not generate CsvConverter when roomUtilCsv option is false`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
@@ -162,7 +162,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     abstract class TestDatabase
                 """.trimIndent()
             ),
-            kspArguments = mutableMapOf("roomUtilCsv" to "nullish"),
+            kspArguments = mutableMapOf("roomUtilCsv" to "FaLsE"),
             )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)
@@ -179,13 +179,12 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
             import com.heyzeusv.androidutilities.room.util.CsvData
             import com.heyzeusv.androidutilities.room.util.CsvInfo
-            import javax.inject.Inject
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
             import test.entity.BasicTwoFieldRoomUtil
 
-            public class CsvConverter @Inject constructor(
+            public class CsvConverter(
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
@@ -300,7 +299,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
             import com.heyzeusv.androidutilities.room.util.CsvData
             import com.heyzeusv.androidutilities.room.util.CsvInfo
-            import javax.inject.Inject
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
@@ -309,7 +307,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.entity.EntityThreeRoomUtil
             import test.entity.EntityTwoRoomUtil
 
-            public class CsvConverter @Inject constructor(
+            public class CsvConverter(
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
@@ -463,12 +461,13 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
             import com.heyzeusv.androidutilities.room.util.CsvData
             import com.heyzeusv.androidutilities.room.util.CsvInfo
+            import javax.inject.Inject
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
             import test.entity.BasicTwoFieldRoomUtil
 
-            public class CsvConverter(
+            public class CsvConverter @Inject constructor(
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {

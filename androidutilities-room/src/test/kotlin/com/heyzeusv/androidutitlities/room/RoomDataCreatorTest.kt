@@ -101,7 +101,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
     }
 
     @Test
-    fun `Do not generate RoomData when roomUtilCsv option has any value`() {
+    fun `Do not generate RoomData when roomUtilCsv option is false`() {
         val kspCompileResult = compile(
             SourceFile.kotlin(
                 name = "TestDatabase.kt",
@@ -114,7 +114,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
                     abstract class TestDatabase
                 """.trimIndent()
             ),
-            kspArguments = mutableMapOf("roomUtilCsv" to ""),
+            kspArguments = mutableMapOf("roomUtilCsv" to "FALse"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(1, kspCompileResult.generatedFiles.size)

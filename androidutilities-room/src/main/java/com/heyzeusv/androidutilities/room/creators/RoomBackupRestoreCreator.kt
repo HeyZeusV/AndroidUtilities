@@ -65,7 +65,9 @@ internal class RoomBackupRestoreCreator(
             .addParameter(DB_FILE_NAME, String::class)
             .addParameter("appDirectoryName", String::class)
 
-        if (hiltOption == null) constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
+        if (hiltOption?.lowercase() == "true") {
+            constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
+        }
 
         primaryConstructor(constructorBuilder.build())
         addProperty(
