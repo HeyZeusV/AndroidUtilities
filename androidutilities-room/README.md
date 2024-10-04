@@ -204,7 +204,7 @@ dependencies {
     // REQUIRED - read/write files
     implementation("androidx.documentfile:documentfile:1.0.1")
     // needed if you want CSV import/export
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
+    implementation("com.jsoizo:kotlin-csv-jvm:1.10.0")
 }
 ```
 

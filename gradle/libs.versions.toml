@@ -2,7 +2,7 @@
 documentfile = "1.0.1"
 hiltAndroid = "2.52"
 hiltNavigationCompose = "1.2.0"
-kotlinCsvJvm = "1.9.3"
+kotlinCsvJvm = "1.10.0"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxSerializationJson = "1.7.1"
 room = "2.6.1"
@@ -49,7 +49,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-kotlin-csv-jvm = { module = "com.github.doyaaaaaken:kotlin-csv-jvm", version.ref = "kotlinCsvJvm" }
+kotlin-csv-jvm = { module = "com.jsoizo:kotlin-csv-jvm", version.ref = "kotlinCsvJvm" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
