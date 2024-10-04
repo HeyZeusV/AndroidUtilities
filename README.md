@@ -3,6 +3,10 @@
 
 A collection of Android utilities I find myself reusing across my apps.
 
+## Room Utilities read me can be found [here][7]
+
+[7]: /androidutilities-room/README.md
+
 ## About Screen
 ### Requires Kotlinx Immutable Collections (See installation instructions)
 
@@ -232,7 +236,7 @@ dependencies {
 }
 ```
 
-**Step 3.** Multiple features use [Kotlinx Immutable Collections][5] in order to make Composables
+**Step 3.** Multiple features use [Kotlinx Immutable Collections][6] in order to make Composables
 stable and skippable. Add dependency to your module's build.gradle
 ```kotlin
 dependencies {
@@ -240,4 +244,4 @@ dependencies {
 }
 ```
 
-[5]: https://github.com/Kotlin/kotlinx.collections.immutable
+[6]: https://github.com/Kotlin/kotlinx.collections.immutable

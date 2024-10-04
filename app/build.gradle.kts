@@ -76,7 +76,6 @@ room {
 
 dependencies {
     implementation(project(":androidutilities"))
-    implementation(project(":androidutilities-room"))
     ksp(project(":androidutilities-room"))
 
     implementation(libs.aboutlibraries.core)

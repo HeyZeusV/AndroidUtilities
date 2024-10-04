@@ -26,6 +26,8 @@ internal object Constants {
      *  Class/File names
      */
     const val CSV_CONVERTER = "CsvConverter"
+    const val CSV_DATA = "CsvData"
+    const val CSV_INFO = "CsvInfo"
     const val ROOM_BACKUP_RESTORE = "RoomBackupRestore"
     const val ROOM_DATA = "RoomData"
     const val ROOM_UTIL_BASE = "RoomUtilBase"

@@ -44,7 +44,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
             )
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(5, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedSingleEntityRoomData, "RoomData.kt")
     }
 
@@ -96,7 +96,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
             )
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(8, kspCompileResult.generatedFiles.size)
+        assertEquals(10, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedMultipleEntityRoomData, "RoomData.kt")
     }
 
@@ -125,8 +125,6 @@ class RoomDataCreatorTest : CreatorTestBase() {
         private val expectedSingleEntityRoomData = """
             package test
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.collections.List
             import kotlin.collections.Map
             import test.entity.BasicTwoField
@@ -148,8 +146,6 @@ class RoomDataCreatorTest : CreatorTestBase() {
         private val expectedMultipleEntityRoomData = """
             package test
             
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.collections.List
             import kotlin.collections.Map
             import test.entity.EntityFour

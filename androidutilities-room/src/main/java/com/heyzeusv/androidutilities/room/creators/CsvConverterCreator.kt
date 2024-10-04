@@ -17,8 +17,6 @@ import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
 import com.heyzeusv.androidutilities.room.util.Constants.injectClassName
 import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.EntityInfo
-import com.heyzeusv.androidutilities.room.util.CsvData
-import com.heyzeusv.androidutilities.room.util.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
@@ -45,7 +43,8 @@ internal class CsvConverterCreator(
     private val packageName = dbClassDeclaration.getPackageName()
 
     private val roomDataClassName = ClassName(packageName, ROOM_DATA)
-    private val csvDataListClassName = CsvData::class.asListTypeName()
+    private val csvDataClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvData")
+    private val csvInfoClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvInfo")
 
     private fun createCsvConverterFile() {
         logger.info("Creating CsvConverter...")
@@ -169,7 +168,7 @@ internal class CsvConverterCreator(
         val funSpec = FunSpec.builder("importCsvToRoomEntity")
             .addModifiers(KModifier.PRIVATE)
             .addParameter("csvFile", documentFileClassName)
-            .returns(csvDataListClassName.copy(nullable = true))
+            .returns(csvDataClassName.asListTypeName().copy(nullable = true))
             .addCode(buildCodeBlock {
                 add("""
                     val inputStream = context.contentResolver.openInputStream(csvFile.uri)
@@ -293,8 +292,8 @@ internal class CsvConverterCreator(
             .addModifiers(KModifier.PRIVATE)
             .returns(documentFileClassName.copy(nullable = true))
             .addParameter("newExportDirectory", documentFileClassName)
-            .addParameter("csvInfo", CsvInfo::class)
-            .addParameter("csvDataList", csvDataListClassName)
+            .addParameter("csvInfo", csvInfoClassName)
+            .addParameter("csvDataList", csvDataClassName.asListTypeName())
             .addCode(buildCodeBlock {
                 add("""
                     val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:

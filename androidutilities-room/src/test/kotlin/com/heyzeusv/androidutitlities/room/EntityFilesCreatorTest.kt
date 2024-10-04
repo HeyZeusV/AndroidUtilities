@@ -19,7 +19,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     
@@ -29,10 +29,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val basicStringField: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(basicEntityTwoFields("BasicTwoField"), "BasicTwoFieldRoomUtil.kt")
     }
@@ -43,7 +44,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     
@@ -59,10 +60,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val basicStringField: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(2, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(basicEntityTwoFields("BasicTwoField"), "BasicTwoFieldRoomUtil.kt")
         kspCompileResult
@@ -75,7 +77,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     
@@ -85,10 +87,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val basicStringField: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             basicEntityTwoFields("BasicTwoField", "custom_name"),
             "BasicTwoFieldRoomUtil.kt"
@@ -101,7 +104,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "IgnoredField.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     import androidx.room.Ignore
@@ -114,10 +117,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         var ignoredLongField: Long = ""
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(basicEntityTwoFields("IgnoredField"), "IgnoredFieldRoomUtil.kt")
     }
@@ -128,7 +132,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "TwoLevelEmbedded.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Embedded
                     import androidx.room.Entity
@@ -153,10 +157,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val stringFieldTwo: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(expectedTwoLevelEmbedded, "TwoLevelEmbeddedRoomUtil.kt")
     }
@@ -167,7 +172,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "TwoLevelEmbedded.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Embedded
                     import androidx.room.Entity
@@ -192,10 +197,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val stringFieldTwo: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(expectedTwoLevelEmbeddedWithPrefixes, "TwoLevelEmbeddedRoomUtil.kt")
     }
@@ -207,7 +213,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "TwoFieldColumnInfo.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.ColumnInfo
                     import androidx.room.Entity
@@ -220,10 +226,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val stringField: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedEntityWithTwoFieldsWithColumnInfo,
             "TwoFieldColumnInfoRoomUtil.kt"
@@ -236,7 +243,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     import androidx.room.Fts4
@@ -248,10 +255,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                         val basicStringField: String = "",
                     )
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(0, kspCompileResult.generatedFiles.size)
+        assertEquals(6, kspCompileResult.generatedFiles.size)
     }
 
     @Test
@@ -260,7 +268,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "TypeConverterEntity.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     import androidx.room.TypeConverter
@@ -281,10 +289,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                     @Entity
                     class TypeConverterEntity(val date: Date = 0)
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedEntityRequiringTypeConverter,
             "TypeConverterEntityRoomUtil.kt"
@@ -305,7 +314,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "AllOptions.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.ColumnInfo
                     import androidx.room.Embedded
@@ -346,10 +355,11 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                     @Entity
                     class FtsTable(val basicIntField: Int = 0)
                 """
-            )
+            ),
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedEntityWithEveryAnnotation,
             "AllOptionsRoomUtil.kt"
@@ -362,7 +372,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             SourceFile.kotlin(
                 name = "BasicTwoField.kt",
                 contents = """
-                    package test
+                    package test.model
                     
                     import androidx.room.Entity
                     
@@ -373,23 +383,24 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
                     )
                 """
             ),
+            dummyDb,
             kspArguments = mutableMapOf("roomUtilCsv" to "false"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(0, kspCompileResult.generatedFiles.size)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
     }
 
     companion object {
         private fun basicEntityTwoFields(name: String, tableName: String = name) = """
-            package test
+            package test.model
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.Any
             import kotlin.Int
             import kotlin.String
             import kotlin.collections.List
             import kotlin.collections.Map
+            import test.CsvData
+            import test.CsvInfo
 
             public data class ${name}RoomUtil(
               public val basicIntField: Int,
@@ -424,15 +435,15 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         """.trimIndent()
 
         private val expectedTwoLevelEmbedded = """
-            package test
+            package test.model
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.Any
             import kotlin.Int
             import kotlin.String
             import kotlin.collections.List
             import kotlin.collections.Map
+            import test.CsvData
+            import test.CsvInfo
 
             public data class TwoLevelEmbeddedRoomUtil(
               public val intField: Int,
@@ -492,15 +503,15 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         """.trimIndent()
 
         private val expectedTwoLevelEmbeddedWithPrefixes = """
-            package test
+            package test.model
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.Any
             import kotlin.Int
             import kotlin.String
             import kotlin.collections.List
             import kotlin.collections.Map
+            import test.CsvData
+            import test.CsvInfo
 
             public data class TwoLevelEmbeddedRoomUtil(
               public val intField: Int,
@@ -560,15 +571,15 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         """.trimIndent()
 
         private val expectedEntityWithTwoFieldsWithColumnInfo = """
-            package test
+            package test.model
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.Any
             import kotlin.Int
             import kotlin.String
             import kotlin.collections.List
             import kotlin.collections.Map
+            import test.CsvData
+            import test.CsvInfo
 
             public data class TwoFieldColumnInfoRoomUtil(
               public val intField: Int,
@@ -604,15 +615,15 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         """.trimIndent()
 
         private val expectedEntityRequiringTypeConverter = """
-            package test
+            package test.model
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.Any
             import kotlin.Long
             import kotlin.String
             import kotlin.collections.List
             import kotlin.collections.Map
+            import test.CsvData
+            import test.CsvInfo
 
             public data class TypeConverterEntityRoomUtil(
               public val date: Long,
@@ -643,16 +654,16 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
         """.trimIndent()
 
         private val expectedEntityWithEveryAnnotation = """
-            package test
+            package test.model
 
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.Any
             import kotlin.Int
             import kotlin.Long
             import kotlin.String
             import kotlin.collections.List
             import kotlin.collections.Map
+            import test.CsvData
+            import test.CsvInfo
 
             public data class AllOptionsRoomUtil(
               public val customDate: Long,

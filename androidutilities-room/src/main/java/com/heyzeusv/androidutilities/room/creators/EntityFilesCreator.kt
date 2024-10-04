@@ -17,8 +17,6 @@ import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.FieldInfo
 import com.heyzeusv.androidutilities.room.util.PropertyInfo
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
-import com.heyzeusv.androidutilities.room.util.CsvData
-import com.heyzeusv.androidutilities.room.util.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.containsNullableType
@@ -54,6 +52,7 @@ import kotlin.Exception
  */
 internal class EntityFilesCreator(
     private val codeGenerator: CodeGenerator,
+    dbClassDeclaration: KSClassDeclaration,
     private val symbols: Sequence<KSAnnotated>,
     private val typeConverterInfoList: List<TypeConverterInfo>,
     private val logger: KSPLogger,
@@ -72,6 +71,9 @@ internal class EntityFilesCreator(
 
     private val _entityInfoList = mutableListOf<EntityInfo>()
     val entityInfoList: List<EntityInfo> get() = _entityInfoList
+
+    private val csvDataClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvData")
+    private val csvInfoClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvInfo")
 
     /**
      *  Go through all [symbols] and create a *RoomUtil file from each using inner class
@@ -123,14 +125,14 @@ internal class EntityFilesCreator(
 
         val classBuilder = TypeSpec.classBuilder(fileName)
             .addModifiers(KModifier.DATA)
-            .addSuperinterface(CsvData::class)
+            .addSuperinterface(csvDataClassName)
             .addProperty(PropertySpec.builder("tableName", String::class)
                 .initializer("%S", tableName)
                 .build()
             )
         private val constructorBuilder = FunSpec.constructorBuilder()
         private val companionObjectBuilder = TypeSpec.companionObjectBuilder()
-            .addSuperinterface(CsvInfo::class)
+            .addSuperinterface(csvInfoClassName)
 
         private val propertyInfoList = mutableListOf<PropertyInfo>()
 
@@ -311,17 +313,17 @@ internal class EntityFilesCreator(
         }
 
         /**
-         *  Builds the implementations of [CsvInfo] and [CsvData] using given [fieldInfoList].
+         *  Builds the implementations of CsvInfo and CsvData using given [fieldInfoList].
          */
         private fun buildCsvInterfaceImplementations(fieldInfoList: List<FieldInfo>) {
-            val fileNamePropBuilder = PropertySpec.builder(CsvInfo::csvFileName.name, String::class)
+            val fileNamePropBuilder = PropertySpec.builder("csvFileName", String::class)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer("%S", "$tableName.csv")
 
             val stringMapClass = Map::class.asTypeName()
                 .parameterizedBy(String::class.asTypeName(), String::class.asTypeName())
             val fieldToTypeMapPropBuilder = PropertySpec
-                .builder(CsvInfo::csvFieldToTypeMap.name, stringMapClass)
+                .builder("csvFieldToTypeMap", stringMapClass)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer(buildCodeBlock {
                     addStatement("mapOf(")
@@ -340,7 +342,7 @@ internal class EntityFilesCreator(
                 .addProperty(fieldToTypeMapPropBuilder.build())
 
             val anyListClass = Any::class.asListTypeName(nullable = true)
-            val rowPropBuilder = PropertySpec.builder(CsvData::csvRow.name, anyListClass)
+            val rowPropBuilder = PropertySpec.builder("csvRow", anyListClass)
                 .addModifiers(KModifier.OVERRIDE)
                 .initializer(buildCodeBlock {
                     addStatement("listOf(")

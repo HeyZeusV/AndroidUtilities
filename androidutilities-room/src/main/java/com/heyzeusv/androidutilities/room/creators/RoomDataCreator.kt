@@ -7,8 +7,6 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_DATA
 import com.heyzeusv.androidutilities.room.util.EntityInfo
-import com.heyzeusv.androidutilities.room.util.CsvData
-import com.heyzeusv.androidutilities.room.util.CsvInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
@@ -22,7 +20,6 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 /**
@@ -40,6 +37,9 @@ internal class RoomDataCreator(
     private val entityInfoList: List<EntityInfo>,
     private val logger: KSPLogger,
 ) {
+    private val csvDataClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvData")
+    private val csvInfoClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvInfo")
+
     /**
      *  Creates RoomData.kt file.
      */
@@ -106,7 +106,7 @@ internal class RoomDataCreator(
         
         csvDataMapCodeBlockBuilder.unindent().add(")")
         val csvMapClassName = ClassName("kotlin.collections", "Map")
-            .parameterizedBy(CsvInfo::class.asTypeName(), CsvData::class.asListTypeName())
+            .parameterizedBy(csvInfoClassName, csvDataClassName.asListTypeName())
         val csvDataMapPropertyBuilder = PropertySpec.builder("csvDataMap", csvMapClassName)
             .initializer(csvDataMapCodeBlockBuilder.build())
         

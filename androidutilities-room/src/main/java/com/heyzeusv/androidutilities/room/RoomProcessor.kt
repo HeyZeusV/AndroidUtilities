@@ -9,6 +9,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.validate
 import com.heyzeusv.androidutilities.room.creators.CsvConverterCreator
+import com.heyzeusv.androidutilities.room.creators.CsvInterfacesCreator
 import com.heyzeusv.androidutilities.room.creators.EntityFilesCreator
 import com.heyzeusv.androidutilities.room.creators.RoomBackupRestoreCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
@@ -38,37 +39,38 @@ class RoomProcessor(
         val eSymbols = resolver.getSymbolsWithAnnotation(PACKAGE_ENTITY)
         val dbSymbols = resolver.getSymbolsWithAnnotation(PACKAGE_DATABASE)
 
-        val typeConverterInfoList = if (csvOption?.lowercase() == FALSE) {
-            emptyList()
-        } else {
-            createTypeConverterInfoList(tcSymbols, logger)
-        }
-
-        val entityInfoList = if (csvOption?.lowercase() == FALSE) {
-            emptyList()
-        } else {
-            EntityFilesCreator(
-                codeGenerator = codeGenerator,
-                symbols = eSymbols,
-                typeConverterInfoList = typeConverterInfoList,
-                logger = logger
-            ).entityInfoList
-        }
-
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
                 if (csvOption?.lowercase() != FALSE) {
+                    val typeConverterInfoList = createTypeConverterInfoList(tcSymbols, logger)
+
+                    CsvInterfacesCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        logger = logger,
+                    )
+
+                    val entityInfoList = EntityFilesCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        symbols = eSymbols,
+                        typeConverterInfoList = typeConverterInfoList,
+                        logger = logger
+                    ).entityInfoList
+
                     RoomUtilBaseCreator(
                         codeGenerator = codeGenerator,
                         dbClassDeclaration = dbClass,
                         logger = logger,
                     )
+
                     RoomDataCreator(
                         codeGenerator = codeGenerator,
                         dbClassDeclaration = dbClass,
                         entityInfoList = entityInfoList,
                         logger = logger,
                     )
+
                     CsvConverterCreator(
                         codeGenerator = codeGenerator,
                         hiltOption = hiltOption,

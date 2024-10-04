@@ -30,20 +30,10 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     )
                 """
             ),
-            SourceFile.kotlin(
-                name = "TestDatabase.kt",
-                contents = """
-                    package test
-
-                    import androidx.room.Database
-
-                    @Database
-                    abstract class TestDatabase
-                """.trimIndent()
-            )
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(5, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedSingleEntityCsvConverter, "CsvConverter.kt")
     }
 
@@ -82,20 +72,10 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     )
                 """
             ),
-            SourceFile.kotlin(
-                name = "TestDatabase.kt",
-                contents = """
-                    package test
-
-                    import androidx.room.Database
-
-                    @Database
-                    abstract class TestDatabase
-                """.trimIndent()
-            )
+            dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(8, kspCompileResult.generatedFiles.size)
+        assertEquals(10, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedMultiEntityCsvConverter, "CsvConverter.kt")
     }
 
@@ -116,21 +96,11 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     )
                 """
             ),
-            SourceFile.kotlin(
-                name = "TestDatabase.kt",
-                contents = """
-                    package test
-
-                    import androidx.room.Database
-
-                    @Database
-                    abstract class TestDatabase
-                """.trimIndent()
-            ),
+            dummyDb,
             kspArguments = mutableMapOf("roomUtilHilt" to "TrUe"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(5, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedCsvConverterWithHiltOptionValue, "CsvConverter.kt")
     }
 
@@ -151,17 +121,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     )
                 """
             ),
-            SourceFile.kotlin(
-                name = "TestDatabase.kt",
-                contents = """
-                    package test
-
-                    import androidx.room.Database
-
-                    @Database
-                    abstract class TestDatabase
-                """.trimIndent()
-            ),
+            dummyDb,
             kspArguments = mutableMapOf("roomUtilCsv" to "FaLsE"),
             )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
@@ -177,8 +137,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import androidx.documentfile.provider.DocumentFile
             import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
             import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
@@ -297,8 +255,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import androidx.documentfile.provider.DocumentFile
             import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
             import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
@@ -459,8 +415,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import androidx.documentfile.provider.DocumentFile
             import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
             import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
-            import com.heyzeusv.androidutilities.room.util.CsvData
-            import com.heyzeusv.androidutilities.room.util.CsvInfo
             import javax.inject.Inject
             import kotlin.String
             import kotlin.Suppress
