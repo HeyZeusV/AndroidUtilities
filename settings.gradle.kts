@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "Android Utilities"
 include(":app")
 include(":androidutilities")
+include(":androidutilities-room")
