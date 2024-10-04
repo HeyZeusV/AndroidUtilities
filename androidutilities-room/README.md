@@ -36,10 +36,6 @@ Room.databaseBuilder().setJournalMode() when creating the Database. If it is on,
 query is highly recommended to be called before calling RoomBackupRestore.backup(). 
 Information on [wal_checkpoint][1]. [Sample Dao][2] and [Sample Repository][3]
 
-[1]: https://www.sqlite.org/pragma.html#pragma_wal_checkpoint
-[2]: https://github.com/HeyZeusV/AndroidUtilities/blob/feature_room_utilities/app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/dao/AllDao.kt
-[3]: https://github.com/HeyZeusV/AndroidUtilities/blob/feature_room_utilities/app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/Repository.kt
-
 ```kotlin
 @Dao
 abstract class SomeDao {
@@ -65,7 +61,7 @@ class RoomBackupRestore(
     val dbFileName: String,
     // name of directory that will be created to store backups
     val appDirectoryName: String,
-) {
+) : RoomUtilBase(context, appDirectoryName) {
     /**
      *  Backs up database file(s) to given [appBackupDirectory]. [appBackupDirectory] should
      *  be the [Uri] recieved from findOrCreateAppDirectory.
@@ -84,7 +80,84 @@ class RoomBackupRestore(
 }
 ```
 
+# Import and Export
+This method converts database data to/from selected type (currently only CSV). Currently all data
+is replaced on import.
 
+### Primary Key Auto Generate
+When using @PrimaryKey(autoGenerate = true), an additional table called "sqlite_sequence" is
+created. When importing data, it is recommended to empty this table after deleting existing data
+and before inserting new data. Additional information can be found [here][4]. 
+[Sample Dao][2] and [Sample Repository][3].
+```kotlin
+@Dao
+abstract class SomeDao {
+    @Query("DELETE FROM sqlite_sequence")
+    abstract suspend fun deleteAllPrimaryKeys()
+}
+
+class Repository(val someDao: SomeDao) {
+    suspend fun deleteAll() {
+        // delete entity data first
+        allDao.deleteAllPrimaryKeys()
+    }
+}
+```
+
+### FTS4
+Entities that have @Fts4 annotation are not included in import/export process. Instead it is 
+recommended to rebuild them using rebuild command. Additional information can be found [here][5] at
+linked section, as well as section 6.2.2 "External Content FTS4 Tables".
+[Sample Dao][2] and [Sample Repository][3].
+```kotlin
+@Dao
+abstract class SomeDao {
+    @Query("INSERT INTO fts_table_name(fts_table_name) VALUES ('rebuild')")
+    abstract suspend fun rebuildItemFts()
+}
+
+class Repository(val someDao: SomeDao) {
+    suspend fun rebuildItemFts() = allDao.rebuildItemFts()
+
+}
+```
+### RoomData
+Data class used to pass/retrieve Room entity data to/from CsvConverter.
+```kotlin
+data class RoomData(
+    val entityOneData: List<EntityOne>,
+    val entityTwoData: List<EntityTwo>,
+    // ...
+    val entityNData: List<EntityN>,
+)
+```
+### CsvConverter
+Uses [kotlin-csv][6] library to read/write from/to CSV.
+```kotlin
+class CsvConverter(
+    // used to read/write files and restart the app after restore
+    val context: Context,
+    // name of directory that will be created to store backups
+    val appDirectoryName: String,
+) : RoomUtilBase(context, appDirectoryName) {
+    /**
+     *  Imports CSV data found at given [selectedDirectoryUri] in the form of [RoomData]. Every
+     *  entity table should have its own CSV file with the name matching @Entity.tableName or 
+     *  class name if blank. Returns null if CSV file is missing, if data is the wrong type, or
+     *  if there is an error opening a file. Existing Room data should only be deleted if this
+     *  does not return null.
+     */
+    fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData?
+    
+    /**
+     *  Exports given [roomData] as CSV to [appExportDirectoryUri]. [appExportDirectoryUri] should
+     *  be the [Uri] recieved from findOrCreateAppDirectory. If any entity fails to export,
+     *  deletes previously successfully exported data and its directory of this export attempt.
+     *  Creates a file for each entity, even if it is an empty table.
+     */
+    fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData)
+}
+```
 
 ## Gradle Options
 In module build.gradle
@@ -134,3 +207,10 @@ dependencies {
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 }
 ```
+
+[1]: https://www.sqlite.org/pragma.html#pragma_wal_checkpoint
+[2]: https://github.com/HeyZeusV/AndroidUtilities/blob/feature_room_utilities/app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/dao/AllDao.kt
+[3]: https://github.com/HeyZeusV/AndroidUtilities/blob/feature_room_utilities/app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/Repository.kt
+[4]: https://www.sqlite.org/autoinc.html
+[5]: https://www.sqlite.org/fts3.html#*fts4rebuidcmd
+[6]: https://github.com/jsoizo/kotlin-csv
