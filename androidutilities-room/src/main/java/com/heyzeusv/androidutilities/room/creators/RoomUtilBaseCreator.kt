@@ -12,7 +12,6 @@ import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
 import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
-import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -90,21 +89,19 @@ internal class RoomUtilBaseCreator(
      *  scheme.
      */
     private fun buildCreateNewDirectoryFunction(): FunSpec.Builder {
-        val appDirectory = "appDirectory"
         val funSpec = FunSpec.builder("createNewDirectory")
             .addModifiers(KModifier.PROTECTED)
             .returns(documentFileClassName.copy(nullable = true))
-            .addParameter(appDirectory, documentFileClassName)
+            .addParameter("appDirectory", documentFileClassName)
             .addCode(buildCodeBlock {
-                addStatement(
-                    "val sdf = %T(%S, %T.getDefault())",
-                    SimpleDateFormat::class, "MMM_dd_yyyy__hh_mm_aa", Locale::class,
-                )
-                addStatement("val formattedDate = sdf.format(%T())", Date::class)
                 add("""
-                    val newDirectory = $appDirectory.createDirectory(formattedDate)
+                    val sdf = %T(%S, %T.getDefault())
+                    val formattedDate = sdf.format(%T())
+                    val newDirectory = appDirectory.createDirectory(formattedDate)
                     return newDirectory
-                """.trimIndent())
+                """.trimIndent(),
+                    SimpleDateFormat::class, "MMM_dd_yyyy__hh_mm_aa", Locale::class, Date::class
+                )
             })
 
         return funSpec
@@ -119,26 +116,18 @@ internal class RoomUtilBaseCreator(
             .returns(uriClassName.copy(nullable = true))
             .addParameter(SELECTED_DIRECTORY_URI, uriClassName)
             .addCode(buildCodeBlock {
-                addStatement("try {")
-                addIndented {
-                    addStatement(
-                        "val selectedDirectory = %T.fromTreeUri(%L, %L)!!",
-                        documentFileClassName, CONTEXT, SELECTED_DIRECTORY_URI,
-                    )
-                    add("""
-                        val appDirectory = selectedDirectory.findFile(appDirectoryName) ?:
-                          selectedDirectory.createDirectory(appDirectoryName)!!
-      
-                        return appDirectory.uri
-                    
-                    """.trimIndent())
-                }
-                addStatement("} catch (e: %T) {", UnsupportedOperationException::class)
-                addIndented {
-                    addStatement("// Don't use fromSingleUri(Context, Uri)")
-                    addStatement("return null")
-                }
-                addStatement("}")
+                add("""
+                    try {
+                      val selectedDirectory = %T.fromTreeUri(context, selectedDirectoryUri)!!
+                      val appDirectory = selectedDirectory.findFile(appDirectoryName) ?:
+                        selectedDirectory.createDirectory(appDirectoryName)!!
+                        
+                      return appDirectory.uri
+                    } catch (e: %T) {
+                      // Don't use fromSingleUri(Context, Uri)
+                      return null
+                    }
+                """.trimIndent(), documentFileClassName, UnsupportedOperationException::class)
             })
 
         return funSpec
