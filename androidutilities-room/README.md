@@ -181,10 +181,14 @@ ksp {
 [Sample Compose Screen][7] | [Sample ViewModel][8] | [Sample Database][9] | [Sample Hilt Modules][10]
 
 ### GIFs
-<details><summary><b>RoomBackupRestore</b></summary>
-<img src="../images/CsvConverterExport.gif" width="225" height="500"/>
-<img src="/images/ComposeResourcesSample.gif" width="225" height="500"/>
-</details>
+
+[Backup][11]
+
+[Restore][12]
+
+[CSV Import][13]
+
+[CSV Export][14]
 
 
 ## Installation
@@ -230,3 +234,7 @@ dependencies {
 [8]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/feature/roomutil/RoomUtilViewModel.kt
 [9]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/database
 [10]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/di
+[11]: ../images/RoomBackup.gif
+[12]: ../images/RoomRestore.gif
+[13]: ../images/CsvConverterImport.gif
+[14]: ../images/CsvConverterExport.gif
