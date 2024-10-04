@@ -4,6 +4,18 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
+import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
+import com.heyzeusv.androidutilities.room.util.Constants.CSV_CONVERTER
+import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_DATA
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.TRUE
+import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
+import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
+import com.heyzeusv.androidutilities.room.util.Constants.injectClassName
+import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.CsvData
 import com.heyzeusv.androidutilities.room.util.CsvInfo
@@ -23,8 +35,6 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 
-private const val CONTEXT = "context"
-
 internal class CsvConverterCreator(
     private val codeGenerator: CodeGenerator,
     private val hiltOption: String?,
@@ -34,17 +44,14 @@ internal class CsvConverterCreator(
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
 
-    private val roomDataClassName = ClassName(packageName, "RoomData")
-    private val uriClassName = ClassName("android.net", "Uri")
-    private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
+    private val roomDataClassName = ClassName(packageName, ROOM_DATA)
     private val csvDataListClassName = CsvData::class.asListTypeName()
 
     private fun createCsvConverterFile() {
         logger.info("Creating CsvConverter...")
-        val fileName = "CsvConverter"
-        val fileBuilder = FileSpec.builder(packageName, fileName)
+        val fileBuilder = FileSpec.builder(packageName, CSV_CONVERTER)
 
-        val classBuilder = TypeSpec.classBuilder(fileName)
+        val classBuilder = TypeSpec.classBuilder(CSV_CONVERTER)
             .buildCsvConverter()
 
         fileBuilder.addType(classBuilder.build())
@@ -52,8 +59,8 @@ internal class CsvConverterCreator(
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
             packageName = packageName,
-            fileName = fileName,
-            extensionName = "kt"
+            fileName = CSV_CONVERTER,
+            extensionName = EXTENSION_KT,
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
 
@@ -61,20 +68,16 @@ internal class CsvConverterCreator(
      *  Builds CsvConverter TypeSpec by adding parameters/properties and functions.
      */
     private fun TypeSpec.Builder.buildCsvConverter(): TypeSpec.Builder {
-        val contextClassName = ClassName("android.content", "Context")
-
-        superclass(ClassName(packageName, "RoomUtilBase"))
+        superclass(ClassName(packageName, ROOM_UTIL_BASE))
         addSuperclassConstructorParameter(CONTEXT)
-        addSuperclassConstructorParameter("appDirectoryName")
+        addSuperclassConstructorParameter(APP_DIRECTORY_NAME)
 
         // context parameter/property in order to read/write files
         val constructorBuilder = FunSpec.constructorBuilder()
             .addParameter(CONTEXT, contextClassName)
-            .addParameter("appDirectoryName", String::class)
+            .addParameter(APP_DIRECTORY_NAME, String::class)
 
-        if (hiltOption?.lowercase() == "true") {
-            constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
-        }
+        if (hiltOption?.lowercase() == TRUE) constructorBuilder.addAnnotation(injectClassName)
 
         primaryConstructor(constructorBuilder.build())
         addProperty(
@@ -84,8 +87,8 @@ internal class CsvConverterCreator(
                 .build()
         )
         addProperty(
-            PropertySpec.builder("appDirectoryName", String::class)
-                .initializer("appDirectoryName")
+            PropertySpec.builder(APP_DIRECTORY_NAME, String::class)
+                .initializer(APP_DIRECTORY_NAME)
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
@@ -116,19 +119,17 @@ internal class CsvConverterCreator(
     }
 
     private fun buildImportCsvToRoomFunction(): FunSpec.Builder {
-        val selectedDirectoryUri = "selectedDirectoryUri"
-
         val funSpec = FunSpec.builder("importCsvToRoom")
             .addAnnotation(
                 AnnotationSpec.builder(Suppress::class)
                     .addMember("%S", "UNCHECKED_CAST")
                     .build()
             )
-            .addParameter(selectedDirectoryUri, uriClassName)
+            .addParameter(SELECTED_DIRECTORY_URI, uriClassName)
             .returns(roomDataClassName.copy(nullable = true))
             .addCode(buildCodeBlock {
                 add("""
-                    val selectedDirectory = DocumentFile.fromTreeUri(context, $selectedDirectoryUri)!!
+                    val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                     if (!selectedDirectory.exists()) {
                       // selected directory does not exist
                       return null
@@ -163,16 +164,15 @@ internal class CsvConverterCreator(
     }
 
     private fun buildImportCsvToRoomEntityFunction(): FunSpec.Builder {
-        val csvFile = "csvFile"
         val csvReaderMemberName = MemberName("com.github.doyaaaaaken.kotlincsv.dsl", "csvReader")
 
         val funSpec = FunSpec.builder("importCsvToRoomEntity")
             .addModifiers(KModifier.PRIVATE)
-            .addParameter(csvFile, documentFileClassName)
+            .addParameter("csvFile", documentFileClassName)
             .returns(csvDataListClassName.copy(nullable = true))
             .addCode(buildCodeBlock {
                 add("""
-                val inputStream = context.contentResolver.openInputStream($csvFile.uri)
+                val inputStream = context.contentResolver.openInputStream(csvFile.uri)
                   ?: return null // corrupt file
                 try {
                   
@@ -254,14 +254,12 @@ internal class CsvConverterCreator(
     }
 
     private fun buildExportRoomToCsvFunction(): FunSpec.Builder {
-        val appExportDirectoryUri = "appExportDirectoryUri"
-        val roomData = "roomData"
         val funSpec = FunSpec.builder("exportRoomToCsv")
-            .addParameter(appExportDirectoryUri, uriClassName)
-            .addParameter(roomData, roomDataClassName)
+            .addParameter("appExportDirectoryUri", uriClassName)
+            .addParameter("roomData", roomDataClassName)
             .addCode(buildCodeBlock {
                 addStatement(
-                    "val appExportDirectory = %T.fromTreeUri(%L, $appExportDirectoryUri)!!",
+                    "val appExportDirectory = %T.fromTreeUri(%L, appExportDirectoryUri)!!",
                     documentFileClassName, CONTEXT,
                 )
                 add("""
@@ -272,7 +270,7 @@ internal class CsvConverterCreator(
                       // returns if fails to create directory
                       val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
                       val newCsvFiles = mutableListOf<DocumentFile>()
-                      $roomData.csvDataMap.entries.forEach {
+                      roomData.csvDataMap.entries.forEach {
                         val csvFile = exportRoomEntityToCsv(
                           newExportDirectory = newExportDirectory,
                           csvInfo = it.key,
@@ -295,19 +293,19 @@ internal class CsvConverterCreator(
     }
 
     private fun buildExportRoomEntityToCsv(): FunSpec.Builder {
-        val newExportDirectory = "newExportDirectory"
         val csvWriterMemberName = MemberName("com.github.doyaaaaaken.kotlincsv.dsl", "csvWriter")
+
         val funSpec = FunSpec.builder("exportRoomEntityToCsv")
             .addModifiers(KModifier.PRIVATE)
             .returns(documentFileClassName.copy(nullable = true))
-            .addParameter(newExportDirectory, documentFileClassName)
+            .addParameter("newExportDirectory", documentFileClassName)
             .addParameter("csvInfo", CsvInfo::class)
             .addParameter("csvDataList", csvDataListClassName)
             .addCode(buildCodeBlock {
                 add("""
                     val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
                       return null // failed to create file
-                    val outputStream = $CONTEXT.contentResolver.openOutputStream(csvFile.uri) ?:
+                    val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
                       return null // failed to open output stream
                     
                     

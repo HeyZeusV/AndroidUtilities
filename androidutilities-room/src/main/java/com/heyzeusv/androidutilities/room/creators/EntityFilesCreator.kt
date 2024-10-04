@@ -6,6 +6,12 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.util.CloseClass
+import com.heyzeusv.androidutilities.room.util.Constants.ANNOTATION_COLUMN_INFO
+import com.heyzeusv.androidutilities.room.util.Constants.ANNOTATION_EMBEDDED
+import com.heyzeusv.androidutilities.room.util.Constants.ANNOTATION_ENTITY
+import com.heyzeusv.androidutilities.room.util.Constants.ANNOTATION_FTS4
+import com.heyzeusv.androidutilities.room.util.Constants.ANNOTATION_IGNORE
+import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.EmbeddedInfo
 import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.FieldInfo
@@ -75,7 +81,7 @@ internal class EntityFilesCreator(
         symbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { classDeclaration ->
                 // skip any classes that are annotated with Room.Fts4
-                if (classDeclaration.annotations.any { it.shortName.getShortName() == "Fts4"}) {
+                if (classDeclaration.annotations.any { it.getName() == ANNOTATION_FTS4 }) {
                     logger.warn("Entity annotated with Fts4 detected...\n" +
                             "   Make sure to rebuild Fts4 table after import using: " +
                             "   INSERT INTO table_name(table_name) VALUES('rebuild');\n" +
@@ -89,7 +95,7 @@ internal class EntityFilesCreator(
                     dependencies = Dependencies(false, symbol.containingFile!!),
                     packageName = entityBuilder.packageName,
                     fileName = entityBuilder.fileName,
-                    extensionName = "kt"
+                    extensionName = EXTENSION_KT,
                 ).bufferedWriter().use { entityBuilder.fileBuilder.build().writeTo(it) }
             }
         }
@@ -111,7 +117,8 @@ internal class EntityFilesCreator(
          *  Get table name by first searching for tableName parameter of Room.Entity annotation.
          *  If it is blank, then use the name of the class annotated with Room.Entity.
          */
-        private val tableName = classDeclaration.getAnnotationArgumentValue("Entity", "tableName")
+        private val tableName = classDeclaration
+            .getAnnotationArgumentValue(ANNOTATION_ENTITY, "tableName")
             .ifBlank { classDeclaration.simpleName.getShortName() }
 
         val classBuilder = TypeSpec.classBuilder(fileName)
@@ -141,18 +148,18 @@ internal class EntityFilesCreator(
         ) {
             classDeclaration.getAllProperties().forEach { prop ->
                 val name = prop.getName()
-                val annotations = prop.annotations.map { it.shortName.getShortName() }
+                val annotations = prop.annotations.map { it.getName() }
 
                 // print log message and continue
-                if (annotations.contains("Ignore")) {
+                if (annotations.contains(ANNOTATION_IGNORE)) {
                     logger.info("Ignoring field $name of type ${prop.type}")
                 // flatten embedded class by recursively calling this function and passing prefix (if any)
-                } else if (annotations.contains("Embedded")) {
+                } else if (annotations.contains(ANNOTATION_EMBEDDED)) {
                     logger.info("Flattening embedded class ${prop.type}")
 
                     val embeddedClass = prop.type.resolve().declaration as KSClassDeclaration
                     // get prefix by getting Room.Embedded.prefix value
-                    val newPrefix = prop.getAnnotationArgumentValue("Embedded", "prefix")
+                    val newPrefix = prop.getAnnotationArgumentValue(ANNOTATION_EMBEDDED, "prefix")
                     val embeddedInfo = EmbeddedInfo(name, embeddedClass)
                     propertyInfoList.add(embeddedInfo)
 
@@ -175,8 +182,9 @@ internal class EntityFilesCreator(
 
                     var fieldName = "$embeddedPrefix$name"
                     // check if custom field name has been set using ColumnInfo.name
-                    if (annotations.contains("ColumnInfo")) {
-                        val columnName = prop.getAnnotationArgumentValue("ColumnInfo", "name")
+                    if (annotations.contains(ANNOTATION_COLUMN_INFO)) {
+                        val columnName =
+                            prop.getAnnotationArgumentValue(ANNOTATION_COLUMN_INFO, "name")
                         // checks if columnName is different from its default value
                         if (columnName != "[field-name]") fieldName = "$embeddedPrefix$columnName"
                     }

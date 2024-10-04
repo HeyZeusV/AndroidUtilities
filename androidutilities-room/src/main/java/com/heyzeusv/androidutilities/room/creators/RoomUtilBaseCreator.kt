@@ -4,9 +4,16 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
+import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
+import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
+import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
+import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.getPackageName
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -27,19 +34,14 @@ internal class RoomUtilBaseCreator(
     private val dbClassDeclaration: KSClassDeclaration,
     private val logger: KSPLogger,
 ) {
-    private val contextClassName = ClassName("android.content", "Context")
-    private val uriClassName = ClassName("android.net", "Uri")
-    private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
-
     /**
      *  Creates RoomUtilBase.kt file.
      */
     private fun createRoomUtilBaseFile() {
         logger.info("Creating RoomUtilBase...")
         val packageName = dbClassDeclaration.getPackageName()
-        val fileName = "RoomUtilBase"
-        val fileBuilder = FileSpec.builder(packageName, fileName)
-        val classBuilder = TypeSpec.classBuilder(fileName)
+        val fileBuilder = FileSpec.builder(packageName, ROOM_UTIL_BASE)
+        val classBuilder = TypeSpec.classBuilder(ROOM_UTIL_BASE)
             .buildRoomUtilBase()
 
         fileBuilder.addType(classBuilder.build())
@@ -47,8 +49,8 @@ internal class RoomUtilBaseCreator(
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
             packageName = packageName,
-            fileName = fileName,
-            extensionName = "kt",
+            fileName = ROOM_UTIL_BASE,
+            extensionName = EXTENSION_KT,
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
 
@@ -60,19 +62,19 @@ internal class RoomUtilBaseCreator(
 
         primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter("context", contextClassName)
-                .addParameter("appDirectoryName", String::class)
+                .addParameter(CONTEXT, contextClassName)
+                .addParameter(APP_DIRECTORY_NAME, String::class)
                 .build()
         )
         addProperty(
-            PropertySpec.builder("context", contextClassName)
-                .initializer("context")
+            PropertySpec.builder(CONTEXT, contextClassName)
+                .initializer(CONTEXT)
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
         addProperty(
-            PropertySpec.builder("appDirectoryName", String::class)
-                .initializer("appDirectoryName")
+            PropertySpec.builder(APP_DIRECTORY_NAME, String::class)
+                .initializer(APP_DIRECTORY_NAME)
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
@@ -113,24 +115,19 @@ internal class RoomUtilBaseCreator(
      *  returns its Uri if found, else it creates appExportDirectoryName in selectedDirectoryUri.
      */
     private fun buildFindOrCreateAppDirectoryFunction(): FunSpec.Builder {
-        val context = "context"
-
-        val selectedDirectoryUri = "selectedDirectoryUri"
-        val appDirectoryName = "appDirectoryName"
-
         val funSpec = FunSpec.builder("findOrCreateAppDirectory")
             .returns(uriClassName.copy(nullable = true))
-            .addParameter(selectedDirectoryUri, uriClassName)
+            .addParameter(SELECTED_DIRECTORY_URI, uriClassName)
             .addCode(buildCodeBlock {
                 addStatement("try {")
                 addIndented {
                     addStatement(
                         "val selectedDirectory = %T.fromTreeUri(%L, %L)!!",
-                        documentFileClassName, context, selectedDirectoryUri,
+                        documentFileClassName, CONTEXT, SELECTED_DIRECTORY_URI,
                     )
                     add("""
-                        val appDirectory = selectedDirectory.findFile($appDirectoryName) ?:
-                          selectedDirectory.createDirectory($appDirectoryName)!!
+                        val appDirectory = selectedDirectory.findFile(appDirectoryName) ?:
+                          selectedDirectory.createDirectory(appDirectoryName)!!
       
                         return appDirectory.uri
                     

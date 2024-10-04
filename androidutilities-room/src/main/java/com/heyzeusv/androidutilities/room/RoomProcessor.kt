@@ -13,6 +13,13 @@ import com.heyzeusv.androidutilities.room.creators.EntityFilesCreator
 import com.heyzeusv.androidutilities.room.creators.RoomBackupRestoreCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
 import com.heyzeusv.androidutilities.room.creators.RoomUtilBaseCreator
+import com.heyzeusv.androidutilities.room.util.Constants.FALSE
+import com.heyzeusv.androidutilities.room.util.Constants.OPTION_CSV
+import com.heyzeusv.androidutilities.room.util.Constants.OPTION_DB
+import com.heyzeusv.androidutilities.room.util.Constants.OPTION_HILT
+import com.heyzeusv.androidutilities.room.util.Constants.PACKAGE_DATABASE
+import com.heyzeusv.androidutilities.room.util.Constants.PACKAGE_ENTITY
+import com.heyzeusv.androidutilities.room.util.Constants.PACKAGE_TYPE_CONVERTER
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
 
 class RoomProcessor(
@@ -22,22 +29,22 @@ class RoomProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val csvOption = options["roomUtilCsv"]
-        val dbOption = options["roomUtilDb"]
-        val hiltOption = options["roomUtilHilt"]
+        val csvOption = options[OPTION_CSV]
+        val dbOption = options[OPTION_DB]
+        val hiltOption = options[OPTION_HILT]
 
         // get all symbols
-        val tcSymbols = resolver.getSymbolsWithAnnotation("androidx.room.TypeConverter")
-        val eSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Entity")
-        val dbSymbols = resolver.getSymbolsWithAnnotation("androidx.room.Database")
+        val tcSymbols = resolver.getSymbolsWithAnnotation(PACKAGE_TYPE_CONVERTER)
+        val eSymbols = resolver.getSymbolsWithAnnotation(PACKAGE_ENTITY)
+        val dbSymbols = resolver.getSymbolsWithAnnotation(PACKAGE_DATABASE)
 
-        val typeConverterInfoList = if (csvOption?.lowercase() == "false") {
+        val typeConverterInfoList = if (csvOption?.lowercase() == FALSE) {
             emptyList()
         } else {
             createTypeConverterInfoList(tcSymbols, logger)
         }
 
-        val entityInfoList = if (csvOption?.lowercase() == "false") {
+        val entityInfoList = if (csvOption?.lowercase() == FALSE) {
             emptyList()
         } else {
             EntityFilesCreator(
@@ -50,7 +57,7 @@ class RoomProcessor(
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
-                if (csvOption?.lowercase() != "false") {
+                if (csvOption?.lowercase() != FALSE) {
                     RoomUtilBaseCreator(
                         codeGenerator = codeGenerator,
                         dbClassDeclaration = dbClass,
@@ -70,7 +77,7 @@ class RoomProcessor(
                         logger = logger,
                     )
                 }
-                if (dbOption?.lowercase() != "false") {
+                if (dbOption?.lowercase() != FALSE) {
                     RoomBackupRestoreCreator(
                         codeGenerator = codeGenerator,
                         hiltOption = hiltOption,

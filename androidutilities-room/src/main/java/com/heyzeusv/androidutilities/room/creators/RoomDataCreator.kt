@@ -4,6 +4,8 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_DATA
 import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.CsvData
 import com.heyzeusv.androidutilities.room.util.CsvInfo
@@ -38,16 +40,14 @@ internal class RoomDataCreator(
     private val entityInfoList: List<EntityInfo>,
     private val logger: KSPLogger,
 ) {
-    private val fileName = "RoomData"
-
     /**
      *  Creates RoomData.kt file.
      */
     private fun createRoomDataFile() {
         logger.info("Creating RoomData...")
         val packageName = dbClassDeclaration.getPackageName()
-        val fileBuilder = FileSpec.builder(packageName, fileName)
-        val classBuilder = TypeSpec.classBuilder(fileName)
+        val fileBuilder = FileSpec.builder(packageName, ROOM_DATA)
+        val classBuilder = TypeSpec.classBuilder(ROOM_DATA)
             .addModifiers(KModifier.DATA)
             .buildRoomData()
 
@@ -56,8 +56,8 @@ internal class RoomDataCreator(
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
             packageName = packageName,
-            fileName = fileName,
-            extensionName = "kt",
+            fileName = ROOM_DATA,
+            extensionName = EXTENSION_KT,
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
 

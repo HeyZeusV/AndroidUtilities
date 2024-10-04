@@ -4,6 +4,17 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
+import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
+import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_BACKUP_RESTORE
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.TRUE
+import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
+import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
+import com.heyzeusv.androidutilities.room.util.Constants.injectClassName
+import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.getPackageName
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -19,9 +30,8 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 
-private const val CONTEXT = "context"
 private const val DB_FILE_NAME = "dbFileName"
-private const val TEXT_MIME = "text/*"
+private const val MIME_TEXT = "text/*"
 
 internal class RoomBackupRestoreCreator(
     private val codeGenerator: CodeGenerator,
@@ -30,15 +40,12 @@ internal class RoomBackupRestoreCreator(
     private val logger: KSPLogger,
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
-    private val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
-    private val uriClassName = ClassName("android.net", "Uri")
 
     private fun createRoomBackupRestoreFile() {
         logger.info("Creating RoomBackupRestore...")
-        val fileName = "RoomBackupRestore"
-        val fileBuilder = FileSpec.builder(packageName, fileName)
+        val fileBuilder = FileSpec.builder(packageName, ROOM_BACKUP_RESTORE)
 
-        val classBuilder = TypeSpec.classBuilder(fileName)
+        val classBuilder = TypeSpec.classBuilder(ROOM_BACKUP_RESTORE)
             .buildRoomBackupRestore()
 
         fileBuilder.addType(classBuilder.build())
@@ -46,28 +53,24 @@ internal class RoomBackupRestoreCreator(
         codeGenerator.createNewFile(
             dependencies = Dependencies(false, dbClassDeclaration.containingFile!!),
             packageName = packageName,
-            fileName = fileName,
-            extensionName = "kt"
+            fileName = ROOM_BACKUP_RESTORE,
+            extensionName = EXTENSION_KT,
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
 
     private fun TypeSpec.Builder.buildRoomBackupRestore(): TypeSpec.Builder {
-        val contextClassName = ClassName("android.content", "Context")
-
-        superclass(ClassName(packageName, "RoomUtilBase"))
+        superclass(ClassName(packageName, ROOM_UTIL_BASE))
         addSuperclassConstructorParameter(CONTEXT)
-        addSuperclassConstructorParameter("appDirectoryName")
+        addSuperclassConstructorParameter(APP_DIRECTORY_NAME)
 
         // context parameter/property in order to read/write files
         val constructorBuilder = FunSpec.constructorBuilder()
             .addComment("include file extension to dbFileName!!")
             .addParameter(CONTEXT, contextClassName)
             .addParameter(DB_FILE_NAME, String::class)
-            .addParameter("appDirectoryName", String::class)
+            .addParameter(APP_DIRECTORY_NAME, String::class)
 
-        if (hiltOption?.lowercase() == "true") {
-            constructorBuilder.addAnnotation(ClassName("javax.inject", "Inject"))
-        }
+        if (hiltOption?.lowercase() == TRUE) constructorBuilder.addAnnotation(injectClassName)
 
         primaryConstructor(constructorBuilder.build())
         addProperty(
@@ -83,8 +86,8 @@ internal class RoomBackupRestoreCreator(
                 .build()
         )
         addProperty(
-            PropertySpec.builder("appDirectoryName", String::class)
-                .initializer("appDirectoryName")
+            PropertySpec.builder(APP_DIRECTORY_NAME, String::class)
+                .initializer(APP_DIRECTORY_NAME)
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
@@ -137,7 +140,7 @@ internal class RoomBackupRestoreCreator(
                     }
                     newFiles.add(bkpDbFile)
                     
-                """.trimIndent(), TEXT_MIME, DB_FILE_NAME)
+                """.trimIndent(), MIME_TEXT, DB_FILE_NAME)
                 add("""
                     
                     if (dbWalFile.exists()) {
@@ -152,7 +155,7 @@ internal class RoomBackupRestoreCreator(
                       newFiles.add(bkpDbWalFile)
                     }
                         
-                """.trimIndent(), TEXT_MIME, "$" + "dbFileName-wal")
+                """.trimIndent(), MIME_TEXT, "$" + "dbFileName-wal")
                 add("""
                     
                     if (dbShmFile.exists()) {
@@ -165,7 +168,7 @@ internal class RoomBackupRestoreCreator(
                         return // failed to copy shm file
                       }
                     }
-                """.trimIndent(), TEXT_MIME, "$" + "dbFileName-shm")
+                """.trimIndent(), MIME_TEXT, "$" + "dbFileName-shm")
             })
 
         return funSpec
@@ -174,7 +177,7 @@ internal class RoomBackupRestoreCreator(
     private fun buildRestoreFunction(): FunSpec.Builder {
         val unitLambda = LambdaTypeName.get(returnType = Unit::class.asTypeName())
         val funSpec = FunSpec.builder("restore")
-            .addParameter("selectedDirectoryUri", uriClassName)
+            .addParameter(SELECTED_DIRECTORY_URI, uriClassName)
             .addParameter(ParameterSpec.builder("restartApp", unitLambda)
                 .defaultValue("{ restartAppStandard() }")
                 .build()

@@ -41,6 +41,11 @@ internal fun KSAnnotated.getAnnotationArgumentValue(
     annotations.getWithName(annotation).arguments.getWithName(argument).value.toString()
 
 /**
+ *  Returns qualified name of [this] annotation.
+ */
+internal fun KSAnnotation.getName(): String = shortName.getShortName()
+
+/**
  *  Adds [code] to [this] [CodeBlock.Builder] indented one level.
  */
 internal fun CodeBlock.Builder.addIndented(code: CodeBlock.Builder.() -> Unit): CodeBlock.Builder =
@@ -89,7 +94,7 @@ internal fun ClassName.getDataName(): String {
  *  exists in [this] sequence.
  */
 internal fun Sequence<KSAnnotation>.getWithName(annotationName: String): KSAnnotation =
-    find { it.shortName.getShortName() == annotationName }!!
+    find { it.getName() == annotationName }!!
 
 /**
  *  Returns [KSValueArgument] with given [argumentName], assumes that given [argumentName] 100%
