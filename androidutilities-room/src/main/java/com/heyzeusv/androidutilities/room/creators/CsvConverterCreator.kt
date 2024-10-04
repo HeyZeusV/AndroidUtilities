@@ -172,30 +172,27 @@ internal class CsvConverterCreator(
             .returns(csvDataListClassName.copy(nullable = true))
             .addCode(buildCodeBlock {
                 add("""
-                val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return null // corrupt file
-                try {
-                  
-                """.trimIndent())
-                addStatement("val content = %M().readAll(inputStream)", csvReaderMemberName)
+                    val inputStream = context.contentResolver.openInputStream(csvFile.uri)
+                      ?: return null // corrupt file
+                    try {
+                      val content = %M().readAll(inputStream)
+                      if (content.size == 1) {
+                        return emptyList()
+                      }
+                
+                      val header = content[0]
+                      val rows = content.drop(1)
+                      val entityData = mutableListOf<CsvData>()
+                      when (header) {
+                        
+                """.trimIndent(), csvReaderMemberName)
                 addIndented {
-                    add("""
-                    if (content.size == 1) {
-                      return emptyList()
-                    }
-                  
-                    val header = content[0]
-                    val rows = content.drop(1)
-                    val entityData = mutableListOf<CsvData>()
-                    when (header) {
-                  
-                    """.trimIndent())
                     addIndented {
                         entityInfoList.forEach { entityInfo ->
                             add("""
-                            %T.csvFieldToTypeMap.keys.toList() -> {
-                              rows.forEach {
-                                val entry = %T(
+                                %T.csvFieldToTypeMap.keys.toList() -> {
+                                  rows.forEach {
+                                    val entry = %T(
                             
                             """.trimIndent(), entityInfo.utilClassName, entityInfo.utilClassName)
                             addIndented {
@@ -207,21 +204,21 @@ internal class CsvConverterCreator(
                                 }
                             }
                             add("""
-                                )
-                                entityData.add(entry)
-                              }
-                            }
+                                    )
+                                    entityData.add(entry)
+                                  }
+                                }
                   
                             """.trimIndent())
                         }
                     }
                 }
                 add("""
-                  }
-                  return entityData
-                } catch (e: Exception) {
-                  return null // invalid data, wrong type data
-                }
+                      }
+                      return entityData
+                    } catch (e: Exception) {
+                      return null // invalid data, wrong type data
+                    }
                 """.trimIndent())
             })
 
@@ -258,11 +255,8 @@ internal class CsvConverterCreator(
             .addParameter("appExportDirectoryUri", uriClassName)
             .addParameter("roomData", roomDataClassName)
             .addCode(buildCodeBlock {
-                addStatement(
-                    "val appExportDirectory = %T.fromTreeUri(%L, appExportDirectoryUri)!!",
-                    documentFileClassName, CONTEXT,
-                )
                 add("""
+                    val appExportDirectory = %T.fromTreeUri(%L, appExportDirectoryUri)!!
                     if (!appExportDirectory.exists()) {
                       // given directory doesn't exist
                       return
@@ -286,7 +280,7 @@ internal class CsvConverterCreator(
                         newCsvFiles.add(csvFile)
                       }
                     }
-                """.trimIndent())
+                """.trimIndent(), documentFileClassName, CONTEXT)
             })
 
         return funSpec
@@ -308,15 +302,12 @@ internal class CsvConverterCreator(
                     val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
                       return null // failed to open output stream
                     
-                    
-                """.trimIndent())
-                addStatement("%M().open(outputStream) {", csvWriterMemberName)
-                add("""
+                    %M().open(outputStream) {
                       writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                       csvDataList.forEach { writeRow(it.csvRow) }
                     }
                     return csvFile
-                """.trimIndent())
+                """.trimIndent(), csvWriterMemberName)
             })
 
         return funSpec
