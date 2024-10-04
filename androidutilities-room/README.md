@@ -175,6 +175,18 @@ ksp {
 }
 ```
 
+## Sample
+
+### Code
+[Sample Compose Screen][7] | [Sample ViewModel][8] | [Sample Database][9] | [Sample Hilt Modules][10]
+
+### GIFs
+<details><summary><b>RoomBackupRestore</b></summary>
+<img src="../images/CsvConverterExport.gif" width="225" height="500"/>
+<img src="/images/ComposeResourcesSample.gif" width="225" height="500"/>
+</details>
+
+
 ## Installation
 
 **Step 1.** Add Maven Central to root build.gradle
@@ -209,8 +221,12 @@ dependencies {
 ```
 
 [1]: https://www.sqlite.org/pragma.html#pragma_wal_checkpoint
-[2]: https://github.com/HeyZeusV/AndroidUtilities/blob/feature_room_utilities/app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/dao/AllDao.kt
-[3]: https://github.com/HeyZeusV/AndroidUtilities/blob/feature_room_utilities/app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/Repository.kt
+[2]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/dao/AllDao.kt
+[3]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/database/Repository.kt
 [4]: https://www.sqlite.org/autoinc.html
 [5]: https://www.sqlite.org/fts3.html#*fts4rebuidcmd
 [6]: https://github.com/jsoizo/kotlin-csv
+[7]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/feature/roomutil/RoomUtil.kt
+[8]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/feature/roomutil/RoomUtilViewModel.kt
+[9]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/database
+[10]: ../app/src/main/java/com/heyzeusv/androidutilitieslibrary/di
