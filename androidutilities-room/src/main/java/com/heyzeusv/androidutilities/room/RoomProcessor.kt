@@ -14,6 +14,7 @@ import com.heyzeusv.androidutilities.room.creators.EntityFilesCreator
 import com.heyzeusv.androidutilities.room.creators.RoomBackupRestoreCreator
 import com.heyzeusv.androidutilities.room.creators.RoomDataCreator
 import com.heyzeusv.androidutilities.room.creators.RoomUtilBaseCreator
+import com.heyzeusv.androidutilities.room.creators.RoomUtilStatusCreator
 import com.heyzeusv.androidutilities.room.util.Constants.FALSE
 import com.heyzeusv.androidutilities.room.util.Constants.OPTION_CSV
 import com.heyzeusv.androidutilities.room.util.Constants.OPTION_DB
@@ -87,6 +88,11 @@ class RoomProcessor(
                         logger = logger,
                     )
                 }
+                RoomUtilStatusCreator(
+                    codeGenerator = codeGenerator,
+                    dbClassDeclaration = dbClass,
+                    logger = logger,
+                )
             }
         }
 

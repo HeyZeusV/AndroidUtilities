@@ -32,4 +32,8 @@ internal class RoomUtilStatusCreator(
             extensionName = EXTENSION_KT,
         ).bufferedWriter().use { fileBuilder.build().writeTo(it) }
     }
+
+    init {
+        createRoomUtilStatusFile()
+    }
 }
