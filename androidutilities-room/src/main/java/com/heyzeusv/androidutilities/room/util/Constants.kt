@@ -31,6 +31,7 @@ internal object Constants {
     const val ROOM_BACKUP_RESTORE = "RoomBackupRestore"
     const val ROOM_DATA = "RoomData"
     const val ROOM_UTIL_BASE = "RoomUtilBase"
+    const val ROOM_UTIL_STATUS = "RoomUtilStatus"
 
     /**
      *  Parameters and/or Properties
