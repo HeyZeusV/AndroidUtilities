@@ -33,7 +33,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedSingleEntityCsvConverter, "CsvConverter.kt")
     }
 
@@ -75,7 +75,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(10, kspCompileResult.generatedFiles.size)
+        assertEquals(11, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedMultiEntityCsvConverter, "CsvConverter.kt")
     }
 
@@ -100,7 +100,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilHilt" to "TrUe"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedCsvConverterWithHiltOptionValue, "CsvConverter.kt")
     }
 
@@ -125,7 +125,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilCsv" to "FaLsE"),
             )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(2, kspCompileResult.generatedFiles.size)
     }
 
     companion object {

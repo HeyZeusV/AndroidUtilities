@@ -44,7 +44,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
             )
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedSingleEntityRoomData, "RoomData.kt")
     }
 
@@ -96,7 +96,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
             )
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(10, kspCompileResult.generatedFiles.size)
+        assertEquals(11, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedMultipleEntityRoomData, "RoomData.kt")
     }
 
@@ -117,7 +117,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilCsv" to "FALse"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(2, kspCompileResult.generatedFiles.size)
         assertFalse(kspCompileResult.generatedFiles.any { it.name == "RoomData.kt" })
     }
 

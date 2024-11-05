@@ -30,7 +30,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             )
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(6, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedRoomBackupRestore, "RoomBackupRestore.kt")
     }
 
@@ -51,7 +51,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilHilt" to "TRUE"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(6, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedRoomBackupRestoreWithHiltOptionValue,
             "RoomBackupRestore.kt",
@@ -76,7 +76,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilDb" to "FALSE"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(5, kspCompileResult.generatedFiles.size)
+        assertEquals(6, kspCompileResult.generatedFiles.size)
         assertFalse(kspCompileResult.generatedFiles.any { it.name == "RoomBackupRestore.kt" })
     }
 
