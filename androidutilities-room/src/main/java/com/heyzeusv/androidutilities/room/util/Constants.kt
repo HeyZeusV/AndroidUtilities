@@ -32,6 +32,10 @@ internal object Constants {
     const val ROOM_DATA = "RoomData"
     const val ROOM_UTIL_BASE = "RoomUtilBase"
     const val ROOM_UTIL_STATUS = "RoomUtilStatus"
+    const val STATUS_STANDBY = "Standby"
+    const val STATUS_PROGRESS = "Progress"
+    const val STATUS_ERROR = "Error"
+    const val STATUS_SUCCESS = "Success"
 
     /**
      *  Parameters and/or Properties
@@ -39,9 +43,13 @@ internal object Constants {
     const val APP_DIRECTORY_NAME = "appDirectoryName"
     const val CONTEXT = "context"
     const val SELECTED_DIRECTORY_URI = "selectedDirectoryUri"
+    const val MESSAGE_ID = "messageId"
+    const val NAME = "name"
+    const val DB_DATA = "dbData"
 
     val contextClassName = ClassName("android.content", "Context")
     val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")
     val injectClassName = ClassName("javax.inject", "Inject")
     val uriClassName = ClassName("android.net", "Uri")
+    val stringResClassName = ClassName("androidx.annotation", "StringRes")
 }
