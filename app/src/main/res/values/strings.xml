@@ -25,5 +25,6 @@
     <string name="status_error_import_missing_directory">Selected directory is missing!</string>
     <string name="status_error_import_missing_file">%1$s is missing from selected directory!</string>
     <string name="status_progress_import_entity_success">Successfully imported %1$s…</string>
+    <string name="status_progress_import_started">Started importing data…</string>
     <string name="status_success_import">Successfully imported data!</string>
 </resources>

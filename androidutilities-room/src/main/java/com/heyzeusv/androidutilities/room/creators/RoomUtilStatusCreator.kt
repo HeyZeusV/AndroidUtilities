@@ -56,10 +56,10 @@ internal class RoomUtilStatusCreator(
             .superclass(statusClassName)
         addType(standbyBuilder.build())
 
-        val progressBuilder = buildProgressClasses()
+        val progressBuilder = buildProgressErrorClasses(STATUS_PROGRESS)
         addType(progressBuilder.build())
 
-        val errorBuilder = buildErrorClasses()
+        val errorBuilder = buildProgressErrorClasses(STATUS_ERROR)
         addType(errorBuilder.build())
 
         val successBuilder = buildSuccessClass()
@@ -68,38 +68,7 @@ internal class RoomUtilStatusCreator(
         return this
     }
 
-    private fun buildProgressClasses(): TypeSpec.Builder {
-        val messageParameterBuilder = ParameterSpec.builder(MESSAGE_ID, Int::class)
-            .addAnnotation(stringResClassName)
-        val nameParameterBuilder = ParameterSpec.builder(NAME, String::class)
-            .defaultValue("\"\"")
-        val dataParameterBuilder = ParameterSpec.builder(DB_DATA, Any::class)
-            .defaultValue("\"\"")
-        val constructorBuilder = FunSpec.constructorBuilder()
-            .addParameter(messageParameterBuilder.build())
-            .addParameter(nameParameterBuilder.build())
-            .addParameter(dataParameterBuilder.build())
-        val classBuilder = TypeSpec.classBuilder(STATUS_PROGRESS)
-            .addModifiers(KModifier.DATA)
-            .superclass(statusClassName)
-            .primaryConstructor(constructorBuilder.build())
-            .addProperty(PropertySpec.builder(MESSAGE_ID, Int::class)
-                .initializer(MESSAGE_ID)
-                .build()
-            )
-            .addProperty(PropertySpec.builder(NAME, String::class)
-                .initializer(NAME)
-                .build()
-            )
-            .addProperty(PropertySpec.builder(DB_DATA, Any::class)
-                .initializer(DB_DATA)
-                .build()
-            )
-
-        return classBuilder
-    }
-
-    private fun buildErrorClasses(): TypeSpec.Builder {
+    private fun buildProgressErrorClasses(name: String): TypeSpec.Builder {
         val messageParameterBuilder = ParameterSpec.builder(MESSAGE_ID, Int::class)
             .addAnnotation(stringResClassName)
         val nameParameterBuilder = ParameterSpec.builder(NAME, String::class)
@@ -107,7 +76,7 @@ internal class RoomUtilStatusCreator(
         val constructorBuilder = FunSpec.constructorBuilder()
             .addParameter(messageParameterBuilder.build())
             .addParameter(nameParameterBuilder.build())
-        val classBuilder = TypeSpec.classBuilder(STATUS_ERROR)
+        val classBuilder = TypeSpec.classBuilder(name)
             .addModifiers(KModifier.DATA)
             .superclass(statusClassName)
             .primaryConstructor(constructorBuilder.build())

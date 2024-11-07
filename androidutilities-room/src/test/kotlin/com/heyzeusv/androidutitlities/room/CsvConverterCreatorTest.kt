@@ -146,59 +146,61 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
-            import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
-
+            
             public class CsvConverter(
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
               private val _status: MutableStateFlow<RoomUtilStatus> = MutableStateFlow(Standby)
-
+            
               public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
             
               private val csvFileNames: List<String> = listOf(
                 "BasicTwoField.csv", 
               )
-
+            
               @Suppress("UNCHECKED_CAST")
-              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomUtilStatus {
+              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                _status.value = Progress(R.string.status_progress_import_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  return Error(R.string.status_error_import_missing_directory)
+                  _status.value = Error(R.string.status_error_import_missing_directory)
+                  return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it) ?:
-                    return Error(R.string.status_error_import_missing_file)
-                  csvDocumentFiles.add(file)
+                  val file = selectedDirectory.findFile(it)
+                  if (file == null) {
+                    _status.value = Error(R.string.status_error_import_missing_file)
+                    return null
+                  } else {
+                    csvDocumentFiles.add(file)
+                  }
                 }
-
+            
                 val basicTwoFieldRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
-                if (basicTwoFieldRoomUtilStatus is Error) return basicTwoFieldRoomUtilStatus
-
-                return Success(
-                  messageId = R.string.status_success_import,
-                  dbData = RoomData(
-                    basicTwoFieldData =
-                    ((basicTwoFieldRoomUtilStatus as Progress).dbData as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
-                  )
+                if (basicTwoFieldRoomUtilStatus == null) return null
+            
+                return RoomData(
+                  basicTwoFieldData =
+                    (basicTwoFieldRoomUtilStatus as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
                 )
               }
-
-              private fun importCsvToRoomEntity(csvFile: DocumentFile): RoomUtilStatus {
+            
+              private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                if (inputStream == null) {
+                  _status.value = Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                  return null
+                }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    return Progress(
-                      messageId = R.string.status_progress_import_entity_success,
-                      name = csvFile.name!!,
-                      dbData = emptyList<CsvInfo>(),
-                    )
+                    _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
+                    return mutableListOf()
                   }
-
+            
                   val header = content[0]
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
@@ -213,16 +215,14 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
-                  return Progress(
-                    messageId = R.string.status_progress_import_entity_success,
-                    name = csvFile.name!!,
-                    dbData = emptyList<CsvInfo>(),
-                  )
+                  _status.value = Progress(R.string.status_progress_import_entity_success, csvFile.name!!)
+                  return entityData
                 } catch (e: Exception) {
-                  return Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  _status.value = Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  return null
                 }
               }
-
+            
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
@@ -249,7 +249,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   }
                 }
               }
-
+            
               private fun exportRoomEntityToCsv(
                 newExportDirectory: DocumentFile,
                 csvInfo: CsvInfo,
@@ -259,7 +259,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   return null // failed to create file
                 val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
                   return null // failed to open output stream
-
+            
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
@@ -286,7 +286,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
-            import test.RoomUtilStatus.Success
             import test.entity.EntityFourRoomUtil
             import test.entity.EntityOneRoomUtil
             import test.entity.EntityThreeRoomUtil
@@ -305,56 +304,57 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               )
 
               @Suppress("UNCHECKED_CAST")
-              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomUtilStatus {
+              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                _status.value = Progress(R.string.status_progress_import_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  return Error(R.string.status_error_import_missing_directory)
+                  _status.value = Error(R.string.status_error_import_missing_directory)
+                  return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it) ?:
-                    return Error(R.string.status_error_import_missing_file)
-                  csvDocumentFiles.add(file)
+                  val file = selectedDirectory.findFile(it)
+                  if (file == null) {
+                    _status.value = Error(R.string.status_error_import_missing_file)
+                    return null
+                  } else {
+                    csvDocumentFiles.add(file)
+                  }
                 }
 
                 val entityOneRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
-                if (entityOneRoomUtilStatus is Error) return entityOneRoomUtilStatus
+                if (entityOneRoomUtilStatus == null) return null
             
                 val entityTwoRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[1])
-                if (entityTwoRoomUtilStatus is Error) return entityTwoRoomUtilStatus
+                if (entityTwoRoomUtilStatus == null) return null
             
                 val entityThreeRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[2])
-                if (entityThreeRoomUtilStatus is Error) return entityThreeRoomUtilStatus
+                if (entityThreeRoomUtilStatus == null) return null
             
                 val entityFourRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[3])
-                if (entityFourRoomUtilStatus is Error) return entityFourRoomUtilStatus
-
-                return Success(
-                  messageId = R.string.status_success_import,
-                  dbData = RoomData(
-                    entityOneData =
-                    ((entityOneRoomUtilStatus as Progress).dbData as List<EntityOneRoomUtil>).map { it.toOriginal() },
-                    entityTwoData =
-                    ((entityTwoRoomUtilStatus as Progress).dbData as List<EntityTwoRoomUtil>).map { it.toOriginal() },
-                    entityThreeData =
-                    ((entityThreeRoomUtilStatus as Progress).dbData as List<EntityThreeRoomUtil>).map { it.toOriginal() },
-                    entityFourData =
-                    ((entityFourRoomUtilStatus as Progress).dbData as List<EntityFourRoomUtil>).map { it.toOriginal() },
-                  )
+                if (entityFourRoomUtilStatus == null) return null
+            
+                return RoomData(
+                  entityOneData = (entityOneRoomUtilStatus as List<EntityOneRoomUtil>).map { it.toOriginal() },
+                  entityTwoData = (entityTwoRoomUtilStatus as List<EntityTwoRoomUtil>).map { it.toOriginal() },
+                  entityThreeData =
+                    (entityThreeRoomUtilStatus as List<EntityThreeRoomUtil>).map { it.toOriginal() },
+                  entityFourData =
+                    (entityFourRoomUtilStatus as List<EntityFourRoomUtil>).map { it.toOriginal() },
                 )
               }
 
-              private fun importCsvToRoomEntity(csvFile: DocumentFile): RoomUtilStatus {
+              private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                if (inputStream == null) {
+                  _status.value = Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                  return null
+                }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    return Progress(
-                      messageId = R.string.status_progress_import_entity_success,
-                      name = csvFile.name!!,
-                      dbData = emptyList<CsvInfo>(),
-                    )
+                    _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
+                    return mutableListOf()
                   }
 
                   val header = content[0]
@@ -398,13 +398,11 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
-                  return Progress(
-                    messageId = R.string.status_progress_import_entity_success,
-                    name = csvFile.name!!,
-                    dbData = emptyList<CsvInfo>(),
-                  )
+                  _status.value = Progress(R.string.status_progress_import_entity_success, csvFile.name!!)
+                  return entityData
                 } catch (e: Exception) {
-                  return Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  _status.value = Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  return null
                 }
               }
 
@@ -472,7 +470,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
-            import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
 
             public class CsvConverter @Inject constructor(
@@ -488,41 +485,44 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               )
 
               @Suppress("UNCHECKED_CAST")
-              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomUtilStatus {
+              public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                _status.value = Progress(R.string.status_progress_import_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  return Error(R.string.status_error_import_missing_directory)
+                  _status.value = Error(R.string.status_error_import_missing_directory)
+                  return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it) ?:
-                    return Error(R.string.status_error_import_missing_file)
-                  csvDocumentFiles.add(file)
+                  val file = selectedDirectory.findFile(it)
+                  if (file == null) {
+                    _status.value = Error(R.string.status_error_import_missing_file)
+                    return null
+                  } else {
+                    csvDocumentFiles.add(file)
+                  }
                 }
 
                 val basicTwoFieldRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
-                if (basicTwoFieldRoomUtilStatus is Error) return basicTwoFieldRoomUtilStatus
-
-                return Success(
-                  messageId = R.string.status_success_import,
-                  dbData = RoomData(
-                    basicTwoFieldData =
-                    ((basicTwoFieldRoomUtilStatus as Progress).dbData as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
-                  )
+                if (basicTwoFieldRoomUtilStatus == null) return null
+            
+                return RoomData(
+                  basicTwoFieldData =
+                    (basicTwoFieldRoomUtilStatus as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
                 )
               }
 
-              private fun importCsvToRoomEntity(csvFile: DocumentFile): RoomUtilStatus {
+              private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                if (inputStream == null) {
+                  _status.value = Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                  return null
+                }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    return Progress(
-                      messageId = R.string.status_progress_import_entity_success,
-                      name = csvFile.name!!,
-                      dbData = emptyList<CsvInfo>(),
-                    )
+                    _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
+                    return mutableListOf()
                   }
 
                   val header = content[0]
@@ -539,13 +539,11 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
-                  return Progress(
-                    messageId = R.string.status_progress_import_entity_success,
-                    name = csvFile.name!!,
-                    dbData = emptyList<CsvInfo>(),
-                  )
+                  _status.value = Progress(R.string.status_progress_import_entity_success, csvFile.name!!)
+                  return entityData
                 } catch (e: Exception) {
-                  return Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  _status.value = Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  return null
                 }
               }
 
