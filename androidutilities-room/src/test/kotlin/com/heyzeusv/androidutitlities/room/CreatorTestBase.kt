@@ -27,6 +27,7 @@ abstract class CreatorTestBase {
         vararg sourceFiles: SourceFile,
         kspArguments: MutableMap<String, String> = mutableMapOf(),
     ): KspCompileResult {
+        kspArguments["roomUtilNamespace"] = "test"
         val compilation = prepareCompilation(*sourceFiles, kspArguments = kspArguments)
         val result = compilation.compile()
         return KspCompileResult(

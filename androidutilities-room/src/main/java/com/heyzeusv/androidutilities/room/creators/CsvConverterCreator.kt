@@ -7,10 +7,16 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
 import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
 import com.heyzeusv.androidutilities.room.util.Constants.CSV_CONVERTER
+import com.heyzeusv.androidutilities.room.util.Constants.CSV_DATA
+import com.heyzeusv.androidutilities.room.util.Constants.CSV_INFO
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_DATA
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_ERROR
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_PROGRESS
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_SUCCESS
 import com.heyzeusv.androidutilities.room.util.Constants.TRUE
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
@@ -21,6 +27,7 @@ import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
 import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.heyzeusv.androidutilities.room.util.getStatusName
 import com.heyzeusv.androidutilities.room.util.removeKotlinPrefix
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -38,13 +45,18 @@ internal class CsvConverterCreator(
     private val hiltOption: String?,
     private val dbClassDeclaration: KSClassDeclaration,
     private val entityInfoList: List<EntityInfo>,
+    private val resourceClassName: ClassName,
     private val logger: KSPLogger,
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
 
     private val roomDataClassName = ClassName(packageName, ROOM_DATA)
-    private val csvDataClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvData")
-    private val csvInfoClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvInfo")
+    private val csvDataClassName = ClassName(packageName, CSV_DATA)
+    private val csvInfoClassName = ClassName(packageName, CSV_INFO)
+    private val statusClassName = ClassName(packageName, ROOM_UTIL_STATUS)
+    private val statusProgressClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_PROGRESS)
+    private val statusErrorClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_ERROR)
+    private val statusSuccessClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_SUCCESS)
 
     private fun createCsvConverterFile() {
         logger.info("Creating CsvConverter...")
@@ -125,37 +137,46 @@ internal class CsvConverterCreator(
                     .build()
             )
             .addParameter(SELECTED_DIRECTORY_URI, uriClassName)
-            .returns(roomDataClassName.copy(nullable = true))
+            .returns(statusClassName)
             .addCode(buildCodeBlock {
                 add("""
                     val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                     if (!selectedDirectory.exists()) {
-                      // selected directory does not exist
-                      return null
+                      return %T(%T.string.status_error_import_missing_directory)
                     }
                     val csvDocumentFiles = mutableListOf<DocumentFile>()
                     csvFileNames.forEach {
-                      val file = selectedDirectory.findFile(it) ?: return null // file was not found
+                      val file = selectedDirectory.findFile(it) ?:
+                        return Error(R.string.status_error_import_missing_file)
                       csvDocumentFiles.add(file)
                     }
                     
-                """.trimIndent())
+                """.trimIndent(), statusErrorClassName, resourceClassName)
                 entityInfoList.forEachIndexed { i, entityInfo ->
-                    val utilName = entityInfo.utilClassName.getDataName()
-                    addStatement("")
-                    addStatement("val %L = importCsvToRoomEntity(csvDocumentFiles[%L])", utilName, i)
-                    addStatement("if (%L == null) return null // error importing data", utilName)
+                    val utilName = entityInfo.utilClassName.getStatusName()
+                    add("""
+                        
+                        val %L = importCsvToRoomEntity(csvDocumentFiles[%L])
+                        if (%L is Error) return %L
+                        
+                    """.trimIndent(), utilName, i, utilName, utilName)
                 }
-                addStatement("")
-                addStatement("return RoomData(")
+                add("""
+                    
+                    return %T(
+                      messageId = R.string.status_success_import,
+                      dbData = RoomData(
+                    
+                """.trimIndent(), statusSuccessClassName)
                 entityInfoList.forEach { data ->
-                    val utilName = data.utilClassName.getDataName()
-                    val dataName = utilName.replace("RoomUtil", "")
+                    val utilName = data.utilClassName.getStatusName()
+                    val dataName = data.utilClassName.getDataName().replace("RoomUtil", "")
                     addStatement(
-                        "  %L = (%L·as·List<%L>).map·{·it.toOriginal()·},",
-                        dataName, utilName, data.utilClassName.simpleName,
+                        "    %L = ((%L·as·%T).dbData·as·List<%L>).map·{·it.toOriginal()·},",
+                        dataName, utilName, statusProgressClassName, data.utilClassName.simpleName
                     )
                 }
+                addStatement("  )")
                 addStatement(")")
             })
 
@@ -168,15 +189,19 @@ internal class CsvConverterCreator(
         val funSpec = FunSpec.builder("importCsvToRoomEntity")
             .addModifiers(KModifier.PRIVATE)
             .addParameter("csvFile", documentFileClassName)
-            .returns(csvDataClassName.asListTypeName().copy(nullable = true))
+            .returns(statusClassName)
             .addCode(buildCodeBlock {
                 add("""
                     val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                      ?: return null // corrupt file
+                      ?: return Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
                     try {
                       val content = %M().readAll(inputStream)
                       if (content.size == 1) {
-                        return emptyList()
+                        return Progress(
+                          messageId = R.string.status_progress_import_entity_success,
+                          name = csvFile.name!!,
+                          dbData = emptyList<CsvInfo>(),
+                        )
                       }
                 
                       val header = content[0]
@@ -214,9 +239,13 @@ internal class CsvConverterCreator(
                 }
                 add("""
                       }
-                      return entityData
+                      return Progress(
+                        messageId = R.string.status_progress_import_entity_success,
+                        name = csvFile.name!!,
+                        dbData = emptyList<CsvInfo>(),
+                      )
                     } catch (e: Exception) {
-                      return null // invalid data, wrong type data
+                      return Error(R.string.status_error_import_invalid_data, csvFile.name!!)
                     }
                 """.trimIndent())
             })

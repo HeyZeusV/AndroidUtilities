@@ -8,6 +8,7 @@ internal object Constants {
     const val FALSE = "false"
     const val TRUE = "true"
 
+    const val OPTION_NAMESPACE = "roomUtilNamespace"
     const val OPTION_CSV = "roomUtilCsv"
     const val OPTION_DB = "roomUtilDb"
     const val OPTION_HILT = "roomUtilHilt"

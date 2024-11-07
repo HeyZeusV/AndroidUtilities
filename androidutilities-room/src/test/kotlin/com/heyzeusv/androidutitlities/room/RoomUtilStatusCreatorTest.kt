@@ -53,6 +53,7 @@ class RoomUtilStatusCreatorTest : CreatorTestBase() {
                 @StringRes
                 public val messageId: Int,
                 public val name: String = "",
+                public val dbData: Any = "",
               ) : RoomUtilStatus()
 
               public data class Error(

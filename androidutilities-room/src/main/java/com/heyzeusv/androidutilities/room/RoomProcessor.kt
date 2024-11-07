@@ -19,10 +19,12 @@ import com.heyzeusv.androidutilities.room.util.Constants.FALSE
 import com.heyzeusv.androidutilities.room.util.Constants.OPTION_CSV
 import com.heyzeusv.androidutilities.room.util.Constants.OPTION_DB
 import com.heyzeusv.androidutilities.room.util.Constants.OPTION_HILT
+import com.heyzeusv.androidutilities.room.util.Constants.OPTION_NAMESPACE
 import com.heyzeusv.androidutilities.room.util.Constants.PACKAGE_DATABASE
 import com.heyzeusv.androidutilities.room.util.Constants.PACKAGE_ENTITY
 import com.heyzeusv.androidutilities.room.util.Constants.PACKAGE_TYPE_CONVERTER
 import com.heyzeusv.androidutilities.room.util.TypeConverterInfo
+import com.squareup.kotlinpoet.ClassName
 
 class RoomProcessor(
     private val codeGenerator: CodeGenerator,
@@ -31,9 +33,14 @@ class RoomProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        val namespaceOption = options[OPTION_NAMESPACE]
         val csvOption = options[OPTION_CSV]
         val dbOption = options[OPTION_DB]
         val hiltOption = options[OPTION_HILT]
+
+        if (namespaceOption.isNullOrBlank()) throw Exception("roomUtilNamespace cannot be blank!")
+
+        val resourceClassName = ClassName(namespaceOption, "R")
 
         // get all symbols
         val tcSymbols = resolver.getSymbolsWithAnnotation(PACKAGE_TYPE_CONVERTER)
@@ -77,6 +84,7 @@ class RoomProcessor(
                         hiltOption = hiltOption,
                         dbClassDeclaration = dbClass,
                         entityInfoList = entityInfoList,
+                        resourceClassName = resourceClassName,
                         logger = logger,
                     )
                 }
