@@ -53,4 +53,7 @@ internal object Constants {
     val injectClassName = ClassName("javax.inject", "Inject")
     val uriClassName = ClassName("android.net", "Uri")
     val stringResClassName = ClassName("androidx.annotation", "StringRes")
+    val mutableStateFlowClassName = ClassName("kotlinx.coroutines.flow", "MutableStateFlow")
+    val stateFlowClassName = ClassName("kotlinx.coroutines.flow", "StateFlow")
+    val asStateFlowClassName = ClassName("kotlinx.coroutines.flow", "asStateFlow")
 }
