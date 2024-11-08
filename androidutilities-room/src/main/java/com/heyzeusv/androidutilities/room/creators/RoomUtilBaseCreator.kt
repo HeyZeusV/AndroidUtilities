@@ -8,14 +8,21 @@ import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
 import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_STANDBY
+import com.heyzeusv.androidutilities.room.util.Constants.asStateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
+import com.heyzeusv.androidutilities.room.util.Constants.mutableStateFlowClassName
+import com.heyzeusv.androidutilities.room.util.Constants.stateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
@@ -33,6 +40,11 @@ internal class RoomUtilBaseCreator(
     private val dbClassDeclaration: KSClassDeclaration,
     private val logger: KSPLogger,
 ) {
+    private val packageName = dbClassDeclaration.getPackageName()
+
+    private val statusClassName = ClassName(packageName, ROOM_UTIL_STATUS)
+    private val statusStandbyClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_STANDBY)
+
     /**
      *  Creates RoomUtilBase.kt file.
      */
@@ -75,6 +87,17 @@ internal class RoomUtilBaseCreator(
             PropertySpec.builder(APP_DIRECTORY_NAME, String::class)
                 .initializer(APP_DIRECTORY_NAME)
                 .addModifiers(KModifier.PRIVATE)
+                .build()
+        )
+        addProperty(
+            PropertySpec.builder("_status", mutableStateFlowClassName.parameterizedBy(statusClassName))
+                .initializer(buildCodeBlock { add("MutableStateFlow(%T)", statusStandbyClassName) })
+                .addModifiers(KModifier.PROTECTED)
+                .build()
+        )
+        addProperty(
+            PropertySpec.builder("status", stateFlowClassName.parameterizedBy(statusClassName))
+                .initializer(buildCodeBlock { add("_status.%T()", asStateFlowClassName) })
                 .build()
         )
 

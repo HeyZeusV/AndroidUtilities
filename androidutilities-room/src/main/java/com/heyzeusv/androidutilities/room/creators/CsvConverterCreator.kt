@@ -16,15 +16,11 @@ import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
 import com.heyzeusv.androidutilities.room.util.Constants.STATUS_ERROR
 import com.heyzeusv.androidutilities.room.util.Constants.STATUS_PROGRESS
-import com.heyzeusv.androidutilities.room.util.Constants.STATUS_STANDBY
 import com.heyzeusv.androidutilities.room.util.Constants.STATUS_SUCCESS
 import com.heyzeusv.androidutilities.room.util.Constants.TRUE
-import com.heyzeusv.androidutilities.room.util.Constants.asStateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
 import com.heyzeusv.androidutilities.room.util.Constants.injectClassName
-import com.heyzeusv.androidutilities.room.util.Constants.mutableStateFlowClassName
-import com.heyzeusv.androidutilities.room.util.Constants.stateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.EntityInfo
 import com.heyzeusv.androidutilities.room.util.addIndented
@@ -39,7 +35,6 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
@@ -58,11 +53,9 @@ internal class CsvConverterCreator(
     private val roomDataClassName = ClassName(packageName, ROOM_DATA)
     private val csvDataClassName = ClassName(packageName, CSV_DATA)
     private val csvInfoClassName = ClassName(packageName, CSV_INFO)
-    private val statusClassName = ClassName(packageName, ROOM_UTIL_STATUS)
     private val statusProgressClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_PROGRESS)
     private val statusErrorClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_ERROR)
     private val statusSuccessClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_SUCCESS)
-    private val statusStandbyClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_STANDBY)
 
     private fun createCsvConverterFile() {
         logger.info("Creating CsvConverter...")
@@ -107,17 +100,6 @@ internal class CsvConverterCreator(
             PropertySpec.builder(APP_DIRECTORY_NAME, String::class)
                 .initializer(APP_DIRECTORY_NAME)
                 .addModifiers(KModifier.PRIVATE)
-                .build()
-        )
-        addProperty(
-            PropertySpec.builder("_status", mutableStateFlowClassName.parameterizedBy(statusClassName))
-                .initializer(buildCodeBlock { add("MutableStateFlow(%T)", statusStandbyClassName) })
-                .addModifiers(KModifier.PRIVATE)
-                .build()
-        )
-        addProperty(
-            PropertySpec.builder("status", stateFlowClassName.parameterizedBy(statusClassName))
-                .initializer(buildCodeBlock { add("_status.%T()", asStateFlowClassName) })
                 .build()
         )
         addProperty(

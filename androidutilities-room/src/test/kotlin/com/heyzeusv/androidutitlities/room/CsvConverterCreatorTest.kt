@@ -140,12 +140,8 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
-            import kotlinx.coroutines.flow.MutableStateFlow
-            import kotlinx.coroutines.flow.StateFlow
-            import kotlinx.coroutines.flow.asStateFlow
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
-            import test.RoomUtilStatus.Standby
             import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
             
@@ -153,10 +149,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
-              private val _status: MutableStateFlow<RoomUtilStatus> = MutableStateFlow(Standby)
-            
-              public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
-            
               private val csvFileNames: List<String> = listOf(
                 "BasicTwoField.csv", 
               )
@@ -302,12 +294,8 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
-            import kotlinx.coroutines.flow.MutableStateFlow
-            import kotlinx.coroutines.flow.StateFlow
-            import kotlinx.coroutines.flow.asStateFlow
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
-            import test.RoomUtilStatus.Standby
             import test.RoomUtilStatus.Success
             import test.entity.EntityFourRoomUtil
             import test.entity.EntityOneRoomUtil
@@ -318,10 +306,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
-              private val _status: MutableStateFlow<RoomUtilStatus> = MutableStateFlow(Standby)
-            
-              public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
-            
               private val csvFileNames: List<String> = listOf(
                 "EntityOne.csv", "EntityTwo.csv", "EntityThree.csv", "EntityFour.csv", 
               )
@@ -508,12 +492,8 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
-            import kotlinx.coroutines.flow.MutableStateFlow
-            import kotlinx.coroutines.flow.StateFlow
-            import kotlinx.coroutines.flow.asStateFlow
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
-            import test.RoomUtilStatus.Standby
             import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
             
@@ -521,10 +501,6 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
-              private val _status: MutableStateFlow<RoomUtilStatus> = MutableStateFlow(Standby)
-            
-              public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
-            
               private val csvFileNames: List<String> = listOf(
                 "BasicTwoField.csv", 
               )
