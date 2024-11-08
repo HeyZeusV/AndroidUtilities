@@ -146,6 +146,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
+            import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
             
             public class CsvConverter(
@@ -224,13 +225,18 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               }
             
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                _status.value = Progress(R.string.status_progress_export_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
+                  _status.value = Error(R.string.status_error_export_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
-                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newExportDirectory = createNewDirectory(appExportDirectory)
+                  if (newExportDirectory == null) {
+                    _status.value = Error(R.string.status_error_export_create_directory_failed)
+                    return
+                  }
                   val newCsvFiles = mutableListOf<DocumentFile>()
                   roomData.csvDataMap.entries.forEach {
                     val csvFile = exportRoomEntityToCsv(
@@ -247,6 +253,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
+                  _status.value = Success(R.string.status_success_export)
                 }
               }
             
@@ -255,15 +262,30 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 csvInfo: CsvInfo,
                 csvDataList: List<CsvData>,
               ): DocumentFile? {
-                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                  return null // failed to create file
-                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                  return null // failed to open output stream
-            
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                if (csvFile == null) {
+                  _status.value = Error(
+                    messageId = R.string.status_error_export_create_file_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                if (outputStream == null) {
+                  _status.value = Error(
+                    messageId = R.string.status_error_export_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
+                _status.value = Progress(
+                  messageId = R.string.status_progress_export_entity_success,
+                  name = csvInfo.csvFileName,
+                )
                 return csvFile
               }
             }
@@ -286,23 +308,24 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
+            import test.RoomUtilStatus.Success
             import test.entity.EntityFourRoomUtil
             import test.entity.EntityOneRoomUtil
             import test.entity.EntityThreeRoomUtil
             import test.entity.EntityTwoRoomUtil
-
+            
             public class CsvConverter(
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
               private val _status: MutableStateFlow<RoomUtilStatus> = MutableStateFlow(Standby)
-
+            
               public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
             
               private val csvFileNames: List<String> = listOf(
                 "EntityOne.csv", "EntityTwo.csv", "EntityThree.csv", "EntityFour.csv", 
               )
-
+            
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
                 _status.value = Progress(R.string.status_progress_import_started)
@@ -321,7 +344,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     csvDocumentFiles.add(file)
                   }
                 }
-
+            
                 val entityOneRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
                 if (entityOneRoomUtilStatus == null) return null
             
@@ -343,7 +366,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     (entityFourRoomUtilStatus as List<EntityFourRoomUtil>).map { it.toOriginal() },
                 )
               }
-
+            
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
                 if (inputStream == null) {
@@ -356,7 +379,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
                     return mutableListOf()
                   }
-
+            
                   val header = content[0]
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
@@ -405,15 +428,20 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   return null
                 }
               }
-
+            
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                _status.value = Progress(R.string.status_progress_export_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
+                  _status.value = Error(R.string.status_error_export_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
-                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newExportDirectory = createNewDirectory(appExportDirectory)
+                  if (newExportDirectory == null) {
+                    _status.value = Error(R.string.status_error_export_create_directory_failed)
+                    return
+                  }
                   val newCsvFiles = mutableListOf<DocumentFile>()
                   roomData.csvDataMap.entries.forEach {
                     val csvFile = exportRoomEntityToCsv(
@@ -430,23 +458,39 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
+                  _status.value = Success(R.string.status_success_export)
                 }
               }
-
+            
               private fun exportRoomEntityToCsv(
                 newExportDirectory: DocumentFile,
                 csvInfo: CsvInfo,
                 csvDataList: List<CsvData>,
               ): DocumentFile? {
-                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                  return null // failed to create file
-                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                  return null // failed to open output stream
-
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                if (csvFile == null) {
+                  _status.value = Error(
+                    messageId = R.string.status_error_export_create_file_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                if (outputStream == null) {
+                  _status.value = Error(
+                    messageId = R.string.status_error_export_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
+                _status.value = Progress(
+                  messageId = R.string.status_progress_export_entity_success,
+                  name = csvInfo.csvFileName,
+                )
                 return csvFile
               }
             }
@@ -470,20 +514,21 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import test.RoomUtilStatus.Error
             import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
+            import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
-
+            
             public class CsvConverter @Inject constructor(
               private val context: Context,
               private val appDirectoryName: String,
             ) : RoomUtilBase(context, appDirectoryName) {
               private val _status: MutableStateFlow<RoomUtilStatus> = MutableStateFlow(Standby)
-
+            
               public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
             
               private val csvFileNames: List<String> = listOf(
                 "BasicTwoField.csv", 
               )
-
+            
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
                 _status.value = Progress(R.string.status_progress_import_started)
@@ -502,7 +547,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     csvDocumentFiles.add(file)
                   }
                 }
-
+            
                 val basicTwoFieldRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
                 if (basicTwoFieldRoomUtilStatus == null) return null
             
@@ -511,7 +556,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     (basicTwoFieldRoomUtilStatus as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
                 )
               }
-
+            
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
                 if (inputStream == null) {
@@ -524,7 +569,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
                     return mutableListOf()
                   }
-
+            
                   val header = content[0]
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
@@ -546,15 +591,20 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   return null
                 }
               }
-
+            
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                _status.value = Progress(R.string.status_progress_export_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
+                  _status.value = Error(R.string.status_error_export_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
-                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newExportDirectory = createNewDirectory(appExportDirectory)
+                  if (newExportDirectory == null) {
+                    _status.value = Error(R.string.status_error_export_create_directory_failed)
+                    return
+                  }
                   val newCsvFiles = mutableListOf<DocumentFile>()
                   roomData.csvDataMap.entries.forEach {
                     val csvFile = exportRoomEntityToCsv(
@@ -571,23 +621,39 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
+                  _status.value = Success(R.string.status_success_export)
                 }
               }
-
+            
               private fun exportRoomEntityToCsv(
                 newExportDirectory: DocumentFile,
                 csvInfo: CsvInfo,
                 csvDataList: List<CsvData>,
               ): DocumentFile? {
-                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                  return null // failed to create file
-                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                  return null // failed to open output stream
-
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                if (csvFile == null) {
+                  _status.value = Error(
+                    messageId = R.string.status_error_export_create_file_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                if (outputStream == null) {
+                  _status.value = Error(
+                    messageId = R.string.status_error_export_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
+                _status.value = Progress(
+                  messageId = R.string.status_progress_export_entity_success,
+                  name = csvInfo.csvFileName,
+                )
                 return csvFile
               }
             }

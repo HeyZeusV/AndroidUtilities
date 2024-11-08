@@ -20,11 +20,18 @@
     <!-- Hyperlink Annotation String -->
     <string name="hyperlink_example">This string resource contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
 
-    <string name="status_error_import_corrupt_file">Something went wrong while reading %1$s, please try again</string>
+    <string name="status_error_import_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
     <string name="status_error_import_invalid_data">%1$s contains invalid data!</string>
     <string name="status_error_import_missing_directory">Selected directory is missing!</string>
     <string name="status_error_import_missing_file">%1$s is missing from selected directory!</string>
+    <string name="status_error_export_create_directory_failed">Failed to create export directory, please try again…</string>
+    <string name="status_error_export_create_file_failed">Something went wrong creating %1$s, please try again…</string>
+    <string name="status_error_export_failed">Something went wrong exporting %1$s, please try again…</string>
+    <string name="status_error_export_missing_directory">App directory is missing!</string>
     <string name="status_progress_import_entity_success">Successfully imported %1$s…</string>
     <string name="status_progress_import_started">Started importing data…</string>
+    <string name="status_progress_export_entity_success">Successfully exported %1$s…</string>
+    <string name="status_progress_export_started">Started exporting data…</string>
     <string name="status_success_import">Successfully imported data!</string>
+    <string name="status_success_export">Successfully exported data!</string>
 </resources>

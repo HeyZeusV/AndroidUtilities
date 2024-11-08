@@ -299,13 +299,18 @@ internal class CsvConverterCreator(
             .addParameter("roomData", roomDataClassName)
             .addCode(buildCodeBlock {
                 add("""
+                    _status.value = Progress(R.string.status_progress_export_started)
                     val appExportDirectory = %T.fromTreeUri(%L, appExportDirectoryUri)!!
                     if (!appExportDirectory.exists()) {
-                      // given directory doesn't exist
+                      _status.value = Error(R.string.status_error_export_missing_directory)
                       return
                     } else {
                       // returns if fails to create directory
-                      val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                      val newExportDirectory = createNewDirectory(appExportDirectory)
+                      if (newExportDirectory == null) {
+                        _status.value = Error(R.string.status_error_export_create_directory_failed)
+                        return
+                      }
                       val newCsvFiles = mutableListOf<DocumentFile>()
                       roomData.csvDataMap.entries.forEach {
                         val csvFile = exportRoomEntityToCsv(
@@ -322,8 +327,9 @@ internal class CsvConverterCreator(
                         }
                         newCsvFiles.add(csvFile)
                       }
+                      _status.value = %T(R.string.status_success_export)
                     }
-                """.trimIndent(), documentFileClassName, CONTEXT)
+                """.trimIndent(), documentFileClassName, CONTEXT, statusSuccessClassName)
             })
 
         return funSpec
@@ -340,15 +346,30 @@ internal class CsvConverterCreator(
             .addParameter("csvDataList", csvDataClassName.asListTypeName())
             .addCode(buildCodeBlock {
                 add("""
-                    val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                      return null // failed to create file
-                    val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                      return null // failed to open output stream
-                    
+                    val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                    if (csvFile == null) {
+                      _status.value = Error(
+                        messageId = R.string.status_error_export_create_file_failed,
+                        name = csvInfo.csvFileName,
+                      )
+                      return null
+                    }
+                    val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                    if (outputStream == null) {
+                      _status.value = Error(
+                        messageId = R.string.status_error_export_failed,
+                        name = csvInfo.csvFileName,
+                      )
+                      return null
+                    }
                     %M().open(outputStream) {
                       writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                       csvDataList.forEach { writeRow(it.csvRow) }
                     }
+                    _status.value = Progress(
+                      messageId = R.string.status_progress_export_entity_success,
+                      name = csvInfo.csvFileName,
+                    )
                     return csvFile
                 """.trimIndent(), csvWriterMemberName)
             })
