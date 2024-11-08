@@ -125,7 +125,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilCsv" to "FaLsE"),
             )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(2, kspCompileResult.generatedFiles.size)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
     }
 
     companion object {

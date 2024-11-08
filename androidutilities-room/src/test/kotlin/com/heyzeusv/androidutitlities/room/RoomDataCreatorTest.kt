@@ -117,7 +117,7 @@ class RoomDataCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilCsv" to "FALse"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(2, kspCompileResult.generatedFiles.size)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
         assertFalse(kspCompileResult.generatedFiles.any { it.name == "RoomData.kt" })
     }
 

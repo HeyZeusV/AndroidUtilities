@@ -1,9 +1,11 @@
 package com.heyzeusv.androidutitlities.room
 
 import com.tschuchort.compiletesting.KotlinCompilation
+import junit.framework.TestCase.assertTrue
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 /**
  *  Used [this article](https://dev.to/chigichan24/why-dont-you-write-unit-tests-and-integration-tests-to-ksp-project-2oio)
@@ -18,6 +20,43 @@ class RoomUtilBaseCreatorTest : CreatorTestBase() {
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
         assertEquals(7, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedRoomUtilBase, "RoomUtilBase.kt")
+    }
+
+    @Test
+    fun `Do not generate RoomUtilBase when both roomUtilCsv and roomUtilDb options are false`() {
+        val kspCompileResult = compile(
+            dummyDb,
+            kspArguments = mutableMapOf(
+                "roomUtilCsv" to "FaLsE",
+                "roomUtilDb" to "false",
+            ),
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertFalse(kspCompileResult.generatedFiles.any { it.name == "RoomUtilBase.kt" })
+    }
+
+
+    @Test
+    fun `Do generate RoomUtilBase when roomUtilDb option is false`() {
+        val kspCompileResult = compile(
+            dummyDb,
+            kspArguments = mutableMapOf("roomUtilDb" to "false"),
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(6, kspCompileResult.generatedFiles.size)
+        assertTrue(kspCompileResult.generatedFiles.any { it.name == "RoomUtilBase.kt" })
+    }
+
+    @Test
+    fun `Do generate RoomUtilBase when roomUtilCsv option is false`() {
+        val kspCompileResult = compile(
+            dummyDb,
+            kspArguments = mutableMapOf("roomUtilCsv" to "false"),
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
+        assertTrue(kspCompileResult.generatedFiles.any { it.name == "RoomUtilBase.kt" })
     }
 
     companion object {

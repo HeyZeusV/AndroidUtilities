@@ -387,7 +387,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             kspArguments = mutableMapOf("roomUtilCsv" to "false"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(2, kspCompileResult.generatedFiles.size)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
     }
 
     companion object {

@@ -49,6 +49,13 @@ class RoomProcessor(
 
         dbSymbols.filterIsInstance<KSClassDeclaration>().forEach { symbol ->
             (symbol as? KSClassDeclaration)?.let { dbClass ->
+                if (csvOption?.lowercase() != FALSE || dbOption?.lowercase() != FALSE) {
+                    RoomUtilBaseCreator(
+                        codeGenerator = codeGenerator,
+                        dbClassDeclaration = dbClass,
+                        logger = logger,
+                    )
+                }
                 if (csvOption?.lowercase() != FALSE) {
                     val typeConverterInfoList = createTypeConverterInfoList(tcSymbols, logger)
 
@@ -65,12 +72,6 @@ class RoomProcessor(
                         typeConverterInfoList = typeConverterInfoList,
                         logger = logger
                     ).entityInfoList
-
-                    RoomUtilBaseCreator(
-                        codeGenerator = codeGenerator,
-                        dbClassDeclaration = dbClass,
-                        logger = logger,
-                    )
 
                     RoomDataCreator(
                         codeGenerator = codeGenerator,
