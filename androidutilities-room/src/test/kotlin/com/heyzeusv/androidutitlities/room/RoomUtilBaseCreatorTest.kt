@@ -84,6 +84,10 @@ class RoomUtilBaseCreatorTest : CreatorTestBase() {
             
               public val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
             
+              public fun updateStatus(newValue: RoomUtilStatus) {
+                _status.value = newValue
+              }
+            
               protected fun createNewDirectory(appDirectory: DocumentFile): DocumentFile? {
                 val sdf = SimpleDateFormat("MMM_dd_yyyy__hh_mm_aa", Locale.getDefault())
                 val formattedDate = sdf.format(Date())

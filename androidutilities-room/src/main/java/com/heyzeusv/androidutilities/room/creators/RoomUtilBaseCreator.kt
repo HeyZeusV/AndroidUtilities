@@ -101,10 +101,24 @@ internal class RoomUtilBaseCreator(
                 .build()
         )
 
+        addFunction(buildUpdateStatusFunction().build())
         addFunction(buildCreateNewDirectoryFunction().build())
         addFunction(buildFindOrCreateAppDirectoryFunction().build())
 
         return this
+    }
+
+    /**
+     *  Builds function to update status value.
+     */
+    private fun buildUpdateStatusFunction(): FunSpec.Builder {
+        val funSpec = FunSpec.builder("updateStatus")
+            .addParameter("newValue", statusClassName)
+            .addCode(buildCodeBlock {
+                addStatement("_status.value = newValue")
+            })
+
+        return funSpec
     }
 
     /**
