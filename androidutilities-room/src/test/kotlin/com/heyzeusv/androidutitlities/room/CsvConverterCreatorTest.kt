@@ -155,17 +155,17 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
-                _status.value = Progress(R.string.status_progress_import_started)
+                _status.value = Progress(R.string.import_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  _status.value = Error(R.string.status_error_import_missing_directory)
+                  _status.value = Error(R.string.import_error_missing_directory)
                   return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
                   val file = selectedDirectory.findFile(it)
                   if (file == null) {
-                    _status.value = Error(R.string.status_error_import_missing_file)
+                    _status.value = Error(R.string.import_error_missing_file)
                     return null
                   } else {
                     csvDocumentFiles.add(file)
@@ -184,13 +184,13 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
                 if (inputStream == null) {
-                  _status.value = Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                  _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
                   return null
                 }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
+                    _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                     return mutableListOf()
                   }
             
@@ -208,25 +208,25 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
-                  _status.value = Progress(R.string.status_progress_import_entity_success, csvFile.name!!)
+                  _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                   return entityData
                 } catch (e: Exception) {
-                  _status.value = Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
                   return null
                 }
               }
             
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
-                _status.value = Progress(R.string.status_progress_export_started)
+                _status.value = Progress(R.string.export_progress_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  _status.value = Error(R.string.status_error_export_missing_directory)
+                  _status.value = Error(R.string.export_error_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
                   val newExportDirectory = createNewDirectory(appExportDirectory)
                   if (newExportDirectory == null) {
-                    _status.value = Error(R.string.status_error_export_create_directory_failed)
+                    _status.value = Error(R.string.export_error_create_directory_failed)
                     return
                   }
                   val newCsvFiles = mutableListOf<DocumentFile>()
@@ -245,7 +245,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
-                  _status.value = Success(R.string.status_success_export)
+                  _status.value = Success(R.string.export_success)
                 }
               }
             
@@ -257,7 +257,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
                 if (csvFile == null) {
                   _status.value = Error(
-                    messageId = R.string.status_error_export_create_file_failed,
+                    messageId = R.string.export_error_create_file_failed,
                     name = csvInfo.csvFileName,
                   )
                   return null
@@ -265,7 +265,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
                 if (outputStream == null) {
                   _status.value = Error(
-                    messageId = R.string.status_error_export_failed,
+                    messageId = R.string.export_error_failed,
                     name = csvInfo.csvFileName,
                   )
                   return null
@@ -275,7 +275,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
                 _status.value = Progress(
-                  messageId = R.string.status_progress_export_entity_success,
+                  messageId = R.string.export_progress_entity_success,
                   name = csvInfo.csvFileName,
                 )
                 return csvFile
@@ -312,17 +312,17 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
-                _status.value = Progress(R.string.status_progress_import_started)
+                _status.value = Progress(R.string.import_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  _status.value = Error(R.string.status_error_import_missing_directory)
+                  _status.value = Error(R.string.import_error_missing_directory)
                   return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
                   val file = selectedDirectory.findFile(it)
                   if (file == null) {
-                    _status.value = Error(R.string.status_error_import_missing_file)
+                    _status.value = Error(R.string.import_error_missing_file)
                     return null
                   } else {
                     csvDocumentFiles.add(file)
@@ -354,13 +354,13 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
                 if (inputStream == null) {
-                  _status.value = Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                  _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
                   return null
                 }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
+                    _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                     return mutableListOf()
                   }
             
@@ -405,25 +405,25 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
-                  _status.value = Progress(R.string.status_progress_import_entity_success, csvFile.name!!)
+                  _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                   return entityData
                 } catch (e: Exception) {
-                  _status.value = Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
                   return null
                 }
               }
             
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
-                _status.value = Progress(R.string.status_progress_export_started)
+                _status.value = Progress(R.string.export_progress_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  _status.value = Error(R.string.status_error_export_missing_directory)
+                  _status.value = Error(R.string.export_error_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
                   val newExportDirectory = createNewDirectory(appExportDirectory)
                   if (newExportDirectory == null) {
-                    _status.value = Error(R.string.status_error_export_create_directory_failed)
+                    _status.value = Error(R.string.export_error_create_directory_failed)
                     return
                   }
                   val newCsvFiles = mutableListOf<DocumentFile>()
@@ -442,7 +442,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
-                  _status.value = Success(R.string.status_success_export)
+                  _status.value = Success(R.string.export_success)
                 }
               }
             
@@ -454,7 +454,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
                 if (csvFile == null) {
                   _status.value = Error(
-                    messageId = R.string.status_error_export_create_file_failed,
+                    messageId = R.string.export_error_create_file_failed,
                     name = csvInfo.csvFileName,
                   )
                   return null
@@ -462,7 +462,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
                 if (outputStream == null) {
                   _status.value = Error(
-                    messageId = R.string.status_error_export_failed,
+                    messageId = R.string.export_error_failed,
                     name = csvInfo.csvFileName,
                   )
                   return null
@@ -472,7 +472,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
                 _status.value = Progress(
-                  messageId = R.string.status_progress_export_entity_success,
+                  messageId = R.string.export_progress_entity_success,
                   name = csvInfo.csvFileName,
                 )
                 return csvFile
@@ -507,17 +507,17 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
-                _status.value = Progress(R.string.status_progress_import_started)
+                _status.value = Progress(R.string.import_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  _status.value = Error(R.string.status_error_import_missing_directory)
+                  _status.value = Error(R.string.import_error_missing_directory)
                   return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
                   val file = selectedDirectory.findFile(it)
                   if (file == null) {
-                    _status.value = Error(R.string.status_error_import_missing_file)
+                    _status.value = Error(R.string.import_error_missing_file)
                     return null
                   } else {
                     csvDocumentFiles.add(file)
@@ -536,13 +536,13 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
                 if (inputStream == null) {
-                  _status.value = Error(R.string.status_error_import_corrupt_file, csvFile.name!!)
+                  _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
                   return null
                 }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    _status.value = Progress(R.string.status_progress_import_entity_success,csvFile.name!!)
+                    _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                     return mutableListOf()
                   }
             
@@ -560,25 +560,25 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
-                  _status.value = Progress(R.string.status_progress_import_entity_success, csvFile.name!!)
+                  _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                   return entityData
                 } catch (e: Exception) {
-                  _status.value = Error(R.string.status_error_import_invalid_data, csvFile.name!!)
+                  _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
                   return null
                 }
               }
             
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
-                _status.value = Progress(R.string.status_progress_export_started)
+                _status.value = Progress(R.string.export_progress_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  _status.value = Error(R.string.status_error_export_missing_directory)
+                  _status.value = Error(R.string.export_error_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
                   val newExportDirectory = createNewDirectory(appExportDirectory)
                   if (newExportDirectory == null) {
-                    _status.value = Error(R.string.status_error_export_create_directory_failed)
+                    _status.value = Error(R.string.export_error_create_directory_failed)
                     return
                   }
                   val newCsvFiles = mutableListOf<DocumentFile>()
@@ -597,7 +597,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
-                  _status.value = Success(R.string.status_success_export)
+                  _status.value = Success(R.string.export_success)
                 }
               }
             
@@ -609,7 +609,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
                 if (csvFile == null) {
                   _status.value = Error(
-                    messageId = R.string.status_error_export_create_file_failed,
+                    messageId = R.string.export_error_create_file_failed,
                     name = csvInfo.csvFileName,
                   )
                   return null
@@ -617,7 +617,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
                 if (outputStream == null) {
                   _status.value = Error(
-                    messageId = R.string.status_error_export_failed,
+                    messageId = R.string.export_error_failed,
                     name = csvInfo.csvFileName,
                   )
                   return null
@@ -627,7 +627,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
                 _status.value = Progress(
-                  messageId = R.string.status_progress_export_entity_success,
+                  messageId = R.string.export_progress_entity_success,
                   name = csvInfo.csvFileName,
                 )
                 return csvFile

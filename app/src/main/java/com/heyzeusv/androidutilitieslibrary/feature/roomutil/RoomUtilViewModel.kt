@@ -169,7 +169,7 @@ class RoomUtilViewModel @Inject constructor(
             val data = csvConverter.importCsvToRoom(selectedDirectoryUri)
 
             data?.let {
-                csvConverter.updateStatus(Progress(R.string.status_progress_import_data))
+                csvConverter.updateStatus(Progress(R.string.import_progress_data))
                 repository.transactionProvider.runAsTransaction {
                     repository.run {
                         deleteAll()
@@ -177,7 +177,7 @@ class RoomUtilViewModel @Inject constructor(
                         rebuildItemFts()
                     }
                 }
-                csvConverter.updateStatus(Success(R.string.status_success_import))
+                csvConverter.updateStatus(Success(R.string.import_success))
             }
         }
     }

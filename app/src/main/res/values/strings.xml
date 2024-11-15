@@ -27,19 +27,20 @@
     <string name="delete">Deleting all data…</string>
     <string name="delete_success">Successfully delete all data!</string>
 
-    <string name="status_error_import_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
-    <string name="status_error_import_invalid_data">%1$s contains invalid data!</string>
-    <string name="status_error_import_missing_directory">Selected directory is missing!</string>
-    <string name="status_error_import_missing_file">%1$s is missing from selected directory!</string>
-    <string name="status_error_export_create_directory_failed">Failed to create export directory, please try again…</string>
-    <string name="status_error_export_create_file_failed">Something went wrong creating %1$s, please try again…</string>
-    <string name="status_error_export_failed">Something went wrong exporting %1$s, please try again…</string>
-    <string name="status_error_export_missing_directory">App directory is missing!</string>
-    <string name="status_progress_import_entity_success">Successfully read %1$s…</string>
-    <string name="status_progress_import_started">Started importing data…</string>
-    <string name="status_progress_import_data">Importing data…</string>
-    <string name="status_progress_export_entity_success">Successfully exported %1$s…</string>
-    <string name="status_progress_export_started">Started exporting data…</string>
-    <string name="status_success_import">Successfully imported data!</string>
-    <string name="status_success_export">Successfully exported data!</string>
+    <string name="import_error_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
+    <string name="import_error_invalid_data">%1$s contains invalid data!</string>
+    <string name="import_error_missing_directory">Selected directory is missing!</string>
+    <string name="import_error_missing_file">%1$s is missing from selected directory!</string>
+    <string name="import_progress_entity_success">Successfully read %1$s…</string>
+    <string name="import_progress_started">Started importing data…</string>
+    <string name="import_progress_data">Importing data…</string>
+    <string name="import_success">Successfully imported data!</string>
+
+    <string name="export_error_create_directory_failed">Failed to create export directory, please try again…</string>
+    <string name="export_error_create_file_failed">Something went wrong creating %1$s, please try again…</string>
+    <string name="export_error_failed">Something went wrong exporting %1$s, please try again…</string>
+    <string name="export_error_missing_directory">App directory is missing!</string>
+    <string name="export_progress_entity_success">Successfully exported %1$s…</string>
+    <string name="export_progress_started">Started exporting data…</string>
+    <string name="export_success">Successfully exported data!</string>
 </resources>
