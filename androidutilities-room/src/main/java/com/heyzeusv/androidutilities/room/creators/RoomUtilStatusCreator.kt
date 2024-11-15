@@ -4,7 +4,6 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.heyzeusv.androidutilities.room.util.Constants.DB_DATA
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.MESSAGE_ID
 import com.heyzeusv.androidutilities.room.util.Constants.NAME
@@ -95,21 +94,14 @@ internal class RoomUtilStatusCreator(
     private fun buildSuccessClass(): TypeSpec.Builder {
         val messageParameterBuilder = ParameterSpec.builder(MESSAGE_ID, Int::class)
             .addAnnotation(stringResClassName)
-        val dataParameterBuilder = ParameterSpec.builder(DB_DATA, Any::class)
-            .defaultValue("\"\"")
         val constructorBuilder = FunSpec.constructorBuilder()
             .addParameter(messageParameterBuilder.build())
-            .addParameter(dataParameterBuilder.build())
         val classBuilder = TypeSpec.classBuilder(STATUS_SUCCESS)
             .addModifiers(KModifier.DATA)
             .superclass(statusClassName)
             .primaryConstructor(constructorBuilder.build())
             .addProperty(PropertySpec.builder(MESSAGE_ID, Int::class)
                 .initializer(MESSAGE_ID)
-                .build()
-            )
-            .addProperty(PropertySpec.builder(DB_DATA, Any::class)
-                .initializer(DB_DATA)
                 .build()
             )
 

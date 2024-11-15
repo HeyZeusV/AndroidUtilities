@@ -46,7 +46,6 @@ internal object Constants {
     const val SELECTED_DIRECTORY_URI = "selectedDirectoryUri"
     const val MESSAGE_ID = "messageId"
     const val NAME = "name"
-    const val DB_DATA = "dbData"
 
     val contextClassName = ClassName("android.content", "Context")
     val documentFileClassName = ClassName("androidx.documentfile.provider", "DocumentFile")

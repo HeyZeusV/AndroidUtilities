@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.androidutilitieslibrary.database.CsvConverter
 import com.heyzeusv.androidutilitieslibrary.database.Repository
 import com.heyzeusv.androidutilitieslibrary.database.RoomBackupRestore
+import com.heyzeusv.androidutilitieslibrary.database.RoomUtilStatus
 import com.heyzeusv.androidutilitieslibrary.database.models.Category
 import com.heyzeusv.androidutilitieslibrary.database.models.Item
 import com.heyzeusv.androidutilitieslibrary.database.models.SampleInnerEmbed
@@ -57,6 +58,8 @@ class RoomUtilViewModel @Inject constructor(
         _appDbDirectoryUri = null
         _appCsvDirectoryUri = null
     }
+
+    val csvStatus: StateFlow<RoomUtilStatus> get() = csvConverter.status
 
     private var _isBusy = MutableStateFlow(false)
     val isBusy: StateFlow<Boolean> get() = _isBusy.asStateFlow()

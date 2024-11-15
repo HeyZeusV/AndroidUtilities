@@ -42,7 +42,6 @@ class RoomUtilStatusCreatorTest : CreatorTestBase() {
             package test
             
             import androidx.`annotation`.StringRes
-            import kotlin.Any
             import kotlin.Int
             import kotlin.String
 
@@ -64,7 +63,6 @@ class RoomUtilStatusCreatorTest : CreatorTestBase() {
               public data class Success(
                 @StringRes
                 public val messageId: Int,
-                public val dbData: Any = "",
               ) : RoomUtilStatus()
             }
         """.trimIndent()
