@@ -72,12 +72,14 @@ class RoomUtilViewModel @Inject constructor(
      */
     fun insert1000RandomCategories() {
         viewModelScope.launch(ioDispatcher) {
+            csvConverter.updateStatus(Progress(R.string.categories_add))
             val categoryList = mutableListOf<Category>()
             repeat(1000) {
                 val category = Category(name = randomString())
                 categoryList.add(category)
             }
             repository.insertCategories(*categoryList.toTypedArray())
+            csvConverter.updateStatus(Success(R.string.categories_success))
         }
     }
 
@@ -86,6 +88,7 @@ class RoomUtilViewModel @Inject constructor(
      */
     fun insert1000RandomItems() {
         viewModelScope.launch(ioDispatcher) {
+            csvConverter.updateStatus(Progress(R.string.items_add))
             val itemList = mutableListOf<Item>()
             repeat(1000) {
                 val item = Item(
@@ -115,13 +118,16 @@ class RoomUtilViewModel @Inject constructor(
                 )
                 itemList.add(item)
                 repository.upsertItems(*itemList.toTypedArray())
+                csvConverter.updateStatus(Success(R.string.items_success))
             }
         }
     }
 
     fun deleteAll() {
         viewModelScope.launch(ioDispatcher) {
+            csvConverter.updateStatus(Success(R.string.delete))
             repository.deleteAll()
+            csvConverter.updateStatus(Success(R.string.delete_success))
         }
     }
 

@@ -20,6 +20,13 @@
     <!-- Hyperlink Annotation String -->
     <string name="hyperlink_example">This string resource contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
 
+    <string name="categories_add">Adding 1000 random categories…</string>
+    <string name="categories_success">Successfully added 1000 random categories!</string>
+    <string name="items_add">Adding 1000 random items…</string>
+    <string name="items_success">Successfully added 1000 random items!</string>
+    <string name="delete">Deleting all data…</string>
+    <string name="delete_success">Successfully delete all data!</string>
+
     <string name="status_error_import_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
     <string name="status_error_import_invalid_data">%1$s contains invalid data!</string>
     <string name="status_error_import_missing_directory">Selected directory is missing!</string>
