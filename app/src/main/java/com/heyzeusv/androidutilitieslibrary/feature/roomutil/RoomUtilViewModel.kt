@@ -118,9 +118,9 @@ class RoomUtilViewModel @Inject constructor(
                     )
                 )
                 itemList.add(item)
-                repository.upsertItems(*itemList.toTypedArray())
-                csvConverter.updateStatus(Success(R.string.items_success))
             }
+            repository.upsertItems(*itemList.toTypedArray())
+            csvConverter.updateStatus(Success(R.string.items_success))
         }
     }
 
