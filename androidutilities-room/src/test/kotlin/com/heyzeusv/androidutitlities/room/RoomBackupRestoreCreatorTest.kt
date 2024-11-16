@@ -96,6 +96,9 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             import kotlin.Boolean
             import kotlin.String
             import kotlin.Unit
+            import test.RoomUtilStatus.Error
+            import test.RoomUtilStatus.Progress
+            import test.RoomUtilStatus.Success
 
             public class RoomBackupRestore(
               private val context: Context,
@@ -106,52 +109,78 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                 // include file extension to dbFileName!!
               }
               public fun backup(appBackupDirectoryUri: Uri) {
+                _status.value = Progress(R.string.backup_progress_started)
                 val appBackupDirectory = DocumentFile.fromTreeUri(context, appBackupDirectoryUri)!!
                 if (!appBackupDirectory.exists()) {
-                  return // directory not found
+                  _status.value = Error(R.string.backup_error_missing_directory)
+                  return
                 }
 
-                val newBackupDirectory = createNewDirectory(appBackupDirectory) ?:
-                  return // new directory could not be created
+                val newBackupDirectory = createNewDirectory(appBackupDirectory)
+                if (newBackupDirectory == null) {
+                  _status.value = Error(R.string.backup_error_create_directory_failed)
+                  return
+                }
                 val dbPath = context.getDatabasePath(dbFileName).path
                 val dbFile = DocumentFile.fromFile(File(dbPath))
                 val dbWalFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-wal""${'"'}))
                 val dbShmFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-shm""${'"'}))
-                if (!dbFile.exists()) return // main db file not found
+                if (!dbFile.exists()) {
+                  _status.value = Error(R.string.backup_error_missing_file, dbPath)
+                  return
+                }
 
                 val newFiles = mutableListOf(newBackupDirectory)
-                val bkpDbFile = newBackupDirectory.createFile("text/*", dbFileName) ?:
-                  return // error creating backup file
+                val bkpDbFile = newBackupDirectory.createFile("text/*", dbFileName)
+                if (bkpDbFile == null) {
+                  _status.value = Error(R.string.backup_error_create_file_failed, dbFileName)
+                  return
+                }
                 var dbFileCopyStatus = dbFile.copyTo(bkpDbFile)
                 if (!dbFileCopyStatus) {
                   bkpDbFile.delete()
                   newBackupDirectory.delete()
-                  return // failed to copy main db file
+                  _status.value = Error(R.string.backup_error_failed, dbFileName)
+                  return
                 }
                 newFiles.add(bkpDbFile)
+                _status.value = Progress(R.string.backup_progress_file_success, dbFileName)
 
                 if (dbWalFile.exists()) {
-                  val bkpDbWalFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-wal""${'"'}) ?:
-                    return // error creating backup file
+                  val bkpDbWalFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-wal""${'"'})
+                  if (bkpDbWalFile == null) {
+                    _status.value = Error(R.string.backup_error_create_file_failed, ""${'"'}${'$'}dbFileName-wal""${'"'})
+                    return
+                  }  
                   dbFileCopyStatus = dbWalFile.copyTo(bkpDbWalFile)
                   if (!dbFileCopyStatus) {
                     newFiles.forEach { it.delete() }
                     bkpDbWalFile.delete()
-                    return // failed to copy wal file
+                    newBackupDirectory.delete()
+                    _status.value = Error(R.string.backup_error_failed, ""${'"'}${'$'}dbFileName-wal""${'"'})
+                    return
                   }
                   newFiles.add(bkpDbWalFile)
+                  _status.value = Progress(R.string.backup_progress_file_success, ""${'"'}${'$'}dbFileName-wal""${'"'})
                 }
                     
                 if (dbShmFile.exists()) {
-                  val bkpDbShmFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-shm""${'"'}) ?:
-                    return // error creating backup file
+                  val bkpDbShmFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-shm""${'"'})
+                  if (bkpDbShmFile == null) {
+                    _status.value = Error(R.string.backup_error_create_file_failed, ""${'"'}${'$'}dbFileName-shm""${'"'})
+                    return
+                  } 
                   dbFileCopyStatus = dbShmFile.copyTo(bkpDbShmFile)
                   if (!dbFileCopyStatus) {
                     newFiles.forEach { it.delete() }
                     bkpDbShmFile.delete()
-                    return // failed to copy shm file
+                    newBackupDirectory.delete()
+                    _status.value = Error(R.string.backup_error_failed, ""${'"'}${'$'}dbFileName-shm""${'"'})
+                    return
                   }
+                  _status.value = Progress(R.string.backup_progress_file_success, ""${'"'}${'$'}dbFileName-shm""${'"'})
                 }
+                _status.value = Success(R.string.backup_success)
               }
 
               public fun restore(selectedDirectoryUri: Uri, restartApp: () -> Unit = { restartAppStandard() }) {
@@ -250,6 +279,9 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
             import kotlin.Boolean
             import kotlin.String
             import kotlin.Unit
+            import test.RoomUtilStatus.Error
+            import test.RoomUtilStatus.Progress
+            import test.RoomUtilStatus.Success
 
             public class RoomBackupRestore @Inject constructor(
               private val context: Context,
@@ -260,52 +292,78 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                 // include file extension to dbFileName!!
               }
               public fun backup(appBackupDirectoryUri: Uri) {
+                _status.value = Progress(R.string.backup_progress_started)
                 val appBackupDirectory = DocumentFile.fromTreeUri(context, appBackupDirectoryUri)!!
                 if (!appBackupDirectory.exists()) {
-                  return // directory not found
+                  _status.value = Error(R.string.backup_error_missing_directory)
+                  return
                 }
 
-                val newBackupDirectory = createNewDirectory(appBackupDirectory) ?:
-                  return // new directory could not be created
+                val newBackupDirectory = createNewDirectory(appBackupDirectory)
+                if (newBackupDirectory == null) {
+                  _status.value = Error(R.string.backup_error_create_directory_failed)
+                  return
+                }
                 val dbPath = context.getDatabasePath(dbFileName).path
                 val dbFile = DocumentFile.fromFile(File(dbPath))
                 val dbWalFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-wal""${'"'}))
                 val dbShmFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-shm""${'"'}))
-                if (!dbFile.exists()) return // main db file not found
+                if (!dbFile.exists()) {
+                  _status.value = Error(R.string.backup_error_missing_file, dbPath)
+                  return
+                }
 
                 val newFiles = mutableListOf(newBackupDirectory)
-                val bkpDbFile = newBackupDirectory.createFile("text/*", dbFileName) ?:
-                  return // error creating backup file
+                val bkpDbFile = newBackupDirectory.createFile("text/*", dbFileName)
+                if (bkpDbFile == null) {
+                  _status.value = Error(R.string.backup_error_create_file_failed, dbFileName)
+                  return
+                }
                 var dbFileCopyStatus = dbFile.copyTo(bkpDbFile)
                 if (!dbFileCopyStatus) {
                   bkpDbFile.delete()
                   newBackupDirectory.delete()
-                  return // failed to copy main db file
+                  _status.value = Error(R.string.backup_error_failed, dbFileName)
+                  return
                 }
                 newFiles.add(bkpDbFile)
+                _status.value = Progress(R.string.backup_progress_file_success, dbFileName)
 
                 if (dbWalFile.exists()) {
-                  val bkpDbWalFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-wal""${'"'}) ?:
-                    return // error creating backup file
+                  val bkpDbWalFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-wal""${'"'})
+                  if (bkpDbWalFile == null) {
+                    _status.value = Error(R.string.backup_error_create_file_failed, ""${'"'}${'$'}dbFileName-wal""${'"'})
+                    return
+                  }  
                   dbFileCopyStatus = dbWalFile.copyTo(bkpDbWalFile)
                   if (!dbFileCopyStatus) {
                     newFiles.forEach { it.delete() }
                     bkpDbWalFile.delete()
-                    return // failed to copy wal file
+                    newBackupDirectory.delete()
+                    _status.value = Error(R.string.backup_error_failed, ""${'"'}${'$'}dbFileName-wal""${'"'})
+                    return
                   }
                   newFiles.add(bkpDbWalFile)
+                  _status.value = Progress(R.string.backup_progress_file_success, ""${'"'}${'$'}dbFileName-wal""${'"'})
                 }
                     
                 if (dbShmFile.exists()) {
-                  val bkpDbShmFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-shm""${'"'}) ?:
-                    return // error creating backup file
+                  val bkpDbShmFile = newBackupDirectory.createFile("text/*", ""${'"'}${'$'}dbFileName-shm""${'"'})
+                  if (bkpDbShmFile == null) {
+                    _status.value = Error(R.string.backup_error_create_file_failed, ""${'"'}${'$'}dbFileName-shm""${'"'})
+                    return
+                  } 
                   dbFileCopyStatus = dbShmFile.copyTo(bkpDbShmFile)
                   if (!dbFileCopyStatus) {
                     newFiles.forEach { it.delete() }
                     bkpDbShmFile.delete()
-                    return // failed to copy shm file
+                    newBackupDirectory.delete()
+                    _status.value = Error(R.string.backup_error_failed, ""${'"'}${'$'}dbFileName-shm""${'"'})
+                    return
                   }
+                  _status.value = Progress(R.string.backup_progress_file_success, ""${'"'}${'$'}dbFileName-shm""${'"'})
                 }
+                _status.value = Success(R.string.backup_success)
               }
 
               public fun restore(selectedDirectoryUri: Uri, restartApp: () -> Unit = { restartAppStandard() }) {
