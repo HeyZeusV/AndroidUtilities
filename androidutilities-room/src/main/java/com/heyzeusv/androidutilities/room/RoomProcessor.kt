@@ -53,6 +53,7 @@ class RoomProcessor(
                     RoomUtilBaseCreator(
                         codeGenerator = codeGenerator,
                         dbClassDeclaration = dbClass,
+                        resourceClassName = resourceClassName,
                         logger = logger,
                     )
                 }

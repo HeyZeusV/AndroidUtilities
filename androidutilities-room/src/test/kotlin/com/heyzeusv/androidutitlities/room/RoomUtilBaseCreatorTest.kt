@@ -74,6 +74,7 @@ class RoomUtilBaseCreatorTest : CreatorTestBase() {
             import kotlinx.coroutines.flow.MutableStateFlow
             import kotlinx.coroutines.flow.StateFlow
             import kotlinx.coroutines.flow.asStateFlow
+            import test.RoomUtilStatus.Progress
             import test.RoomUtilStatus.Standby
             
             public abstract class RoomUtilBase(
@@ -97,6 +98,7 @@ class RoomUtilBaseCreatorTest : CreatorTestBase() {
             
               public fun findOrCreateAppDirectory(selectedDirectoryUri: Uri): Uri? {
                 try {
+                  _status.value = Progress(R.string.app_directory_find_create)
                   val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                   val appDirectory = selectedDirectory.findFile(appDirectoryName) ?:
                     selectedDirectory.createDirectory(appDirectoryName)!!

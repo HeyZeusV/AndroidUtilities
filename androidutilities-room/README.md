@@ -70,6 +70,9 @@ sealed class RoomUtilStatus {
 ### RoomUtilStatus String Resources
 CsvConverter and RoomBackupRestore use the following string resources, which are required.
 ```xml
+    <!-- RoomUtilBase -->
+    <string name="app_directory_find_create">Looking for or creating app directory…</string>
+
     <!-- CSV Import -->
     <string name="import_error_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
     <string name="import_error_invalid_data">%1$s contains invalid data!</string>

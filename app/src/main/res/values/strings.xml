@@ -27,6 +27,8 @@
     <string name="delete">Deleting all data…</string>
     <string name="delete_success">Successfully delete all data!</string>
 
+    <string name="app_directory_find_create">Looking for or creating app directory…</string>
+
     <string name="import_error_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
     <string name="import_error_invalid_data">%1$s contains invalid data!</string>
     <string name="import_error_missing_directory">Selected directory is missing!</string>

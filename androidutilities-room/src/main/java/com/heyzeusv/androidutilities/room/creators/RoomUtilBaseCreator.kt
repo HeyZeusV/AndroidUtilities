@@ -10,6 +10,7 @@ import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_PROGRESS
 import com.heyzeusv.androidutilities.room.util.Constants.STATUS_STANDBY
 import com.heyzeusv.androidutilities.room.util.Constants.asStateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
@@ -38,12 +39,14 @@ import java.util.Locale
 internal class RoomUtilBaseCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
+    private val resourceClassName: ClassName,
     private val logger: KSPLogger,
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
 
     private val statusClassName = ClassName(packageName, ROOM_UTIL_STATUS)
     private val statusStandbyClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_STANDBY)
+    private val statusProgressClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_PROGRESS)
 
     /**
      *  Creates RoomUtilBase.kt file.
@@ -155,6 +158,7 @@ internal class RoomUtilBaseCreator(
             .addCode(buildCodeBlock {
                 add("""
                     try {
+                      _status.value = %T(%T.string.app_directory_find_create)
                       val selectedDirectory = %T.fromTreeUri(context, selectedDirectoryUri)!!
                       val appDirectory = selectedDirectory.findFile(appDirectoryName) ?:
                         selectedDirectory.createDirectory(appDirectoryName)!!
@@ -164,7 +168,10 @@ internal class RoomUtilBaseCreator(
                       // Don't use fromSingleUri(Context, Uri)
                       return null
                     }
-                """.trimIndent(), documentFileClassName, UnsupportedOperationException::class)
+                """.trimIndent(),
+                    statusProgressClassName, resourceClassName,
+                    documentFileClassName, UnsupportedOperationException::class
+                )
             })
 
         return funSpec
