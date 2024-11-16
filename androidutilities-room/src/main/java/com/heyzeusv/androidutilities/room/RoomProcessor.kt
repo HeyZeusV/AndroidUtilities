@@ -94,6 +94,7 @@ class RoomProcessor(
                         codeGenerator = codeGenerator,
                         hiltOption = hiltOption,
                         dbClassDeclaration = dbClass,
+                        resourceClassName = resourceClassName,
                         logger = logger,
                     )
                 }

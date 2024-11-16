@@ -43,4 +43,14 @@
     <string name="export_progress_entity_success">Successfully exported %1$s…</string>
     <string name="export_progress_started">Started exporting data…</string>
     <string name="export_success">Successfully exported data!</string>
+
+    <string name="backup_error_create_directory_failed">Failed to create backup directory, please try again…</string>
+    <string name="backup_error_create_file_failed">Failed to create %1$s, please try again…</string>
+    <string name="backup_error_failed">Failed to backup %1$s, please try again…</string>
+    <string name="backup_error_missing_directory">Backup directory is missing!</string>
+    <string name="backup_error_missing_file">Could not find %1$s…</string>
+    <string name="backup_progress_file_success">%1$s backup successful…</string>
+    <string name="backup_progress_started">Backup started…</string>
+    <string name="backup_success">Backup successful!!</string>
+
 </resources>
