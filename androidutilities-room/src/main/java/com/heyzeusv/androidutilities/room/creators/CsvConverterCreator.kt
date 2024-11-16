@@ -7,10 +7,16 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
 import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
 import com.heyzeusv.androidutilities.room.util.Constants.CSV_CONVERTER
+import com.heyzeusv.androidutilities.room.util.Constants.CSV_DATA
+import com.heyzeusv.androidutilities.room.util.Constants.CSV_INFO
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_DATA
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_ERROR
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_PROGRESS
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_SUCCESS
 import com.heyzeusv.androidutilities.room.util.Constants.TRUE
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
@@ -21,6 +27,7 @@ import com.heyzeusv.androidutilities.room.util.addIndented
 import com.heyzeusv.androidutilities.room.util.asListTypeName
 import com.heyzeusv.androidutilities.room.util.getDataName
 import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.heyzeusv.androidutilities.room.util.getStatusName
 import com.heyzeusv.androidutilities.room.util.removeKotlinPrefix
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -38,13 +45,17 @@ internal class CsvConverterCreator(
     private val hiltOption: String?,
     private val dbClassDeclaration: KSClassDeclaration,
     private val entityInfoList: List<EntityInfo>,
+    private val resourceClassName: ClassName,
     private val logger: KSPLogger,
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
 
     private val roomDataClassName = ClassName(packageName, ROOM_DATA)
-    private val csvDataClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvData")
-    private val csvInfoClassName = ClassName(dbClassDeclaration.getPackageName(), "CsvInfo")
+    private val csvDataClassName = ClassName(packageName, CSV_DATA)
+    private val csvInfoClassName = ClassName(packageName, CSV_INFO)
+    private val statusProgressClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_PROGRESS)
+    private val statusErrorClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_ERROR)
+    private val statusSuccessClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_SUCCESS)
 
     private fun createCsvConverterFile() {
         logger.info("Creating CsvConverter...")
@@ -128,29 +139,38 @@ internal class CsvConverterCreator(
             .returns(roomDataClassName.copy(nullable = true))
             .addCode(buildCodeBlock {
                 add("""
+                    _status.value = %T(R.string.import_progress_started)
                     val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                     if (!selectedDirectory.exists()) {
-                      // selected directory does not exist
+                      _status.value = %T(%T.string.import_error_missing_directory)
                       return null
                     }
                     val csvDocumentFiles = mutableListOf<DocumentFile>()
                     csvFileNames.forEach {
-                      val file = selectedDirectory.findFile(it) ?: return null // file was not found
-                      csvDocumentFiles.add(file)
+                      val file = selectedDirectory.findFile(it)
+                      if (file == null) {
+                        _status.value = Error(R.string.import_error_missing_file, it)
+                        return null
+                      } else {
+                        csvDocumentFiles.add(file)
+                      }
                     }
                     
-                """.trimIndent())
+                """.trimIndent(), statusProgressClassName, statusErrorClassName, resourceClassName)
                 entityInfoList.forEachIndexed { i, entityInfo ->
-                    val utilName = entityInfo.utilClassName.getDataName()
-                    addStatement("")
-                    addStatement("val %L = importCsvToRoomEntity(csvDocumentFiles[%L])", utilName, i)
-                    addStatement("if (%L == null) return null // error importing data", utilName)
+                    val utilName = entityInfo.utilClassName.getStatusName()
+                    add("""
+                        
+                        val %L = importCsvToRoomEntity(csvDocumentFiles[%L])
+                        if (%L == null) return null
+                        
+                    """.trimIndent(), utilName, i, utilName)
                 }
                 addStatement("")
                 addStatement("return RoomData(")
                 entityInfoList.forEach { data ->
-                    val utilName = data.utilClassName.getDataName()
-                    val dataName = utilName.replace("RoomUtil", "")
+                    val utilName = data.utilClassName.getStatusName()
+                    val dataName = data.utilClassName.getDataName().replace("RoomUtil", "")
                     addStatement(
                         "  %L = (%L·as·List<%L>).map·{·it.toOriginal()·},",
                         dataName, utilName, data.utilClassName.simpleName,
@@ -172,11 +192,15 @@ internal class CsvConverterCreator(
             .addCode(buildCodeBlock {
                 add("""
                     val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                      ?: return null // corrupt file
+                    if (inputStream == null) {
+                      _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
+                      return null
+                    }
                     try {
                       val content = %M().readAll(inputStream)
                       if (content.size == 1) {
-                        return emptyList()
+                        _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
+                        return mutableListOf()
                       }
                 
                       val header = content[0]
@@ -214,9 +238,11 @@ internal class CsvConverterCreator(
                 }
                 add("""
                       }
+                      _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                       return entityData
                     } catch (e: Exception) {
-                      return null // invalid data, wrong type data
+                      _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
+                      return null
                     }
                 """.trimIndent())
             })
@@ -255,13 +281,18 @@ internal class CsvConverterCreator(
             .addParameter("roomData", roomDataClassName)
             .addCode(buildCodeBlock {
                 add("""
+                    _status.value = Progress(R.string.export_progress_started)
                     val appExportDirectory = %T.fromTreeUri(%L, appExportDirectoryUri)!!
                     if (!appExportDirectory.exists()) {
-                      // given directory doesn't exist
+                      _status.value = Error(R.string.export_error_missing_directory)
                       return
                     } else {
                       // returns if fails to create directory
-                      val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                      val newExportDirectory = createNewDirectory(appExportDirectory)
+                      if (newExportDirectory == null) {
+                        _status.value = Error(R.string.export_error_create_directory_failed)
+                        return
+                      }
                       val newCsvFiles = mutableListOf<DocumentFile>()
                       roomData.csvDataMap.entries.forEach {
                         val csvFile = exportRoomEntityToCsv(
@@ -278,8 +309,9 @@ internal class CsvConverterCreator(
                         }
                         newCsvFiles.add(csvFile)
                       }
+                      _status.value = %T(R.string.export_success)
                     }
-                """.trimIndent(), documentFileClassName, CONTEXT)
+                """.trimIndent(), documentFileClassName, CONTEXT, statusSuccessClassName)
             })
 
         return funSpec
@@ -296,15 +328,30 @@ internal class CsvConverterCreator(
             .addParameter("csvDataList", csvDataClassName.asListTypeName())
             .addCode(buildCodeBlock {
                 add("""
-                    val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                      return null // failed to create file
-                    val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                      return null // failed to open output stream
-                    
+                    val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                    if (csvFile == null) {
+                      _status.value = Error(
+                        messageId = R.string.export_error_create_file_failed,
+                        name = csvInfo.csvFileName,
+                      )
+                      return null
+                    }
+                    val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                    if (outputStream == null) {
+                      _status.value = Error(
+                        messageId = R.string.export_error_failed,
+                        name = csvInfo.csvFileName,
+                      )
+                      return null
+                    }
                     %M().open(outputStream) {
                       writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                       csvDataList.forEach { writeRow(it.csvRow) }
                     }
+                    _status.value = Progress(
+                      messageId = R.string.export_progress_entity_success,
+                      name = csvInfo.csvFileName,
+                    )
                     return csvFile
                 """.trimIndent(), csvWriterMemberName)
             })

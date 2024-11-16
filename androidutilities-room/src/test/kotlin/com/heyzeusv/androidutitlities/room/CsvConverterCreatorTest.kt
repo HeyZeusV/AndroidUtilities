@@ -33,7 +33,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedSingleEntityCsvConverter, "CsvConverter.kt")
     }
 
@@ -75,7 +75,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(10, kspCompileResult.generatedFiles.size)
+        assertEquals(11, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedMultiEntityCsvConverter, "CsvConverter.kt")
     }
 
@@ -100,7 +100,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilHilt" to "TrUe"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(expectedCsvConverterWithHiltOptionValue, "CsvConverter.kt")
     }
 
@@ -125,7 +125,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             kspArguments = mutableMapOf("roomUtilCsv" to "FaLsE"),
             )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
     }
 
     companion object {
@@ -140,8 +140,11 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
+            import test.RoomUtilStatus.Error
+            import test.RoomUtilStatus.Progress
+            import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
-
+            
             public class CsvConverter(
               private val context: Context,
               private val appDirectoryName: String,
@@ -149,38 +152,48 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private val csvFileNames: List<String> = listOf(
                 "BasicTwoField.csv", 
               )
-
+            
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                _status.value = Progress(R.string.import_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  // selected directory does not exist
+                  _status.value = Error(R.string.import_error_missing_directory)
                   return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it) ?: return null // file was not found
-                  csvDocumentFiles.add(file)
+                  val file = selectedDirectory.findFile(it)
+                  if (file == null) {
+                    _status.value = Error(R.string.import_error_missing_file, it)
+                    return null
+                  } else {
+                    csvDocumentFiles.add(file)
+                  }
                 }
-
-                val basicTwoFieldRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[0])
-                if (basicTwoFieldRoomUtilData == null) return null // error importing data
-
+            
+                val basicTwoFieldRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
+                if (basicTwoFieldRoomUtilStatus == null) return null
+            
                 return RoomData(
                   basicTwoFieldData =
-                    (basicTwoFieldRoomUtilData as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
+                    (basicTwoFieldRoomUtilStatus as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
                 )
               }
-
+            
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return null // corrupt file
+                if (inputStream == null) {
+                  _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
+                  return null
+                }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    return emptyList()
+                    _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
+                    return mutableListOf()
                   }
-
+            
                   val header = content[0]
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
@@ -195,20 +208,27 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
+                  _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                   return entityData
                 } catch (e: Exception) {
-                  return null // invalid data, wrong type data
+                  _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
+                  return null
                 }
               }
-
+            
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                _status.value = Progress(R.string.export_progress_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
+                  _status.value = Error(R.string.export_error_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
-                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newExportDirectory = createNewDirectory(appExportDirectory)
+                  if (newExportDirectory == null) {
+                    _status.value = Error(R.string.export_error_create_directory_failed)
+                    return
+                  }
                   val newCsvFiles = mutableListOf<DocumentFile>()
                   roomData.csvDataMap.entries.forEach {
                     val csvFile = exportRoomEntityToCsv(
@@ -225,23 +245,39 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
+                  _status.value = Success(R.string.export_success)
                 }
               }
-
+            
               private fun exportRoomEntityToCsv(
                 newExportDirectory: DocumentFile,
                 csvInfo: CsvInfo,
                 csvDataList: List<CsvData>,
               ): DocumentFile? {
-                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                  return null // failed to create file
-                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                  return null // failed to open output stream
-
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                if (csvFile == null) {
+                  _status.value = Error(
+                    messageId = R.string.export_error_create_file_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                if (outputStream == null) {
+                  _status.value = Error(
+                    messageId = R.string.export_error_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
+                _status.value = Progress(
+                  messageId = R.string.export_progress_entity_success,
+                  name = csvInfo.csvFileName,
+                )
                 return csvFile
               }
             }
@@ -258,11 +294,14 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
+            import test.RoomUtilStatus.Error
+            import test.RoomUtilStatus.Progress
+            import test.RoomUtilStatus.Success
             import test.entity.EntityFourRoomUtil
             import test.entity.EntityOneRoomUtil
             import test.entity.EntityThreeRoomUtil
             import test.entity.EntityTwoRoomUtil
-
+            
             public class CsvConverter(
               private val context: Context,
               private val appDirectoryName: String,
@@ -270,50 +309,61 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private val csvFileNames: List<String> = listOf(
                 "EntityOne.csv", "EntityTwo.csv", "EntityThree.csv", "EntityFour.csv", 
               )
-
+            
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                _status.value = Progress(R.string.import_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  // selected directory does not exist
+                  _status.value = Error(R.string.import_error_missing_directory)
                   return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it) ?: return null // file was not found
-                  csvDocumentFiles.add(file)
+                  val file = selectedDirectory.findFile(it)
+                  if (file == null) {
+                    _status.value = Error(R.string.import_error_missing_file, it)
+                    return null
+                  } else {
+                    csvDocumentFiles.add(file)
+                  }
                 }
-
-                val entityOneRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[0])
-                if (entityOneRoomUtilData == null) return null // error importing data
-
-                val entityTwoRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[1])
-                if (entityTwoRoomUtilData == null) return null // error importing data
-
-                val entityThreeRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[2])
-                if (entityThreeRoomUtilData == null) return null // error importing data
-
-                val entityFourRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[3])
-                if (entityFourRoomUtilData == null) return null // error importing data
-
+            
+                val entityOneRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
+                if (entityOneRoomUtilStatus == null) return null
+            
+                val entityTwoRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[1])
+                if (entityTwoRoomUtilStatus == null) return null
+            
+                val entityThreeRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[2])
+                if (entityThreeRoomUtilStatus == null) return null
+            
+                val entityFourRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[3])
+                if (entityFourRoomUtilStatus == null) return null
+            
                 return RoomData(
-                  entityOneData = (entityOneRoomUtilData as List<EntityOneRoomUtil>).map { it.toOriginal() },
-                  entityTwoData = (entityTwoRoomUtilData as List<EntityTwoRoomUtil>).map { it.toOriginal() },
+                  entityOneData = (entityOneRoomUtilStatus as List<EntityOneRoomUtil>).map { it.toOriginal() },
+                  entityTwoData = (entityTwoRoomUtilStatus as List<EntityTwoRoomUtil>).map { it.toOriginal() },
                   entityThreeData =
-                    (entityThreeRoomUtilData as List<EntityThreeRoomUtil>).map { it.toOriginal() },
-                  entityFourData = (entityFourRoomUtilData as List<EntityFourRoomUtil>).map { it.toOriginal() },
+                    (entityThreeRoomUtilStatus as List<EntityThreeRoomUtil>).map { it.toOriginal() },
+                  entityFourData =
+                    (entityFourRoomUtilStatus as List<EntityFourRoomUtil>).map { it.toOriginal() },
                 )
               }
-
+            
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return null // corrupt file
+                if (inputStream == null) {
+                  _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
+                  return null
+                }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    return emptyList()
+                    _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
+                    return mutableListOf()
                   }
-
+            
                   val header = content[0]
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
@@ -355,20 +405,27 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
+                  _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                   return entityData
                 } catch (e: Exception) {
-                  return null // invalid data, wrong type data
+                  _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
+                  return null
                 }
               }
-
+            
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                _status.value = Progress(R.string.export_progress_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
+                  _status.value = Error(R.string.export_error_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
-                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newExportDirectory = createNewDirectory(appExportDirectory)
+                  if (newExportDirectory == null) {
+                    _status.value = Error(R.string.export_error_create_directory_failed)
+                    return
+                  }
                   val newCsvFiles = mutableListOf<DocumentFile>()
                   roomData.csvDataMap.entries.forEach {
                     val csvFile = exportRoomEntityToCsv(
@@ -385,23 +442,39 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
+                  _status.value = Success(R.string.export_success)
                 }
               }
-
+            
               private fun exportRoomEntityToCsv(
                 newExportDirectory: DocumentFile,
                 csvInfo: CsvInfo,
                 csvDataList: List<CsvData>,
               ): DocumentFile? {
-                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                  return null // failed to create file
-                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                  return null // failed to open output stream
-
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                if (csvFile == null) {
+                  _status.value = Error(
+                    messageId = R.string.export_error_create_file_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                if (outputStream == null) {
+                  _status.value = Error(
+                    messageId = R.string.export_error_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
+                _status.value = Progress(
+                  messageId = R.string.export_progress_entity_success,
+                  name = csvInfo.csvFileName,
+                )
                 return csvFile
               }
             }
@@ -419,8 +492,11 @@ class CsvConverterCreatorTest : CreatorTestBase() {
             import kotlin.String
             import kotlin.Suppress
             import kotlin.collections.List
+            import test.RoomUtilStatus.Error
+            import test.RoomUtilStatus.Progress
+            import test.RoomUtilStatus.Success
             import test.entity.BasicTwoFieldRoomUtil
-
+            
             public class CsvConverter @Inject constructor(
               private val context: Context,
               private val appDirectoryName: String,
@@ -428,38 +504,48 @@ class CsvConverterCreatorTest : CreatorTestBase() {
               private val csvFileNames: List<String> = listOf(
                 "BasicTwoField.csv", 
               )
-
+            
               @Suppress("UNCHECKED_CAST")
               public fun importCsvToRoom(selectedDirectoryUri: Uri): RoomData? {
+                _status.value = Progress(R.string.import_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  // selected directory does not exist
+                  _status.value = Error(R.string.import_error_missing_directory)
                   return null
                 }
                 val csvDocumentFiles = mutableListOf<DocumentFile>()
                 csvFileNames.forEach {
-                  val file = selectedDirectory.findFile(it) ?: return null // file was not found
-                  csvDocumentFiles.add(file)
+                  val file = selectedDirectory.findFile(it)
+                  if (file == null) {
+                    _status.value = Error(R.string.import_error_missing_file, it)
+                    return null
+                  } else {
+                    csvDocumentFiles.add(file)
+                  }
                 }
-
-                val basicTwoFieldRoomUtilData = importCsvToRoomEntity(csvDocumentFiles[0])
-                if (basicTwoFieldRoomUtilData == null) return null // error importing data
-
+            
+                val basicTwoFieldRoomUtilStatus = importCsvToRoomEntity(csvDocumentFiles[0])
+                if (basicTwoFieldRoomUtilStatus == null) return null
+            
                 return RoomData(
                   basicTwoFieldData =
-                    (basicTwoFieldRoomUtilData as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
+                    (basicTwoFieldRoomUtilStatus as List<BasicTwoFieldRoomUtil>).map { it.toOriginal() },
                 )
               }
-
+            
               private fun importCsvToRoomEntity(csvFile: DocumentFile): List<CsvData>? {
                 val inputStream = context.contentResolver.openInputStream(csvFile.uri)
-                  ?: return null // corrupt file
+                if (inputStream == null) {
+                  _status.value = Error(R.string.import_error_corrupt_file, csvFile.name!!)
+                  return null
+                }
                 try {
                   val content = csvReader().readAll(inputStream)
                   if (content.size == 1) {
-                    return emptyList()
+                    _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
+                    return mutableListOf()
                   }
-
+            
                   val header = content[0]
                   val rows = content.drop(1)
                   val entityData = mutableListOf<CsvData>()
@@ -474,20 +560,27 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                       }
                     }
                   }
+                  _status.value = Progress(R.string.import_progress_entity_success, csvFile.name!!)
                   return entityData
                 } catch (e: Exception) {
-                  return null // invalid data, wrong type data
+                  _status.value = Error(R.string.import_error_invalid_data, csvFile.name!!)
+                  return null
                 }
               }
-
+            
               public fun exportRoomToCsv(appExportDirectoryUri: Uri, roomData: RoomData) {
+                _status.value = Progress(R.string.export_progress_started)
                 val appExportDirectory = DocumentFile.fromTreeUri(context, appExportDirectoryUri)!!
                 if (!appExportDirectory.exists()) {
-                  // given directory doesn't exist
+                  _status.value = Error(R.string.export_error_missing_directory)
                   return
                 } else {
                   // returns if fails to create directory
-                  val newExportDirectory = createNewDirectory(appExportDirectory) ?: return
+                  val newExportDirectory = createNewDirectory(appExportDirectory)
+                  if (newExportDirectory == null) {
+                    _status.value = Error(R.string.export_error_create_directory_failed)
+                    return
+                  }
                   val newCsvFiles = mutableListOf<DocumentFile>()
                   roomData.csvDataMap.entries.forEach {
                     val csvFile = exportRoomEntityToCsv(
@@ -504,23 +597,39 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                     }
                     newCsvFiles.add(csvFile)
                   }
+                  _status.value = Success(R.string.export_success)
                 }
               }
-
+            
               private fun exportRoomEntityToCsv(
                 newExportDirectory: DocumentFile,
                 csvInfo: CsvInfo,
                 csvDataList: List<CsvData>,
               ): DocumentFile? {
-                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName) ?:
-                  return null // failed to create file
-                val outputStream = context.contentResolver.openOutputStream(csvFile.uri) ?:
-                  return null // failed to open output stream
-
+                val csvFile = newExportDirectory.createFile("text/*", csvInfo.csvFileName)
+                if (csvFile == null) {
+                  _status.value = Error(
+                    messageId = R.string.export_error_create_file_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
+                val outputStream = context.contentResolver.openOutputStream(csvFile.uri)
+                if (outputStream == null) {
+                  _status.value = Error(
+                    messageId = R.string.export_error_failed,
+                    name = csvInfo.csvFileName,
+                  )
+                  return null
+                }
                 csvWriter().open(outputStream) {
                   writeRow(csvInfo.csvFieldToTypeMap.keys.toList())
                   csvDataList.forEach { writeRow(it.csvRow) }
                 }
+                _status.value = Progress(
+                  messageId = R.string.export_progress_entity_success,
+                  name = csvInfo.csvFileName,
+                )
                 return csvFile
               }
             }

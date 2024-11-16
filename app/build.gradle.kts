@@ -56,6 +56,7 @@ android {
 }
 
 ksp {
+    arg("roomUtilNamespace", "com.heyzeusv.androidutilitieslibrary")
     arg("roomUtilHilt", "true")
 }
 

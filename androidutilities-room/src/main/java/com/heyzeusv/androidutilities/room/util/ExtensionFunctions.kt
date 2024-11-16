@@ -90,6 +90,15 @@ internal fun ClassName.getDataName(): String {
 }
 
 /**
+ *  Returns the name of [this] class with lowercase first letter and suffix "Status" in order to be
+ *  used as a parameter/property.
+ */
+internal fun ClassName.getStatusName(): String {
+    val lowercase = simpleName.replaceFirstChar { it.lowercase(Locale.getDefault()) }
+    return "${lowercase}Status"
+}
+
+/**
  *  Returns [KSAnnotation] with given [annotationName], assumes that given [annotationName] 100%
  *  exists in [this] sequence.
  */

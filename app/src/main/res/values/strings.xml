@@ -19,4 +19,45 @@
 
     <!-- Hyperlink Annotation String -->
     <string name="hyperlink_example">This string resource contains a link <annotation type="LINK1">HERE</annotation> and right <annotation type="LINK2">here!!!</annotation></string>
+
+    <string name="categories_add">Adding 1000 random categories…</string>
+    <string name="categories_success">Successfully added 1000 random categories!</string>
+    <string name="items_add">Adding 1000 random items…</string>
+    <string name="items_success">Successfully added 1000 random items!</string>
+    <string name="delete">Deleting all data…</string>
+    <string name="delete_success">Successfully delete all data!</string>
+
+    <string name="app_directory_find_create">Looking for or creating app directory…</string>
+
+    <string name="import_error_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
+    <string name="import_error_invalid_data">%1$s contains invalid data!</string>
+    <string name="import_error_missing_directory">Selected directory is missing!</string>
+    <string name="import_error_missing_file">%1$s is missing from selected directory!</string>
+    <string name="import_progress_entity_success">Successfully read %1$s…</string>
+    <string name="import_progress_started">Started importing data…</string>
+    <string name="import_progress_data">Importing data…</string>
+    <string name="import_success">Successfully imported data!</string>
+
+    <string name="export_error_create_directory_failed">Failed to create export directory, please try again…</string>
+    <string name="export_error_create_file_failed">Something went wrong creating %1$s, please try again…</string>
+    <string name="export_error_failed">Something went wrong exporting %1$s, please try again…</string>
+    <string name="export_error_missing_directory">App directory is missing!</string>
+    <string name="export_progress_entity_success">Successfully exported %1$s…</string>
+    <string name="export_progress_started">Started exporting data…</string>
+    <string name="export_success">Successfully exported data!</string>
+
+    <string name="backup_error_create_directory_failed">Failed to create backup directory, please try again…</string>
+    <string name="backup_error_create_file_failed">Failed to create %1$s, please try again…</string>
+    <string name="backup_error_failed">Failed to backup %1$s, please try again…</string>
+    <string name="backup_error_missing_directory">Backup directory is missing!</string>
+    <string name="backup_error_missing_file">Could not find %1$s…</string>
+    <string name="backup_progress_file_success">%1$s backup successful…</string>
+    <string name="backup_progress_started">Backup started…</string>
+    <string name="backup_success">Backup successful!!</string>
+
+    <string name="restore_error_missing_db_file">Could not find database file…</string>
+    <string name="restore_error_missing_directory">Restore directory is missing!</string>
+    <string name="restore_progress_file_success">%1$s restore successful…</string>
+    <string name="restore_progress_started">Restore started…</string>
+    <string name="restore_success">Restore successful!! Restarting app…</string>
 </resources>

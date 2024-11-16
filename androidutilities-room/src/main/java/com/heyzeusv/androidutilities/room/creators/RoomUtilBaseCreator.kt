@@ -8,14 +8,22 @@ import com.heyzeusv.androidutilities.room.util.Constants.APP_DIRECTORY_NAME
 import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_PROGRESS
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_STANDBY
+import com.heyzeusv.androidutilities.room.util.Constants.asStateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
+import com.heyzeusv.androidutilities.room.util.Constants.mutableStateFlowClassName
+import com.heyzeusv.androidutilities.room.util.Constants.stateFlowClassName
 import com.heyzeusv.androidutilities.room.util.Constants.uriClassName
 import com.heyzeusv.androidutilities.room.util.getPackageName
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
@@ -31,8 +39,15 @@ import java.util.Locale
 internal class RoomUtilBaseCreator(
     private val codeGenerator: CodeGenerator,
     private val dbClassDeclaration: KSClassDeclaration,
+    private val resourceClassName: ClassName,
     private val logger: KSPLogger,
 ) {
+    private val packageName = dbClassDeclaration.getPackageName()
+
+    private val statusClassName = ClassName(packageName, ROOM_UTIL_STATUS)
+    private val statusStandbyClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_STANDBY)
+    private val statusProgressClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_PROGRESS)
+
     /**
      *  Creates RoomUtilBase.kt file.
      */
@@ -77,11 +92,36 @@ internal class RoomUtilBaseCreator(
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
+        addProperty(
+            PropertySpec.builder("_status", mutableStateFlowClassName.parameterizedBy(statusClassName))
+                .initializer(buildCodeBlock { add("MutableStateFlow(%T)", statusStandbyClassName) })
+                .addModifiers(KModifier.PROTECTED)
+                .build()
+        )
+        addProperty(
+            PropertySpec.builder("status", stateFlowClassName.parameterizedBy(statusClassName))
+                .initializer(buildCodeBlock { add("_status.%T()", asStateFlowClassName) })
+                .build()
+        )
 
+        addFunction(buildUpdateStatusFunction().build())
         addFunction(buildCreateNewDirectoryFunction().build())
         addFunction(buildFindOrCreateAppDirectoryFunction().build())
 
         return this
+    }
+
+    /**
+     *  Builds function to update status value.
+     */
+    private fun buildUpdateStatusFunction(): FunSpec.Builder {
+        val funSpec = FunSpec.builder("updateStatus")
+            .addParameter("newValue", statusClassName)
+            .addCode(buildCodeBlock {
+                addStatement("_status.value = newValue")
+            })
+
+        return funSpec
     }
 
     /**
@@ -118,6 +158,7 @@ internal class RoomUtilBaseCreator(
             .addCode(buildCodeBlock {
                 add("""
                     try {
+                      _status.value = %T(%T.string.app_directory_find_create)
                       val selectedDirectory = %T.fromTreeUri(context, selectedDirectoryUri)!!
                       val appDirectory = selectedDirectory.findFile(appDirectoryName) ?:
                         selectedDirectory.createDirectory(appDirectoryName)!!
@@ -127,7 +168,10 @@ internal class RoomUtilBaseCreator(
                       // Don't use fromSingleUri(Context, Uri)
                       return null
                     }
-                """.trimIndent(), documentFileClassName, UnsupportedOperationException::class)
+                """.trimIndent(),
+                    statusProgressClassName, resourceClassName,
+                    documentFileClassName, UnsupportedOperationException::class
+                )
             })
 
         return funSpec

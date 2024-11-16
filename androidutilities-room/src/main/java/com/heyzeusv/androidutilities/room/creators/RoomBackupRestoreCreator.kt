@@ -9,7 +9,11 @@ import com.heyzeusv.androidutilities.room.util.Constants.CONTEXT
 import com.heyzeusv.androidutilities.room.util.Constants.EXTENSION_KT
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_BACKUP_RESTORE
 import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_BASE
+import com.heyzeusv.androidutilities.room.util.Constants.ROOM_UTIL_STATUS
 import com.heyzeusv.androidutilities.room.util.Constants.SELECTED_DIRECTORY_URI
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_ERROR
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_PROGRESS
+import com.heyzeusv.androidutilities.room.util.Constants.STATUS_SUCCESS
 import com.heyzeusv.androidutilities.room.util.Constants.TRUE
 import com.heyzeusv.androidutilities.room.util.Constants.contextClassName
 import com.heyzeusv.androidutilities.room.util.Constants.documentFileClassName
@@ -37,9 +41,17 @@ internal class RoomBackupRestoreCreator(
     private val codeGenerator: CodeGenerator,
     private val hiltOption: String?,
     private val dbClassDeclaration: KSClassDeclaration,
+    private val resourceClassName: ClassName,
     private val logger: KSPLogger,
 ) {
     private val packageName = dbClassDeclaration.getPackageName()
+
+    private val statusProgressClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_PROGRESS)
+    private val statusErrorClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_ERROR)
+    private val statusSuccessClassName = ClassName("$packageName.$ROOM_UTIL_STATUS", STATUS_SUCCESS)
+
+    private val walFile = "$" + "dbFileName-wal"
+    private val shmFile = "$" + "dbFileName-shm"
 
     private fun createRoomBackupRestoreFile() {
         logger.info("Creating RoomBackupRestore...")
@@ -107,16 +119,24 @@ internal class RoomBackupRestoreCreator(
             .addParameter(appBackupDirectoryUri, uriClassName)
             .addCode(buildCodeBlock {
                 add("""
+                    _status.value = Progress(R.string.backup_progress_started)
                     val appBackupDirectory = %T.fromTreeUri(%L, %L)!!
                     if (!appBackupDirectory.exists()) {
-                      return // directory not found
+                      _status.value = %T(%T.string.backup_error_missing_directory)
+                      return
                     }
                     
-                """.trimIndent(), documentFileClassName, CONTEXT, appBackupDirectoryUri)
+                """.trimIndent(),
+                    documentFileClassName, CONTEXT, appBackupDirectoryUri,
+                    statusErrorClassName, resourceClassName
+                )
                 add("""
                     
-                    val newBackupDirectory = createNewDirectory(appBackupDirectory) ?:
-                      return // new directory could not be created
+                    val newBackupDirectory = createNewDirectory(appBackupDirectory)
+                    if (newBackupDirectory == null) {
+                      _status.value = Error(R.string.backup_error_create_directory_failed)
+                      return
+                    }
                     val dbPath = %L.getDatabasePath(%L).path
                     
                 """.trimIndent(), CONTEXT, DB_FILE_NAME)
@@ -124,51 +144,74 @@ internal class RoomBackupRestoreCreator(
                     val dbFile = DocumentFile.fromFile(%T(dbPath))
                     val dbWalFile = DocumentFile.fromFile(File(%P))
                     val dbShmFile = DocumentFile.fromFile(File(%P))
-                    if (!dbFile.exists()) return // main db file not found
+                    if (!dbFile.exists()) {
+                      _status.value = Error(R.string.backup_error_missing_file, dbPath)
+                      return
+                    }
                     
                 """.trimIndent(), File::class, "$" + "dbPath-wal", "$" + "dbPath-shm")
                 add("""
                     
                     val newFiles = mutableListOf(newBackupDirectory)
-                    val bkpDbFile = newBackupDirectory.createFile(%S, %L) ?:
-                      return // error creating backup file
+                    val bkpDbFile = newBackupDirectory.createFile(%S, %L)
+                    if (bkpDbFile == null) {
+                      _status.value = Error(R.string.backup_error_create_file_failed, dbFileName)
+                      return
+                    }
                     var dbFileCopyStatus = dbFile.copyTo(bkpDbFile)
                     if (!dbFileCopyStatus) {
                       bkpDbFile.delete()
                       newBackupDirectory.delete()
-                      return // failed to copy main db file
+                      _status.value = Error(R.string.backup_error_failed, dbFileName)
+                      return
                     }
                     newFiles.add(bkpDbFile)
+                    _status.value = %T(R.string.backup_progress_file_success, dbFileName)
                     
-                """.trimIndent(), MIME_TEXT, DB_FILE_NAME)
+                """.trimIndent(), MIME_TEXT, DB_FILE_NAME, statusProgressClassName)
                 add("""
                     
                     if (dbWalFile.exists()) {
-                      val bkpDbWalFile = newBackupDirectory.createFile(%S, %P) ?:
-                        return // error creating backup file
+                      val bkpDbWalFile = newBackupDirectory.createFile(%S, %P)
+                      if (bkpDbWalFile == null) {
+                        _status.value = Error(R.string.backup_error_create_file_failed, %P)
+                        return
+                      }  
                       dbFileCopyStatus = dbWalFile.copyTo(bkpDbWalFile)
                       if (!dbFileCopyStatus) {
                         newFiles.forEach { it.delete() }
                         bkpDbWalFile.delete()
-                        return // failed to copy wal file
+                        newBackupDirectory.delete()
+                        _status.value = Error(R.string.backup_error_failed, %P)
+                        return
                       }
                       newFiles.add(bkpDbWalFile)
+                      _status.value = Progress(R.string.backup_progress_file_success, %P)
                     }
                         
-                """.trimIndent(), MIME_TEXT, "$" + "dbFileName-wal")
+                """.trimIndent(), MIME_TEXT, walFile, walFile, walFile, walFile)
                 add("""
                     
                     if (dbShmFile.exists()) {
-                      val bkpDbShmFile = newBackupDirectory.createFile(%S, %P) ?:
-                        return // error creating backup file
+                      val bkpDbShmFile = newBackupDirectory.createFile(%S, %P)
+                      if (bkpDbShmFile == null) {
+                        _status.value = Error(R.string.backup_error_create_file_failed, %P)
+                        return
+                      } 
                       dbFileCopyStatus = dbShmFile.copyTo(bkpDbShmFile)
                       if (!dbFileCopyStatus) {
                         newFiles.forEach { it.delete() }
                         bkpDbShmFile.delete()
-                        return // failed to copy shm file
+                        newBackupDirectory.delete()
+                        _status.value = Error(R.string.backup_error_failed, %P)
+                        return
                       }
+                      _status.value = Progress(R.string.backup_progress_file_success, %P)
                     }
-                """.trimIndent(), MIME_TEXT, "$" + "dbFileName-shm")
+                    _status.value = %T(R.string.backup_success)
+                """.trimIndent(),
+                    MIME_TEXT, shmFile, shmFile, shmFile, shmFile, statusSuccessClassName
+                )
             })
 
         return funSpec
@@ -184,15 +227,21 @@ internal class RoomBackupRestoreCreator(
             )
             .addCode(buildCodeBlock {
                 add("""
+                    _status.value = Progress(R.string.restore_progress_started)
                     val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                     if (!selectedDirectory.exists()) {
-                      return // directory doesn't exist
+                      _status.value = Error(R.string.restore_error_missing_directory)
+                      return
                     }
                     
                 """.trimIndent())
                 add("""
                     
-                    val bkpDbFile = selectedDirectory.findFile(%L) ?: return // main db file not found
+                    val bkpDbFile = selectedDirectory.findFile(%L)
+                    if (bkpDbFile == null) {
+                      _status.value = Error(R.string.restore_error_missing_db_file)
+                      return
+                    }
                     val bkpDbWalFile = selectedDirectory.findFile(%P)
                     val bkpDbShmFile = selectedDirectory.findFile(%P)
                     
@@ -203,7 +252,10 @@ internal class RoomBackupRestoreCreator(
                     val dbFile = DocumentFile.fromFile(File(dbPath))
                     val dbWalFile = DocumentFile.fromFile(File(%P))
                     val dbShmFile = DocumentFile.fromFile(File(%P))
-                    if (!dbFile.exists()) return // main db file not found
+                    if (!dbFile.exists()) {
+                      _status.value = Error(R.string.restore_error_missing_db_file)
+                      return
+                    }
                     
                 """.trimIndent(), DB_FILE_NAME, "$" + "dbPath-wal", "$" + "dbPath-shm")
                 add("""
@@ -211,6 +263,8 @@ internal class RoomBackupRestoreCreator(
                     // delete any existing content before restoring
                     %T(File(dbPath)).close()
                     bkpDbFile.copyTo(dbFile)
+                    _status.value = Progress(R.string.restore_progress_file_success, dbFile.name!!)
+
                     // file doesn't exist in backup so delete current
                     if (bkpDbWalFile == null) {
                       dbWalFile.delete()
@@ -218,6 +272,7 @@ internal class RoomBackupRestoreCreator(
                       // delete any existing content before restoring
                       PrintWriter(File(%P)).close()
                       bkpDbWalFile.copyTo(dbWalFile)
+                      _status.value = Progress(R.string.restore_progress_file_success, dbWalFile.name!!)
                     }
                     // file doesn't exist in backup so delete current
                     if (bkpDbShmFile == null) {
@@ -226,8 +281,10 @@ internal class RoomBackupRestoreCreator(
                       // delete any existing content before restoring
                       PrintWriter(File(%P)).close()
                       bkpDbShmFile.copyTo(dbShmFile)
+                      _status.value = Progress(R.string.restore_progress_file_success, dbShmFile.name!!)
                     }
                     
+                    _status.value = Success(R.string.restore_success)
                     restartApp()
                 """.trimIndent(),  PrintWriter::class, "$" + "dbPath-wal", "$" + "dbPath-shm")
             })

@@ -1,5 +1,6 @@
 package com.heyzeusv.androidutilitieslibrary.feature.roomutil
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -22,18 +23,26 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.heyzeusv.androidutilities.compose.pagerindicator.HorizontalPagerIndicator
+import com.heyzeusv.androidutilitieslibrary.database.RoomUtilStatus
 import com.heyzeusv.androidutilitieslibrary.database.models.Category
 import com.heyzeusv.androidutilitieslibrary.database.models.Item
 
@@ -43,9 +52,10 @@ fun RoomUtilScreen(
 ) {
     val context = LocalContext.current
 
+    val csvStatus by roomUtilVM.csvStatus.collectAsStateWithLifecycle()
+    val dbStatus by roomUtilVM.dbStatus.collectAsStateWithLifecycle()
     val categories by roomUtilVM.categories.collectAsStateWithLifecycle()
     val items by roomUtilVM.items.collectAsStateWithLifecycle()
-    val isBusy by roomUtilVM.isBusy.collectAsStateWithLifecycle()
 
     val dbRestoreLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
@@ -77,7 +87,8 @@ fun RoomUtilScreen(
     }
 
     RoomUtilScreen(
-        isBusy = isBusy,
+        csvStatus = csvStatus,
+        dbStatus = dbStatus,
         categories = categories,
         items = items,
         dbRestoreOnClick = { dbRestoreLauncher.launch(null) },
@@ -103,9 +114,11 @@ fun RoomUtilScreen(
     )
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun RoomUtilScreen(
-    isBusy: Boolean,
+    csvStatus: RoomUtilStatus,
+    dbStatus: RoomUtilStatus,
     categories: List<Category>,
     items: List<Item>,
     dbRestoreOnClick: () -> Unit,
@@ -118,69 +131,108 @@ fun RoomUtilScreen(
     insertItemsOnClick: () -> Unit,
 ) {
     val pagerState = rememberPagerState { 2 }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) {
-        TwoButtonRow(
-            leftText = "DB Restore",
-            leftOnClick = dbRestoreOnClick,
-            rightText = "Db Backup",
-            rightOnClick = dbBackupOnClick,
-        )
-        TwoButtonRow(
-            leftText = "CSV Import",
-            leftOnClick = csvImportOnClick,
-            rightText = "CSV Export",
-            rightOnClick = csvExportOnClick,
-        )
-        TwoButtonRow(
-            leftText = "Clear App Directory",
-            leftOnClick = clearUriOnClick,
-            rightText = "Clear Database",
-            rightOnClick = deleteAllOnClick,
-        )
-        TwoButtonRow(
-            leftText = "Insert 1k Categories",
-            leftOnClick = insertCategoriesOnClick,
-            rightText = "Insert 1k Items",
-            rightOnClick = insertItemsOnClick,
-            rightEnabled = categories.isNotEmpty()
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = "# of Categories: ${categories.size}",
-                modifier = Modifier.weight(1f),
+            TwoButtonRow(
+                leftText = "DB Restore",
+                leftOnClick = dbRestoreOnClick,
+                rightText = "Db Backup",
+                rightOnClick = dbBackupOnClick,
             )
-            Text(
-                text = "${items.size} : # of Items",
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.End,
+            TwoButtonRow(
+                leftText = "CSV Import",
+                leftOnClick = csvImportOnClick,
+                rightText = "CSV Export",
+                rightOnClick = csvExportOnClick,
             )
-        }
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f),
-        ) { page ->
-            when (page) {
-                0 -> CategoryPage(categories = categories)
-                1 -> ItemPage(items = items)
+            TwoButtonRow(
+                leftText = "Clear App Directory",
+                leftOnClick = clearUriOnClick,
+                rightText = "Clear Database",
+                rightOnClick = deleteAllOnClick,
+            )
+            TwoButtonRow(
+                leftText = "Insert 1k Categories",
+                leftOnClick = insertCategoriesOnClick,
+                rightText = "Insert 1k Items",
+                rightOnClick = insertItemsOnClick,
+                rightEnabled = categories.isNotEmpty()
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
+                Text(
+                    text = "# of Categories: ${categories.size}",
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = "${items.size} : # of Items",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                )
             }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+            ) { page ->
+                when (page) {
+                    0 -> CategoryPage(categories = categories)
+                    1 -> ItemPage(items = items)
+                }
+            }
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                pageCount = 2,
+            )
         }
-        HorizontalPagerIndicator(
-            pagerState = pagerState,
-            pageCount = 2,
+        Status(
+            snackbarHostState = snackbarHostState,
+            status = csvStatus,
+        )
+        Status(
+            snackbarHostState = snackbarHostState,
+            status = dbStatus,
         )
     }
+}
 
-    if (isBusy) {
+@Composable
+fun Status(
+    snackbarHostState: SnackbarHostState,
+    status: RoomUtilStatus,
+) {
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = status) {
+        when (status) {
+            is RoomUtilStatus.Error -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(status.messageId, status.name),
+                    duration = SnackbarDuration.Short,
+                )
+            }
+            is RoomUtilStatus.Success -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(status.messageId),
+                    duration = SnackbarDuration.Short,
+                )
+            }
+            else -> {}
+        }
+    }
+
+    if (status is RoomUtilStatus.Progress) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -198,7 +250,7 @@ fun RoomUtilScreen(
                     strokeCap = StrokeCap.Round,
                 )
                 Text(
-                    text = "Busy...",
+                    text = stringResource(status.messageId, status.name),
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineLarge,

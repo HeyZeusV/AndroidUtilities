@@ -33,7 +33,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(basicEntityTwoFields("BasicTwoField"), "BasicTwoFieldRoomUtil.kt")
     }
@@ -64,7 +64,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(8, kspCompileResult.generatedFiles.size)
+        assertEquals(9, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(basicEntityTwoFields("BasicTwoField"), "BasicTwoFieldRoomUtil.kt")
         kspCompileResult
@@ -91,7 +91,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             basicEntityTwoFields("BasicTwoField", "custom_name"),
             "BasicTwoFieldRoomUtil.kt"
@@ -121,7 +121,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(basicEntityTwoFields("IgnoredField"), "IgnoredFieldRoomUtil.kt")
     }
@@ -161,7 +161,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(expectedTwoLevelEmbedded, "TwoLevelEmbeddedRoomUtil.kt")
     }
@@ -201,7 +201,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult
             .assertFileEquals(expectedTwoLevelEmbeddedWithPrefixes, "TwoLevelEmbeddedRoomUtil.kt")
     }
@@ -230,7 +230,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedEntityWithTwoFieldsWithColumnInfo,
             "TwoFieldColumnInfoRoomUtil.kt"
@@ -259,7 +259,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(6, kspCompileResult.generatedFiles.size)
+        assertEquals(7, kspCompileResult.generatedFiles.size)
     }
 
     @Test
@@ -293,7 +293,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedEntityRequiringTypeConverter,
             "TypeConverterEntityRoomUtil.kt"
@@ -359,7 +359,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             dummyDb,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(7, kspCompileResult.generatedFiles.size)
+        assertEquals(8, kspCompileResult.generatedFiles.size)
         kspCompileResult.assertFileEquals(
             expectedEntityWithEveryAnnotation,
             "AllOptionsRoomUtil.kt"
@@ -387,7 +387,7 @@ class EntityFilesCreatorTest : CreatorTestBase()  {
             kspArguments = mutableMapOf("roomUtilCsv" to "false"),
         )
         assertEquals(KotlinCompilation.ExitCode.OK, kspCompileResult.result.exitCode)
-        assertEquals(1, kspCompileResult.generatedFiles.size)
+        assertEquals(3, kspCompileResult.generatedFiles.size)
     }
 
     companion object {
