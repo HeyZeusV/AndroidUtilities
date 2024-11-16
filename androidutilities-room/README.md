@@ -5,7 +5,8 @@ of database.
 
 ## Common
 
-Both methods, RoomBackupRestore and CsvConverter, inherit from RoomUtilBase.
+### RoomUtilBase
+Both classes, RoomBackupRestore and CsvConverter, inherit from RoomUtilBase.
 ```kotlin
 class RoomUtilBase(
     // used to read/write files and restart the app after restore
@@ -13,6 +14,22 @@ class RoomUtilBase(
     // name of directory that will be created to store backups/exports
     val appDirectoryName: String,
 ) {
+    /**
+     *  Flow that emits the current status of action (import/export/backup/restore). This can be
+     *  observed on View layer to display progress updates, error messages, and success messages.
+     */
+    val status: StateFlow<RoomUtilStatus> = _status.asStateFlow()
+
+    /**
+     *  RoomUtilBase files automatically emit values to status, but this function allows custom
+     *  updates to status.
+     *  
+     *  For example: csv import requries developer to import data to Room after CsvConverter has 
+     *  read csv files and returned data as RoomData. So developer would want to pass
+     *  ROomUtilStatus.Success to updateStatus to let user know that import finished.
+     */
+    fun updateStatus(newValue: RoomUtilStatus)
+    
     /**
      *  Looks for directory with the name of [appDirectoryName] at given [selectedDirectoryUri] 
      *  and returns its [Uri]. If it is not found, then creates it at given [selectedDirectoryUri]
@@ -24,6 +41,68 @@ class RoomUtilBase(
      */
     fun findOrCreateAppDirectory(selectedDirectoryUri: Uri): Uri?
 }
+```
+
+status can be seen used on sample app [here][15].
+
+### RoomUtilStatus
+Sealed class used to provide updates to user on current status of RoomUtil action.
+```kotlin
+sealed class RoomUtilStatus {
+    data object StandBy : RoomUtilStatus()
+    
+    data class Progress(
+        @StringRes val messageID: Int, // string resource id of message to display
+        val name: String = "", // argument for messageId 
+    ) : RoomUtilStatus()
+    
+    data class Error(
+        @StringRes val messageID: Int, // string resource id of message to display
+        val name: String = "", // argument for messageId 
+    ) : RoomUtilStatus()
+    
+    data class Success(
+        @StringRes val messageID: Int, // string resource id of message to display
+    ) : RoomUtilStatus()
+}
+```
+
+### RoomUtilStatus String Resources
+CsvConverter and RoomBackupRestore use the following string resources, which are required.
+```xml
+    <!-- CSV Import -->
+    <string name="import_error_corrupt_file">Something went wrong while reading %1$s, please try again…</string>
+    <string name="import_error_invalid_data">%1$s contains invalid data!</string>
+    <string name="import_error_missing_directory">Selected directory is missing!</string>
+    <string name="import_error_missing_file">%1$s is missing from selected directory!</string>
+    <string name="import_progress_entity_success">Successfully read %1$s…</string>
+    <string name="import_progress_started">Started importing data…</string>
+
+    <!-- CSV Export -->
+    <string name="export_error_create_directory_failed">Failed to create export directory, please try again…</string>
+    <string name="export_error_create_file_failed">Something went wrong creating %1$s, please try again…</string>
+    <string name="export_error_failed">Something went wrong exporting %1$s, please try again…</string>
+    <string name="export_error_missing_directory">App directory is missing!</string>
+    <string name="export_progress_entity_success">Successfully exported %1$s…</string>
+    <string name="export_progress_started">Started exporting data…</string>
+    <string name="export_success">Successfully exported data!</string>
+
+    <!-- Room Backup -->
+    <string name="backup_error_create_directory_failed">Failed to create backup directory, please try again…</string>
+    <string name="backup_error_create_file_failed">Failed to create %1$s, please try again…</string>
+    <string name="backup_error_failed">Failed to backup %1$s, please try again…</string>
+    <string name="backup_error_missing_directory">Backup directory is missing!</string>
+    <string name="backup_error_missing_file">Could not find %1$s…</string>
+    <string name="backup_progress_file_success">%1$s backup successful…</string>
+    <string name="backup_progress_started">Backup started…</string>
+    <string name="backup_success">Backup successful!!</string>
+
+    <!-- Room Restore -->
+    <string name="restore_error_missing_db_file">Could not find database file…</string>
+    <string name="restore_error_missing_directory">Restore directory is missing!</string>
+    <string name="restore_progress_file_success">%1$s restore successful…</string>
+    <string name="restore_progress_started">Restore started…</string>
+    <string name="restore_success">Restore successful!! Restarting app…</string>
 ```
 
 ## Backup and Restore
@@ -163,6 +242,10 @@ class CsvConverter(
 In module build.gradle
 ```kotlin
 ksp {
+    // REQUIRED
+    // used to import R class (Android resources)
+    // use the same value as android.namespace in app build.gradle
+    arg("roomUtilNamespace", "com.namespace.appname")
     // skips generating RoomBackupRestore
     // true by default
     arg("roomUtilDb", "false")
@@ -238,3 +321,4 @@ dependencies {
 [12]: ../images/RoomRestore.gif
 [13]: ../images/CsvConverterImport.gif
 [14]: ../images/CsvConverterExport.gif
+[15]:../app/src/main/java/com/heyzeusv/androidutilitieslibrary/feature/roomutil/RoomUtil.kt
