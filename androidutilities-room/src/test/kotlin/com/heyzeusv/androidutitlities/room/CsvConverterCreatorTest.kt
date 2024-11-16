@@ -165,7 +165,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 csvFileNames.forEach {
                   val file = selectedDirectory.findFile(it)
                   if (file == null) {
-                    _status.value = Error(R.string.import_error_missing_file)
+                    _status.value = Error(R.string.import_error_missing_file, it)
                     return null
                   } else {
                     csvDocumentFiles.add(file)
@@ -322,7 +322,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 csvFileNames.forEach {
                   val file = selectedDirectory.findFile(it)
                   if (file == null) {
-                    _status.value = Error(R.string.import_error_missing_file)
+                    _status.value = Error(R.string.import_error_missing_file, it)
                     return null
                   } else {
                     csvDocumentFiles.add(file)
@@ -517,7 +517,7 @@ class CsvConverterCreatorTest : CreatorTestBase() {
                 csvFileNames.forEach {
                   val file = selectedDirectory.findFile(it)
                   if (file == null) {
-                    _status.value = Error(R.string.import_error_missing_file)
+                    _status.value = Error(R.string.import_error_missing_file, it)
                     return null
                   } else {
                     csvDocumentFiles.add(file)

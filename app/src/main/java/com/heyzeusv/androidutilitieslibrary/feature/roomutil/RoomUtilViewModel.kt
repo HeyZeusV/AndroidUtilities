@@ -61,6 +61,7 @@ class RoomUtilViewModel @Inject constructor(
     }
 
     val csvStatus: StateFlow<RoomUtilStatus> get() = csvConverter.status
+    val dbStatus: StateFlow<RoomUtilStatus> get() = roomBackupRestore.status
 
     /**
      *  Create string of random characters with given [size].
@@ -125,7 +126,7 @@ class RoomUtilViewModel @Inject constructor(
 
     fun deleteAll() {
         viewModelScope.launch(ioDispatcher) {
-            csvConverter.updateStatus(Success(R.string.delete))
+            csvConverter.updateStatus(Progress(R.string.delete))
             repository.deleteAll()
             csvConverter.updateStatus(Success(R.string.delete_success))
         }

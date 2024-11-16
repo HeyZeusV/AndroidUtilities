@@ -53,6 +53,7 @@ fun RoomUtilScreen(
     val context = LocalContext.current
 
     val csvStatus by roomUtilVM.csvStatus.collectAsStateWithLifecycle()
+    val dbStatus by roomUtilVM.dbStatus.collectAsStateWithLifecycle()
     val categories by roomUtilVM.categories.collectAsStateWithLifecycle()
     val items by roomUtilVM.items.collectAsStateWithLifecycle()
 
@@ -87,6 +88,7 @@ fun RoomUtilScreen(
 
     RoomUtilScreen(
         csvStatus = csvStatus,
+        dbStatus = dbStatus,
         categories = categories,
         items = items,
         dbRestoreOnClick = { dbRestoreLauncher.launch(null) },
@@ -116,6 +118,7 @@ fun RoomUtilScreen(
 @Composable
 fun RoomUtilScreen(
     csvStatus: RoomUtilStatus,
+    dbStatus: RoomUtilStatus,
     categories: List<Category>,
     items: List<Item>,
     dbRestoreOnClick: () -> Unit,
@@ -195,7 +198,11 @@ fun RoomUtilScreen(
         }
         Status(
             snackbarHostState = snackbarHostState,
-            csvStatus = csvStatus,
+            status = csvStatus,
+        )
+        Status(
+            snackbarHostState = snackbarHostState,
+            status = dbStatus,
         )
     }
 }
@@ -203,21 +210,21 @@ fun RoomUtilScreen(
 @Composable
 fun Status(
     snackbarHostState: SnackbarHostState,
-    csvStatus: RoomUtilStatus,
+    status: RoomUtilStatus,
 ) {
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = csvStatus) {
-        when (csvStatus) {
+    LaunchedEffect(key1 = status) {
+        when (status) {
             is RoomUtilStatus.Error -> {
                 snackbarHostState.showSnackbar(
-                    message = context.getString(csvStatus.messageId, csvStatus.name),
+                    message = context.getString(status.messageId, status.name),
                     duration = SnackbarDuration.Short,
                 )
             }
             is RoomUtilStatus.Success -> {
                 snackbarHostState.showSnackbar(
-                    message = context.getString(csvStatus.messageId),
+                    message = context.getString(status.messageId),
                     duration = SnackbarDuration.Short,
                 )
             }
@@ -225,7 +232,7 @@ fun Status(
         }
     }
 
-    if (csvStatus is RoomUtilStatus.Progress) {
+    if (status is RoomUtilStatus.Progress) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -243,7 +250,7 @@ fun Status(
                     strokeCap = StrokeCap.Round,
                 )
                 Text(
-                    text = stringResource(csvStatus.messageId, csvStatus.name),
+                    text = stringResource(status.messageId, status.name),
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineLarge,

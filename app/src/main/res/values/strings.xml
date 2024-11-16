@@ -53,7 +53,6 @@
     <string name="backup_progress_started">Backup started…</string>
     <string name="backup_success">Backup successful!!</string>
 
-    <string name="restore_error_failed">Failed to restore %1$s, please try again…</string>
     <string name="restore_error_missing_db_file">Could not find database file…</string>
     <string name="restore_error_missing_directory">Restore directory is missing!</string>
     <string name="restore_progress_file_success">%1$s restore successful…</string>
