@@ -184,12 +184,18 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
               }
 
               public fun restore(selectedDirectoryUri: Uri, restartApp: () -> Unit = { restartAppStandard() }) {
+                _status.value = Progress(R.string.restore_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  return // directory doesn't exist
+                  _status.value = Error(R.string.restore_error_missing_directory)
+                  return
                 }
 
-                val bkpDbFile = selectedDirectory.findFile(dbFileName) ?: return // main db file not found
+                val bkpDbFile = selectedDirectory.findFile(dbFileName)
+                if (bkpDbFile == null) {
+                  _status.value = Error(R.string.restore_error_missing_db_file)
+                  return
+                }
                 val bkpDbWalFile = selectedDirectory.findFile(""${'"'}${'$'}dbFileName-wal""${'"'})
                 val bkpDbShmFile = selectedDirectory.findFile(""${'"'}${'$'}dbFileName-shm""${'"'})
 
@@ -197,11 +203,16 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                 val dbFile = DocumentFile.fromFile(File(dbPath))
                 val dbWalFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-wal""${'"'}))
                 val dbShmFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-shm""${'"'}))
-                if (!dbFile.exists()) return // main db file not found
+                if (!dbFile.exists()) {
+                  _status.value = Error(R.string.restore_error_missing_db_file)
+                  return
+                }
 
                 // delete any existing content before restoring
                 PrintWriter(File(dbPath)).close()
                 bkpDbFile.copyTo(dbFile)
+                _status.value = Progress(R.string.restore_progress_file_success, dbFile.name!!)
+
                 // file doesn't exist in backup so delete current
                 if (bkpDbWalFile == null) {
                   dbWalFile.delete()
@@ -209,6 +220,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                   // delete any existing content before restoring
                   PrintWriter(File(""${'"'}${'$'}dbPath-wal""${'"'})).close()
                   bkpDbWalFile.copyTo(dbWalFile)
+                  _status.value = Progress(R.string.restore_progress_file_success, dbWalFile.name!!)
                 }
                 // file doesn't exist in backup so delete current
                 if (bkpDbShmFile == null) {
@@ -217,8 +229,10 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                   // delete any existing content before restoring
                   PrintWriter(File(""${'"'}${'$'}dbPath-shm""${'"'})).close()
                   bkpDbShmFile.copyTo(dbShmFile)
+                  _status.value = Progress(R.string.restore_progress_file_success, dbShmFile.name!!)
                 }
 
+                _status.value = Success(R.string.restore_success)
                 restartApp()
               }
 
@@ -367,12 +381,18 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
               }
 
               public fun restore(selectedDirectoryUri: Uri, restartApp: () -> Unit = { restartAppStandard() }) {
+                _status.value = Progress(R.string.restore_progress_started)
                 val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                 if (!selectedDirectory.exists()) {
-                  return // directory doesn't exist
+                  _status.value = Error(R.string.restore_error_missing_directory)
+                  return
                 }
 
-                val bkpDbFile = selectedDirectory.findFile(dbFileName) ?: return // main db file not found
+                val bkpDbFile = selectedDirectory.findFile(dbFileName)
+                if (bkpDbFile == null) {
+                  _status.value = Error(R.string.restore_error_missing_db_file)
+                  return
+                }
                 val bkpDbWalFile = selectedDirectory.findFile(""${'"'}${'$'}dbFileName-wal""${'"'})
                 val bkpDbShmFile = selectedDirectory.findFile(""${'"'}${'$'}dbFileName-shm""${'"'})
 
@@ -380,11 +400,16 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                 val dbFile = DocumentFile.fromFile(File(dbPath))
                 val dbWalFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-wal""${'"'}))
                 val dbShmFile = DocumentFile.fromFile(File(""${'"'}${'$'}dbPath-shm""${'"'}))
-                if (!dbFile.exists()) return // main db file not found
+                if (!dbFile.exists()) {
+                  _status.value = Error(R.string.restore_error_missing_db_file)
+                  return
+                }
 
                 // delete any existing content before restoring
                 PrintWriter(File(dbPath)).close()
                 bkpDbFile.copyTo(dbFile)
+                _status.value = Progress(R.string.restore_progress_file_success, dbFile.name!!)
+
                 // file doesn't exist in backup so delete current
                 if (bkpDbWalFile == null) {
                   dbWalFile.delete()
@@ -392,6 +417,7 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                   // delete any existing content before restoring
                   PrintWriter(File(""${'"'}${'$'}dbPath-wal""${'"'})).close()
                   bkpDbWalFile.copyTo(dbWalFile)
+                  _status.value = Progress(R.string.restore_progress_file_success, dbWalFile.name!!)
                 }
                 // file doesn't exist in backup so delete current
                 if (bkpDbShmFile == null) {
@@ -400,8 +426,10 @@ class RoomBackupRestoreCreatorTest : CreatorTestBase() {
                   // delete any existing content before restoring
                   PrintWriter(File(""${'"'}${'$'}dbPath-shm""${'"'})).close()
                   bkpDbShmFile.copyTo(dbShmFile)
+                  _status.value = Progress(R.string.restore_progress_file_success, dbShmFile.name!!)
                 }
 
+                _status.value = Success(R.string.restore_success)
                 restartApp()
               }
 

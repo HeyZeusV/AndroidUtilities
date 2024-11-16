@@ -227,15 +227,21 @@ internal class RoomBackupRestoreCreator(
             )
             .addCode(buildCodeBlock {
                 add("""
+                    _status.value = Progress(R.string.restore_progress_started)
                     val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
                     if (!selectedDirectory.exists()) {
-                      return // directory doesn't exist
+                      _status.value = Error(R.string.restore_error_missing_directory)
+                      return
                     }
                     
                 """.trimIndent())
                 add("""
                     
-                    val bkpDbFile = selectedDirectory.findFile(%L) ?: return // main db file not found
+                    val bkpDbFile = selectedDirectory.findFile(%L)
+                    if (bkpDbFile == null) {
+                      _status.value = Error(R.string.restore_error_missing_db_file)
+                      return
+                    }
                     val bkpDbWalFile = selectedDirectory.findFile(%P)
                     val bkpDbShmFile = selectedDirectory.findFile(%P)
                     
@@ -246,7 +252,10 @@ internal class RoomBackupRestoreCreator(
                     val dbFile = DocumentFile.fromFile(File(dbPath))
                     val dbWalFile = DocumentFile.fromFile(File(%P))
                     val dbShmFile = DocumentFile.fromFile(File(%P))
-                    if (!dbFile.exists()) return // main db file not found
+                    if (!dbFile.exists()) {
+                      _status.value = Error(R.string.restore_error_missing_db_file)
+                      return
+                    }
                     
                 """.trimIndent(), DB_FILE_NAME, "$" + "dbPath-wal", "$" + "dbPath-shm")
                 add("""
@@ -254,6 +263,8 @@ internal class RoomBackupRestoreCreator(
                     // delete any existing content before restoring
                     %T(File(dbPath)).close()
                     bkpDbFile.copyTo(dbFile)
+                    _status.value = Progress(R.string.restore_progress_file_success, dbFile.name!!)
+
                     // file doesn't exist in backup so delete current
                     if (bkpDbWalFile == null) {
                       dbWalFile.delete()
@@ -261,6 +272,7 @@ internal class RoomBackupRestoreCreator(
                       // delete any existing content before restoring
                       PrintWriter(File(%P)).close()
                       bkpDbWalFile.copyTo(dbWalFile)
+                      _status.value = Progress(R.string.restore_progress_file_success, dbWalFile.name!!)
                     }
                     // file doesn't exist in backup so delete current
                     if (bkpDbShmFile == null) {
@@ -269,8 +281,10 @@ internal class RoomBackupRestoreCreator(
                       // delete any existing content before restoring
                       PrintWriter(File(%P)).close()
                       bkpDbShmFile.copyTo(dbShmFile)
+                      _status.value = Progress(R.string.restore_progress_file_success, dbShmFile.name!!)
                     }
                     
+                    _status.value = Success(R.string.restore_success)
                     restartApp()
                 """.trimIndent(),  PrintWriter::class, "$" + "dbPath-wal", "$" + "dbPath-shm")
             })
