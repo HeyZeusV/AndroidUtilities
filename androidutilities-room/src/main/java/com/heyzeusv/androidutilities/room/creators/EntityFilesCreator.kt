@@ -368,7 +368,7 @@ internal class EntityFilesCreator(
             )
             _entityInfoList.add(entityInfo)
             // removes extra CloseClass that is added
-            propertyInfoList.removeLast()
+            propertyInfoList.removeAt(propertyInfoList.lastIndex)
 
             // build toOriginal/toUtil functions
             buildToFunctions()
